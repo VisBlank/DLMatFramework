@@ -49,12 +49,15 @@ class LinearClassifier(object):
       # Hint: Use np.random.choice to generate indices. Sampling with         #
       # replacement is faster than sampling without replacement.              #
       #########################################################################
-      pass
+      # Select a batch
+      indices = np.random.choice(num_train, batch_size,replace=True)
+      X_batch = X[indices]
+      y_batch = y[indices]
       #########################################################################
       #                       END OF YOUR CODE                                #
       #########################################################################
 
-      # evaluate loss and gradient
+      # evaluate loss and gradient http://cs231n.github.io/linear-classify/#svm
       loss, grad = self.loss(X_batch, y_batch, reg)
       loss_history.append(loss)
 
@@ -63,7 +66,9 @@ class LinearClassifier(object):
       # TODO:                                                                 #
       # Update the weights using the gradient and the learning rate.          #
       #########################################################################
-      pass
+      # Do the gradient descent with minibatch
+      # http://cs231n.github.io/optimization-1/#gd
+      self.W += -learning_rate * grad
       #########################################################################
       #                       END OF YOUR CODE                                #
       #########################################################################
@@ -91,7 +96,10 @@ class LinearClassifier(object):
     # TODO:                                                                   #
     # Implement this method. Store the predicted labels in y_pred.            #
     ###########################################################################
-    pass
+    # Calculate the scores, http://cs231n.github.io/linear-classify/#intro
+    scores = X.dot(self.W)
+    # Return the biggest score
+    y_pred = np.argmax(scores, axis = 1)
     ###########################################################################
     #                           END OF YOUR CODE                              #
     ###########################################################################

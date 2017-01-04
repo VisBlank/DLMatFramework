@@ -32,8 +32,12 @@ def svm_loss_naive(W, X, y, reg):
       if j == y[i]:
         continue
       margin = scores[j] - correct_class_score + 1 # note delta = 1
+      # Detect that there is some loss
       if margin > 0:
         loss += margin
+        # Calculate dW when there is actually some loss
+        dW[:,j] = dW[:,j] + X[i].T
+        dW[:,y[i]] = dW[:,y[i]]-X[i].T
 
   # Right now the loss is a sum over all training examples, but we want it
   # to be an average instead so we divide by num_train.
@@ -50,7 +54,7 @@ def svm_loss_naive(W, X, y, reg):
   # loss is being computed. As a result you may need to modify some of the    #
   # code above to compute the gradient.                                       #
   #############################################################################
-
+  dW = dW/num_train + reg*W
 
   return loss, dW
 
@@ -69,7 +73,11 @@ def svm_loss_vectorized(W, X, y, reg):
   # Implement a vectorized version of the structured SVM loss, storing the    #
   # result in loss.                                                           #
   #############################################################################
-  pass
+  # Do the forward propagation and calculate the loss
+  scores = X.dot(W)
+  correct_class_scores = np.choose(y, scores.T)
+  margin = scores.T - correct_class_scores + 1
+  loss = (1.0/X.shape[0])*np.sum(np.maximum(0,margin)) - 1 + 0.5 * reg * np.sum(W * W)
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -84,7 +92,12 @@ def svm_loss_vectorized(W, X, y, reg):
   # to reuse some of the intermediate values that you used to compute the     #
   # loss.                                                                     #
   #############################################################################
-  pass
+  # Calculate gradients (not yet backpropagation)
+  # http://cs231n.github.io/linear-classify/#svm
+  positive_margin = (margin.T > 0).astype(float)
+  margin = positive_margin.sum(1) - 1
+  positive_margin[range(positive_margin.shape[0]), y] = -margin
+  dW = (1.0/X.shape[0])*np.dot(X.T, positive_margin) + reg*W
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
