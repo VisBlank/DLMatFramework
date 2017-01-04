@@ -29,7 +29,36 @@ def softmax_loss_naive(W, X, y, reg):
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
-  pass
+  # The non vectorized version will be slow
+  num_classes = W.shape[1]
+  num_train = X.shape[0]
+  loss = 0.0
+
+  # For each example on training
+  for i in xrange(num_train):
+    scores = X[i].dot(W)
+    # Solve numerical instability
+    shift_scores = scores - max(scores)
+    loss_i = -shift_scores[y[i]] + np.log(sum(np.exp(shift_scores)))
+    loss += loss_i
+
+    for j in xrange(num_classes):
+        softmax_output = np.exp(shift_scores[j])/sum(np.exp(shift_scores))
+        if j == y[i]:
+            dW[:,j] += (-1 + softmax_output) *X[i]
+        else:
+            dW[:,j] += softmax_output *X[i]
+
+
+  # Right now the loss is a sum over all training examples, but we want it to be an average
+  loss /= num_train
+  # Complete loss
+  loss +=  0.5* reg * np.sum(W * W)
+
+  # Get gradient
+  dW = dW/num_train + reg*W
+
+
   #############################################################################
   #                          END OF YOUR CODE                                 #
   #############################################################################
@@ -53,7 +82,31 @@ def softmax_loss_vectorized(W, X, y, reg):
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
-  pass
+  num_classes = W.shape[1]
+  num_train = X.shape[0]
+
+  # Get scores (vectorized), by the way this is the linear classifer with bias trick
+  scores = X.dot(W)
+
+  # Calculate the loss but first solve numerical instability
+  shift_scores = scores - np.max(scores, axis = 1).reshape(-1,1)
+
+  # Get probabilities
+  probabilities = np.exp(shift_scores)/np.sum(np.exp(shift_scores), axis = 1).reshape(-1,1)
+
+  # Calculate complete loss with regularization
+  loss = -np.sum(np.log(probabilities[range(num_train), list(y)]))
+  loss /= num_train
+  loss +=  0.5 * reg * np.sum(W * W)
+
+  # Get the gradient dW
+  # first compute dS: the gradient of the loss function with respect to the scores
+  dS= probabilities.copy()
+  dS[range(num_train), list(y)] += -1
+  dW = (X.T).dot(dS)
+  dW = dW/num_train + reg* W
+
+
   #############################################################################
   #                          END OF YOUR CODE                                 #
   #############################################################################
