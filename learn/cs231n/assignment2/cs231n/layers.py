@@ -186,7 +186,47 @@ def batchnorm_forward(x, gamma, beta, bn_param):
     # the momentum variable to update the running mean and running variance,    #
     # storing your result in the running_mean and running_var variables.        #
     #############################################################################
-    pass
+    # Forward pass on trainning
+    # Reference:
+    # https://kratzert.github.io/2016/02/12/understanding-the-gradient-flow-through-the-batch-normalization-layer.html
+    # This version is more expanded but facilitate discover backpropagation
+    # Step 1 - calculate the mean
+    mu = 1 / float(N) * np.sum(x, axis=0)
+    # Step 2 - subtract the mean from the input x
+    xmu = x - mu
+    # Step 3 - calculate the denominator part
+    carre = xmu**2
+    # Step 4 - calculate the variance
+    var = 1 / float(N) * np.sum(carre, axis=0)
+    # Step 5 - Add eps(small number) for numerical stability
+    sqrtvar = np.sqrt(var + eps)
+    # Step 6 - Invert the square root
+    invvar = 1. / sqrtvar
+    # Step 7 - Calculate the normalization part
+    va2 = xmu * invvar
+    va3 = gamma * va2
+    # Step 8 - Output
+    out = va3 + beta
+
+    # More compact form using numpy mean and variance commands
+    # Reference:
+    # https://github.com/ncchen55414/Winter-2016-CS231N/blob/master/Assignment2/cs231n/layers.py
+    #sample_mean = np.mean(x, axis = 0)
+    #sample_var = np.var(x, axis = 0)
+    #x_normalized = (x-sample_mean) / np.sqrt(sample_var + eps)
+    #out = gamma*x_normalized + beta
+    #running_mean = momentum * running_mean + (1 - momentum) * sample_mean
+    #running_var = momentum * running_var + (1 - momentum) * sample_var
+
+    # Calculate the running mean and variance that will be used during prediction
+    running_mean = momentum * running_mean + (1.0 - momentum) * mu
+    running_var = momentum * running_var + (1.0 - momentum) * var
+
+
+    # Store the values to be used later on other phases
+    cache = (mu, xmu, carre, var, sqrtvar, invvar, va2, va3, gamma, beta, x, bn_param)
+    #cache = (x, sample_mean, sample_var, x_normalized, beta, gamma, eps)
+
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -197,7 +237,17 @@ def batchnorm_forward(x, gamma, beta, bn_param):
     # and shift the normalized data using gamma and beta. Store the result in   #
     # the out variable.                                                         #
     #############################################################################
-    pass
+    # Load cached parameters
+    # TODO: Discussing wih the team (Peng, David) they shown me that probably it's possible
+    # to merge all those operations on the previous layer weights considering the fact that
+    # the operations before the batch norm (FC, CONV) and the output transformation of the batchnorm itself
+    # can be considered linear.
+    # Reference:
+    # https://github.com/vlfeat/matconvnet/blob/master/examples/imagenet/cnn_imagenet_deploy.m#L176
+    running_mean = bn_param['running_mean']
+    running_var = bn_param['running_var']
+    xbar = (x-running_mean)/np.sqrt(running_var+eps)
+    out = gamma*xbar + beta
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -233,7 +283,41 @@ def batchnorm_backward(dout, cache):
   # TODO: Implement the backward pass for batch normalization. Store the      #
   # results in the dx, dgamma, and dbeta variables.                           #
   #############################################################################
-  pass
+  (mu, xmu, carre, var, sqrtvar, invvar, va2, va3, gamma, beta, x, bn_param) = cache
+  eps = bn_param.get('eps', 1e-5)
+  N, D = dout.shape
+
+  # Backprop step 8
+  dva3 = dout
+  dbeta = np.sum(dout, axis=0)
+
+  # Backprop step 7
+  dva2 = gamma * dva3
+  dgamma = np.sum(va2 * dva3, axis=0)
+
+  # Backprop step 6
+  dxmu = invvar * dva2
+  dinvvar = np.sum(xmu * dva2, axis=0)
+
+  # Backprop step 5
+  dsqrtvar = -1.0 / (sqrtvar**2) * dinvvar
+
+  # Backprop step 4
+  dvar = 0.5 * (var + eps)**(-0.5) * dsqrtvar
+
+  # Backprop step 3
+  dcarre = 1 / float(N) * np.ones((carre.shape)) * dvar
+
+  # Backprop step 2
+  dxmu += 2 * xmu * dcarre
+
+  # Backprop step 1
+  dx = dxmu
+  dmu = -np.sum(dxmu, axis=0)
+  dx += 1 / float(N) * np.ones((dxmu.shape)) * dmu
+
+  return dx, dgamma, dbeta
+
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -263,7 +347,14 @@ def batchnorm_backward_alt(dout, cache):
   # should be able to compute gradients with respect to the inputs in a       #
   # single statement; our implementation fits on a single 80-character line.  #
   #############################################################################
-  pass
+  # http://cthorey.github.io./backpropagation/
+  mu, xmu, carre, var, sqrtvar, invvar, va2, va3, gamma, beta, x, bn_param = cache
+  eps = bn_param.get('eps', 1e-5)
+  N, D = dout.shape
+
+  dbeta = np.sum(dout, axis=0)
+  dgamma = np.sum((x - mu) * (1/np.sqrt(var + eps)) * dout, axis=0)
+  dx = (1. / N) * gamma * (1/np.sqrt(var + eps)) * (N * dout - np.sum(dout, axis=0) - (x - mu) * (1/(var + eps)) * np.sum(dout * (x - mu), axis=0))
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
