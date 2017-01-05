@@ -393,7 +393,16 @@ def dropout_forward(x, dropout_param):
     # TODO: Implement the training phase forward pass for inverted dropout.   #
     # Store the dropout mask in the mask variable.                            #
     ###########################################################################
-    pass
+    # Reference: Chainer (Python deep learning library)
+    # https://github.com/pfnet/chainer/blob/a6a4e373071c6be3215bdc1367cb3d40fbcd8a2a/chainer/functions/noise/dropout.py
+    # Create an apply mask (ie: with probability p=0.5) for turn-off half neurons. We scale
+    # all by p to avoid having to multiply by p on backpropagation. This technique is called inverted dropout
+    # Create mask
+    [N,D] = x.shape
+    # mask = (np.random.rand(N,D) < (1-p))/(1-p)
+    mask = (np.random.rand(N,D) >= p)/(1-p) # (Slightly better results)
+    # Apply mask
+    out = x * mask
     ###########################################################################
     #                            END OF YOUR CODE                             #
     ###########################################################################
@@ -401,7 +410,9 @@ def dropout_forward(x, dropout_param):
     ###########################################################################
     # TODO: Implement the test phase forward pass for inverted dropout.       #
     ###########################################################################
-    pass
+    # During prediction no mask is used, it's completely transparent
+    mask = None
+    out = x
     ###########################################################################
     #                            END OF YOUR CODE                             #
     ###########################################################################
@@ -428,7 +439,8 @@ def dropout_backward(dout, cache):
     ###########################################################################
     # TODO: Implement the training phase backward pass for inverted dropout.  #
     ###########################################################################
-    pass
+    # Just backpropagate dout from the neurons that were used during the dropout
+    dx = dout * mask
     ###########################################################################
     #                            END OF YOUR CODE                             #
     ###########################################################################
