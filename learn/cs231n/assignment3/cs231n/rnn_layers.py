@@ -42,13 +42,13 @@ def rnn_step_forward(x, prev_h, Wx, Wh, b):
 
   # step 3
   # total
-  t = xWx + phWh + b.T
+  affine = xWx + phWh + b.T
 
   # step 4
-  next_h = np.tanh(t)
+  next_h = np.tanh(affine)
 
   # we are having prev_h.copy() since python params are pass by reference.
-  cache = (x, prev_h.copy(), Wx, Wh, next_h)
+  cache = (x, prev_h.copy(), Wx, Wh, next_h, affine)
   ##############################################################################
   #                               END OF YOUR CODE                             #
   ##############################################################################
@@ -77,13 +77,14 @@ def rnn_step_backward(dnext_h, cache):
   # HINT: For the tanh function, you can compute the local derivative in terms #
   # of the output value from tanh.                                             #
   ##############################################################################
-  (x, prev_h, Wx, Wh, next_h) = cache
+  (x, prev_h, Wx, Wh, next_h, affine) = cache
 
   #backward in step
   # step 4
   # dt delta of total
-  # Gradient of tanh
-  dt = (1 - np.square(next_h)) * (dnext_h)
+  # Gradient of tanh times dnext_h
+  dt = (1 - np.square(np.tanh(affine))) * (dnext_h)
+
 
   # step 3
   # Gradient of sum block
