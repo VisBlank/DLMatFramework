@@ -57,7 +57,7 @@ while ~isempty(I)
     overlap = (w.*h) ./ areas(I(1:last-1));
     
     % Delete items from the list
-    I([last; find(overlap>overlapThresh(1:last-1))]) = [];
+    I([last; find(overlap>overlapThresh)]) = [];
 end
 
 pick = pick(1:(counter-1));
