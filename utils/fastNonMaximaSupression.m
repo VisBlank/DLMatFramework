@@ -1,4 +1,4 @@
-function [ top_box ] = fastNonMaximaSupression( b_box, overlapThresh )
+function [ top_box ] = fastNonMaximaSupression( b_box, IoUThresh, scores )
 % Greedily select high-scoring detections and skip detections
 % that are significantly covered by a previously selected
 % detection.
@@ -27,37 +27,42 @@ y2 = bbox_conv(:,4);
 
 % compute the area of the bounding boxes
 areas = widths .* heights;
-%area2 = (x2-x1+1) .* (y2-y1+1);
 
-% Sort the bottom-right y-coordinate of the bounding b_box. We need this
-% because we will compute the overlap ratio of other bounding b_box
-[~, I] = sort(y2);
+% Choose the first box to start
+if isempty(scores)
+    [~, sortedBoxesIdx] = sort(y2);
+else
+    [~, sortedBoxesIdx] = sort(scores);
+end
 
+% Pick will have the indexes all the remaining boxes
 pick = zeros(size(b_box,1),1);
 counter = 1;
 
-while ~isempty(I)
-    last = length(I);
-    i = I(last);
-    pick(counter) = i;
+while ~isempty(sortedBoxesIdx)
+    % Select the last element of the sorted list
+    last = length(sortedBoxesIdx);
+    curBoxIdx = sortedBoxesIdx(last);
+    otherBoxesIdx = sortedBoxesIdx(1:last-1);
+    pick(counter) = curBoxIdx;
     counter = counter + 1;
     
     % Get the jaccard index (IoU) between the current box and all the
     % others
-    xx1 = max(x1(i), x1(I(1:last-1)));
-    yy1 = max(y1(i), y1(I(1:last-1)));
-    xx2 = min(x2(i), x2(I(1:last-1)));
-    yy2 = min(y2(i), y2(I(1:last-1)));
-    
+    xx1 = max(x1(curBoxIdx), x1(otherBoxesIdx));
+    yy1 = max(y1(curBoxIdx), y1(otherBoxesIdx));
+    xx2 = min(x2(curBoxIdx), x2(otherBoxesIdx));
+    yy2 = min(y2(curBoxIdx), y2(otherBoxesIdx));    
     % compute the width and height of the bounding box
     w = max(0.0, xx2-xx1+1);
     h = max(0.0, yy2-yy1+1);
     
-    % Compute the overlap
-    overlap = (w.*h) ./ areas(I(1:last-1));
+    % Compute the overlap (is not exactly the IoU formula but works)
+    IoU = (w.*h) ./ areas(otherBoxesIdx);
     
-    % Delete items from the list
-    I([last; find(overlap>overlapThresh)]) = [];
+    % Keep only elements with a IoU < IoUThresh (Delete elements with high
+    % overlap)
+    sortedBoxesIdx([last; find(IoU>IoUThresh)]) = [];
 end
 
 pick = pick(1:(counter-1));
