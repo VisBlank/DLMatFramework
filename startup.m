@@ -6,6 +6,7 @@ disp('Preparing project');
 curdir = fileparts(mfilename('fullpath'));
 addpath(genpath(fullfile(curdir, 'learn/MatLiveScripts')));
 addpath(genpath(fullfile(curdir, 'utils')));
+addpath(genpath(fullfile(curdir, 'solver')));
 
 if ~verLessThan('matlab','8.4')
     % Add python folder
