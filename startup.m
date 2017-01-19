@@ -7,6 +7,7 @@ curdir = fileparts(mfilename('fullpath'));
 addpath(genpath(fullfile(curdir, 'learn/MatLiveScripts')));
 addpath(genpath(fullfile(curdir, 'utils')));
 addpath(genpath(fullfile(curdir, 'solver')));
+addpath(genpath(fullfile(curdir, 'layers')));
 
 if ~verLessThan('matlab','8.4')
     % Add python folder
