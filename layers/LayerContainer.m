@@ -60,10 +60,11 @@ classdef LayerContainer < handle
         
         function showStructure(obj)
             % Iterate on all layers
-            for idxLayer=1:obj.numLayers
-                layerInstance = obj.layersList{idxLayer};
-                txtDesc = layerInstance.getDescription();
-                fprintf('LAYER(%d)--> %s',idxLayer,txtDesc);
+            cellAllLayers = obj.layersContainer.values;
+            for idxLayer=1:obj.layersContainer.Count
+                layerInstance = cellAllLayers{idxLayer};
+                txtDesc = layerInstance.getName();
+                fprintf('LAYER(%d)--> %s\n',idxLayer,txtDesc);
             end
         end
         
