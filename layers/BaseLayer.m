@@ -13,6 +13,7 @@ classdef (Abstract) BaseLayer < handle
         config
         previousInput
         name
+        index
     end
     
     methods(Abstract, Access = 'public')
@@ -27,6 +28,10 @@ classdef (Abstract) BaseLayer < handle
        
        function [config] = getConfig(obj)
             config = obj.config;
+       end 
+       
+       function [index] = getIndex(obj)
+            index = obj.index;
        end 
        
        function [name] = getName(obj)

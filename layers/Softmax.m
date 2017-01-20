@@ -9,11 +9,13 @@ classdef Softmax < BaseLayer
         config
         previousInput
         name
+        index
     end
     
     methods (Access = 'public')
-        function [obj] = Softmax(name)
+        function [obj] = Softmax(name, index)
             obj.name = name;
+            obj.index = index;
         end
         
         function [activations] = ForwardPropagation(obj, scores, weights, bias)

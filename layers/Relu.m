@@ -9,11 +9,13 @@ classdef Relu < BaseLayer
         config
         previousInput
         name
+        index
     end
     
     methods (Access = 'public')
-        function [obj] = Relu(name)
+        function [obj] = Relu(name, index)
             obj.name = name;
+            obj.index = index;
         end
         
         function [activations] = ForwardPropagation(obj, input, weights, bias)

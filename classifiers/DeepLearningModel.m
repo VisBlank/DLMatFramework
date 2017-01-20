@@ -3,6 +3,14 @@ classdef DeepLearningModel < handle
     % References:
     % https://github.com/leonardoaraujosantos/DLMatFramework/blob/master/learn/cs231n/assignment2/cs231n/classifiers/fc_net.py
     % https://github.com/leonardoaraujosantos/DLMatFramework/blob/master/learn/cs231n/assignment2/cs231n/classifiers/cnn.py
+    % Ex:    
+    % layers = LayerContainer();    
+    % layers <= struct('name','FC_1','type','fc');
+    % layers <= struct('name','Relu_1','type','relu');
+    % layers <= struct('name','FC_2','type','fc');
+    % layers <= struct('name','Softmax','type','softmax');
+    % layers.getNumLayers();
+    % net = DeepLearningModel(layers)
     
     properties (Access = 'protected')
         layersContainer
@@ -17,7 +25,16 @@ classdef DeepLearningModel < handle
         end
         
         function [scores] = Predict(obj, X)
-            scores = 0;
+            % Get input signals coordinates
+            [rows,cols,depth,batch] = size(X);
+            
+            % Iterate forward on the graph
+            currInput = X;
+            for idxLayer=1:obj.layersContainer.getNumLayers()
+                currLayer = obj.layersContainer.getLayerFromIndex(idxLayer);
+                currInput = currLayer.ForwardPropagation(currInput,weight,bias);                
+            end
+            scores = currInput;
         end
         
         function [lossVal, gradients] = Loss(obj, X, Y)
@@ -27,6 +44,10 @@ classdef DeepLearningModel < handle
             %% Return loss and gradients
             lossVal = [];
             gradients = [];
+        end
+        
+        function ShowStructure(obj)
+           obj.layersContainer.ShowStructure(); 
         end
     end
     

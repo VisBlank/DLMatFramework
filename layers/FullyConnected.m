@@ -9,11 +9,13 @@ classdef FullyConnected < BaseLayer
         config
         previousInput
         name
+        index
     end
     
     methods (Access = 'public')
-        function [obj] = FullyConnected(name)
-            obj.name = name;            
+        function [obj] = FullyConnected(name, index)
+            obj.name = name;   
+            obj.index = index;
         end
         
         function [activations] = ForwardPropagation(obj, input, weights, bias)
