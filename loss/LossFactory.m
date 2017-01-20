@@ -9,6 +9,7 @@ classdef (Sealed) LossFactory < handle
         % Singleton pattern for loss function
         function lossInstance = GetLoss(lossType)
             persistent localObj
+            % After the first loss is created it will not create anymore
             if isempty(localObj) || ~isvalid(localObj)                
                 switch lossType
                     case 'cross_entropy'
