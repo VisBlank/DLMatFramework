@@ -1,5 +1,8 @@
 classdef LayerContainer < handle
     % Container used to store all layers used on the model
+    % References:
+    % https://uk.mathworks.com/matlabcentral/fileexchange/25024-data-structure--a-cell-array-list-container
+    
     % Ex:
     % cont = LayerContainer();
     % cont <= struct('name','ImageIn','type','input','rows',1,'cols',2,'depth',1, 'batchsize',1);
