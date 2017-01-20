@@ -10,12 +10,15 @@ classdef Softmax < BaseLayer
         previousInput
         name
         index
+        activationShape
+        inputLayer
     end
     
     methods (Access = 'public')
-        function [obj] = Softmax(name, index)
+        function [obj] = Softmax(name, index, inLayer)
             obj.name = name;
             obj.index = index;
+            obj.inputLayer = inLayer;
         end
         
         function [activations] = ForwardPropagation(obj, scores, weights, bias)

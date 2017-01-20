@@ -10,12 +10,17 @@ classdef Relu < BaseLayer
         previousInput
         name
         index
+        activationShape
+        inputLayer
     end
     
     methods (Access = 'public')
-        function [obj] = Relu(name, index)
+        function [obj] = Relu(name, index, inLayer)
             obj.name = name;
             obj.index = index;
+            obj.inputLayer = inLayer;
+            % Relu does not change the shape of it's output
+            obj.activationShape = obj.inputLayer.getActivationShape();
         end
         
         function [activations] = ForwardPropagation(obj, input, weights, bias)

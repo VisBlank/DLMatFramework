@@ -14,6 +14,8 @@ classdef (Abstract) BaseLayer < handle
         previousInput
         name
         index
+        activationShape
+        inputLayer
     end
     
     methods(Abstract, Access = 'public')
@@ -37,6 +39,14 @@ classdef (Abstract) BaseLayer < handle
        function [name] = getName(obj)
             name = obj.name;
        end 
+       
+       function [actShape] = getActivationShape(obj)
+           actShape = obj.activationShape;
+       end
+       
+       function [layer] = getInputLayer(obj)
+          layer = obj.inputLayer; 
+       end
               
     end
     

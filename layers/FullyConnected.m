@@ -10,12 +10,18 @@ classdef FullyConnected < BaseLayer
         previousInput
         name
         index
+        activationShape
+        inputLayer
+        numOutput
     end
     
     methods (Access = 'public')
-        function [obj] = FullyConnected(name, index)
+        function [obj] = FullyConnected(name, numOutput, index, inLayer)
             obj.name = name;   
             obj.index = index;
+            obj.numOutput = numOutput;
+            obj.inputLayer = inLayer;
+            obj.activationShape = [1 numOutput];
         end
         
         function [activations] = ForwardPropagation(obj, input, weights, bias)
@@ -23,7 +29,7 @@ classdef FullyConnected < BaseLayer
             
             % Tensor format (rows,cols,channels, batch) on matlab
             % Get batch size
-            N = size(input,ndims(input));
+            [rows,cols,depth,N] = size(input)            
             
             % Reshape input to have N rows and as much cols needed
             input_reshape = reshape(input,N,[]);
@@ -47,6 +53,10 @@ classdef FullyConnected < BaseLayer
             dx = (dout * obj.weights');
             dx = resize(dx,size(obj.previousInput));
             gradient.input = dx;
+        end    
+        
+        function [numOut] = getNumOutput(obj)
+           numOut = obj.numOutput; 
         end                
     end
     

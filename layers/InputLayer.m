@@ -10,11 +10,13 @@ classdef InputLayer < BaseLayer
         previousInput
         name
         index
+        inputLayer = [];
         
         numRows
         numCols
         numChannels
         batchSize
+        activationShape
     end
     
     methods (Access = 'public')
@@ -24,7 +26,8 @@ classdef InputLayer < BaseLayer
             obj.numCols = numCols;
             obj.numChannels = numChannels;
             obj.batchSize = batchSize;            
-            obj.index = index;            
+            obj.index = index; 
+            obj.activationShape = [numRows numCols numChannels batchSize];
         end
                         
         function [activations] = ForwardPropagation(obj, scores, weights, bias)
@@ -44,6 +47,10 @@ classdef InputLayer < BaseLayer
         function [shapeInput] = getInputShape(obj)
             shapeInput = [obj.numRows,obj.numCols,obj.numChannels,obj.batchSize];
         end
+        
+        function [actShape] = getActivationShape(obj)
+           actShape = obj.activationShape;
+       end
     end
     
 end

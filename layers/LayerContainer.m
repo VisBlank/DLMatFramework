@@ -17,16 +17,27 @@ classdef LayerContainer < handle
     end
     
     methods (Access = 'protected')
-        function pushLayer(obj,metaDataLayer)
+        function pushLayer(obj,metaDataLayer)            
+            % Unless pre-defined the previous layer will be the input of
+            % the current layer.
+            if isfield(metaDataLayer, 'inputLayer')
+                previousLayer = obj.layersContainer(name);
+            else
+                if obj.numLayers == 0
+                    previousLayer = [];
+                else
+                    previousLayer = obj.layersCellContainer{obj.numLayers};
+                end
+            end
             switch metaDataLayer.type                
                 case 'input'                    
                     layerInst = InputLayer(metaDataLayer.name, metaDataLayer.rows,metaDataLayer.cols,metaDataLayer.depth, metaDataLayer.batchsize, obj.numLayers+1);
                 case 'fc'                    
-                    layerInst = FullyConnected(metaDataLayer.name, obj.numLayers+1);                
+                    layerInst = FullyConnected(metaDataLayer.name, metaDataLayer.num_output, obj.numLayers+1, previousLayer);                
                 case 'relu'
-                    layerInst = Relu(metaDataLayer.name, obj.numLayers+1);                                                
+                    layerInst = Relu(metaDataLayer.name, obj.numLayers+1, previousLayer);                                                
                 case 'softmax'
-                    layerInst = Softmax(metaDataLayer.name, obj.numLayers+1);
+                    layerInst = Softmax(metaDataLayer.name, obj.numLayers+1, previousLayer);
                 otherwise
                     fprintf('Layer %s not implemented\n',metaDataLayer.type);
             end
@@ -60,6 +71,7 @@ classdef LayerContainer < handle
         
         function layer = getLayerFromIndex(obj,index)            
             layer = obj.layersCellContainer(index);
+            layer = layer{1};
         end
         
         function numLayers = getNumLayers(obj)
