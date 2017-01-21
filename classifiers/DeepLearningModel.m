@@ -16,7 +16,9 @@ classdef DeepLearningModel < handle
         layersContainer
         lossFunction
         weightsMap = containers.Map('KeyType','char','ValueType','any');
-        BiasMap = containers.Map('KeyType','char','ValueType','any');        
+        BiasMap = containers.Map('KeyType','char','ValueType','any');
+        gradWeightsMap = containers.Map('KeyType','char','ValueType','any');
+        gradBiasMap = containers.Map('KeyType','char','ValueType','any');
     end
     
     methods (Access = 'protected')
@@ -74,7 +76,13 @@ classdef DeepLearningModel < handle
             % Start by the last layer before Softmax
             for idxLayer=obj.layersContainer.getNumLayers()-1:-1:2
                 currLayer = obj.layersContainer.getLayerFromIndex(idxLayer);                
+                layerName = currLayer.getName();
                 currDout = currLayer.BackwardPropagation(currDout);                
+                % Save gradients on parametrizes layers
+                if isa(currLayer,'FullyConnected')
+                    obj.gradWeightsMap(layerName) = currDout.weight;
+                    obj.gradBiasMap(layerName) = currDout.bias;                    
+                end
             end
             
             %% Return loss and gradients
@@ -86,6 +94,9 @@ classdef DeepLearningModel < handle
             obj.layersContainer.ShowStructure();
         end
         
+        % Remember that those maps are passed by reference so the changes
+        % made on the map returned by those functions will be affected on
+        % this object
         function weights = getWeights(obj)
             weights = obj.weightsMap;
         end
@@ -93,6 +104,14 @@ classdef DeepLearningModel < handle
         function bias = getBias(obj)
             bias = obj.BiasMap;
         end                                
+        
+        function weightsGrad = getWeightsGradients(obj)
+            weightsGrad = obj.gradWeightsMap;
+        end
+        
+        function biasGrad = getBiasGradients(obj)
+            biasGrad = obj.gradBiasMap;
+        end
     end
     
 end
