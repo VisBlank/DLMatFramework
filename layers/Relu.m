@@ -30,7 +30,9 @@ classdef Relu < BaseLayer
         end
         
         function [gradient] = BackwardPropagation(obj, dout)
-            gradient  = dout .* (obj.previousInput >= 0);
+            dout = dout.input;
+            dx = dout .* (obj.previousInput >= 0);
+            gradient.input = dx;
         end                
     end
     

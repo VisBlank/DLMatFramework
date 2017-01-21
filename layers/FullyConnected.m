@@ -43,6 +43,7 @@ classdef FullyConnected < BaseLayer
         end
         
         function [gradient] = BackwardPropagation(obj, dout)
+            dout = dout.input;
             % Recover cache            
             [rows,cols,depth,N] = size(obj.previousInput);
             

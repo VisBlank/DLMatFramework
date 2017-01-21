@@ -69,7 +69,9 @@ classdef DeepLearningModel < handle
             %% Add regularization to loss
             
             %% Backprop
-            currDout = grad;
+            % Start with gradient of loss w.r.t correct class probability
+            currDout.input = grad;
+            % Start by the last layer before Softmax
             for idxLayer=obj.layersContainer.getNumLayers()-1:-1:2
                 currLayer = obj.layersContainer.getLayerFromIndex(idxLayer);                
                 currDout = currLayer.BackwardPropagation(currDout);                
