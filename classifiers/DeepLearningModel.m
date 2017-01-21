@@ -87,7 +87,8 @@ classdef DeepLearningModel < handle
             
             %% Return loss and gradients
             lossVal = loss;
-            gradients = [];
+            gradients.weights = obj.gradWeightsMap;
+            gradients.bias = obj.gradBiasMap;
         end
         
         function ShowStructure(obj)
