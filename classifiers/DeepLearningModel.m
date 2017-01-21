@@ -16,7 +16,7 @@ classdef DeepLearningModel < handle
         layersContainer
         lossFunction
         weightsMap = containers.Map('KeyType','char','ValueType','any');
-        BiasMap = containers.Map('KeyType','char','ValueType','any');
+        BiasMap = containers.Map('KeyType','char','ValueType','any');        
     end
     
     methods (Access = 'protected')
@@ -60,11 +60,23 @@ classdef DeepLearningModel < handle
         end
         
         function [lossVal, gradients] = Loss(obj, X, Y)
+            %% Do the forward propagation
+            scores = obj.Predict(X);
+            
             %% Get loss and gradient of the loss w.r.t to the scores
+            [loss, grad] = obj.lossFunction.GetLossAndGradients(scores, Y);            
+                        
             %% Add regularization to loss
+            
             %% Backprop
+            currDout = grad;
+            for idxLayer=obj.layersContainer.getNumLayers()-1:-1:2
+                currLayer = obj.layersContainer.getLayerFromIndex(idxLayer);                
+                currDout = currLayer.BackwardPropagation(currDout);                
+            end
+            
             %% Return loss and gradients
-            lossVal = [];
+            lossVal = loss;
             gradients = [];
         end
         

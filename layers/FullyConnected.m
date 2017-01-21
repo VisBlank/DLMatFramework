@@ -29,7 +29,7 @@ classdef FullyConnected < BaseLayer
             
             % Tensor format (rows,cols,channels, batch) on matlab
             % Get batch size
-            [rows,cols,depth,N] = size(input)            
+            [rows,cols,depth,N] = size(input);           
             
             % Reshape input to have N rows and as much cols needed
             input_reshape = reshape(input,N,[]);
@@ -43,15 +43,15 @@ classdef FullyConnected < BaseLayer
         end
         
         function [gradient] = BackwardPropagation(obj, dout)
-            % Recover cache
-            N = size(obj.previousInput,ndims(obj.previousInput));
+            % Recover cache            
+            [rows,cols,depth,N] = size(obj.previousInput);
             
             input_reshape = reshape(obj.previousInput,N,[]);
             
             gradient.bias = sum(dout);
             gradient.weight = input_reshape' * dout;
             dx = (dout * obj.weights');
-            dx = resize(dx,size(obj.previousInput));
+            dx = reshape(dx,size(obj.previousInput));
             gradient.input = dx;
         end    
         
