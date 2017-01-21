@@ -19,7 +19,9 @@ classdef (Abstract) BaseLayer < handle
     end
     
     methods(Abstract, Access = 'public')
-        [activations] = ForwardPropagation(obj, inputs, weights, bias);                                
+        % Activations will be a tensor
+        [activations] = ForwardPropagation(obj, inputs, weights, bias);
+        % Gradient will be a struct with input, bias, weight
         [gradient] = BackwardPropagation(obj);                
     end
     
