@@ -37,10 +37,33 @@ classdef Solver < handle
             obj.m_loss_history(end+1) = loss;
             
             %% Perform a parameter update
-        end                
+            weightsMap = obj.m_model.getWeights();
+            keys = weightsMap.keys;
+            biasMap = obj.m_model.getBias();            
+            numParameters = numel(keys);
+            for idx = 1:numParameters
+                weight = weightsMap(keys{idx});
+                if ~isempty(weight)
+                    bias = biasMap(keys{idx});                    
+                    next_w = obj.m_optimizer.Optimize(weight,grad.weights(keys{idx}));
+                    next_b = obj.m_optimizer.Optimize(bias,grad.bias(keys{idx}));
+                    
+                    % Update weights on model
+                    weightsMap(keys{idx}) = next_w;
+                    biasMap(keys{idx}) = next_b;
+                end
+            end
+        end
     end
     
     methods(Access = public)
+        function lossHistory = GetLossHistory(obj)
+            lossHistory = obj.m_loss_history;
+        end
+        function SetBatchSize(obj,batchSize)
+            obj.m_batch_size = batchSize;
+        end
+        
         function obj = Solver(model, data, optimizerType, config)
             obj.m_model = model;
             % Get reference to your training data
@@ -97,7 +120,7 @@ classdef Solver < handle
             
             accuracy = mean(y_pred == Y);
         end
-                
+        
     end
     
 end

@@ -13,7 +13,7 @@ classdef (Sealed) Dataset < handle
         m_X_Tensor;m_X_Val_Tensor;
         m_trainingSize;
         m_ValidationSize;
-        m_shuffledIndex;
+        m_shuffledIndex;m_shuffledIndexVal;
     end
     
     methods(Access = private)
@@ -51,6 +51,9 @@ classdef (Sealed) Dataset < handle
             obj.m_Y_val_one_hot = obj.oneHot(Y);
             obj.m_ValidationSize = size(X,dimNumSamples);
             
+            % Create a shuffled index
+            obj.m_shuffledIndexVal = randperm(obj.m_ValidationSize);
+            
             % The expected tensor for data is
             % [rows, cols, depth, batch]
             obj.m_X_Val_Tensor = reshape_row_major(X,[rows,cols,channels,obj.m_ValidationSize]);
@@ -60,6 +63,12 @@ classdef (Sealed) Dataset < handle
             selIndex = obj.m_shuffledIndex(1:batchSize);
             batch.X = obj.m_X_Tensor(:,:,:,selIndex);
             batch.Y = obj.m_Y_one_hot(selIndex,:);
+        end
+        
+        function batch = GetValidationBatch(obj,batchSize)
+            selIndex = obj.m_shuffledIndexVal(1:batchSize);
+            batch.X = obj.m_X_Val_Tensor(:,:,:,selIndex);
+            batch.Y = obj.m_Y_val_one_hot(selIndex,:);
         end
         
         function X = GetOriginalInput(obj)
