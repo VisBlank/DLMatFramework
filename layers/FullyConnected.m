@@ -29,11 +29,17 @@ classdef FullyConnected < BaseLayer
             
             % Tensor format (rows,cols,channels, batch) on matlab
             % Get batch size
-            [rows,cols,depth,N] = size(input);           
+            %[rows,cols,depth,N] = size(input);      
+            lenSizeActivations = length(size(input));
+            if (lenSizeActivations < 3)
+                N = size(input,1);
+            else
+                N = size(input,ndims(input)); 
+            end
             
             % Reshape input to have N rows and as much cols needed
             input_reshape = reshape(input,N,[]);
-            activations = input_reshape*weights + bias;
+            activations = input_reshape*weights + repmat(bias,N,1);
             
             % Cache results for backpropagation
             obj.activations = activations;
@@ -44,8 +50,13 @@ classdef FullyConnected < BaseLayer
         
         function [gradient] = BackwardPropagation(obj, dout)
             dout = dout.input;
-            % Recover cache            
-            [rows,cols,depth,N] = size(obj.previousInput);
+            % Recover cache                        
+            lenSizeActivations = length(size(obj.previousInput));
+            if (lenSizeActivations < 3)
+                N = size(obj.previousInput,1);
+            else
+                N = size(obj.previousInput,ndims(obj.previousInput)); 
+            end
             
             input_reshape = reshape(obj.previousInput,N,[]);
             

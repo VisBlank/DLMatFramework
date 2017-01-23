@@ -32,8 +32,7 @@ classdef Softmax < BaseLayer
             sumProb = repmat(sumProb,1,size(scores,2));
             
             % Calculate probabilities
-            activations = exp(scoresFix) ./ sumProb;
-            
+            activations = exp(scoresFix) ./ sumProb;            
         end
         
         % The softmax activation has only one input (scores) so we just

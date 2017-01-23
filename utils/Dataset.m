@@ -7,11 +7,12 @@ classdef (Sealed) Dataset < handle
     % display_MNIST_Data(reshape_row_major(batch.X,[10,784]))
     
     properties(Access = private)
-        m_X;
-        m_Y;
-        m_Y_one_hot;
-        m_X_Tensor;
+        m_X;m_X_val;
+        m_Y;m_Y_val;
+        m_Y_one_hot;m_Y_val_one_hot;
+        m_X_Tensor;m_X_Val_Tensor;
         m_trainingSize;
+        m_ValidationSize;
         m_shuffledIndex;
     end
     
@@ -44,6 +45,17 @@ classdef (Sealed) Dataset < handle
             obj.m_X_Tensor = reshape_row_major(X,[rows,cols,channels,obj.m_trainingSize]);
         end
         
+        function AddValidation(obj,X,Y,rows, cols, channels,dimNumSamples)
+            obj.m_X_val = X;
+            obj.m_Y_val = Y;
+            obj.m_Y_val_one_hot = obj.oneHot(Y);
+            obj.m_ValidationSize = size(X,dimNumSamples);
+            
+            % The expected tensor for data is
+            % [rows, cols, depth, batch]
+            obj.m_X_Val_Tensor = reshape_row_major(X,[rows,cols,channels,obj.m_ValidationSize]);
+        end
+        
         function batch = GetBatch(obj,batchSize)
             selIndex = obj.m_shuffledIndex(1:batchSize);
             batch.X = obj.m_X_Tensor(:,:,:,selIndex);
@@ -58,8 +70,16 @@ classdef (Sealed) Dataset < handle
             Y = obj.m_Y;
         end
         
+        function Y = GetNumClasses(obj)
+            Y = numel(unique(obj.m_Y));
+        end
+        
         function Y = GetOneHotLabels(obj)
             Y = obj.m_Y_one_hot;
+        end
+        
+        function dataSize = GetTrainSize(obj)
+            dataSize = obj.m_trainingSize;
         end
     end
     

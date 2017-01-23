@@ -19,6 +19,7 @@ classdef Solver < handle
         m_print_every = 1000;
         m_verbose = true;
         m_data = [];
+        m_loss_history = [];
     end
     
     methods(Access = protected)
@@ -27,11 +28,16 @@ classdef Solver < handle
             % be called manually.
             
             %% Select a mini-batch
+            batch = obj.m_data.GetBatch(obj.m_batch_size);
+            X_batch = batch.X;
+            Y_batch = batch.Y;
             
             %% Get model loss and gradients(dw)
+            [loss, grad] = obj.m_model.Loss(X_batch, Y_batch);
+            obj.m_loss_history(end+1) = loss;
             
             %% Perform a parameter update
-        end
+        end                
     end
     
     methods(Access = public)
@@ -50,12 +56,48 @@ classdef Solver < handle
         end
         
         function Train(obj)
-            fprintf('Need implementation\n');
+            num_train = obj.m_data.GetTrainSize();
+            iterations_per_epoch = max(num_train / obj.m_batch_size, 1);
+            num_iterations = obj.m_num_epochs * iterations_per_epoch;
+            
+            for t=1:num_iterations
+                obj.Step();
+                if (obj.m_verbose) && (mod(t,obj.m_print_every) == 0)
+                    fprintf ('(Iteration %d / %d) loss: %d\n',(t + 1), num_iterations, obj.m_loss_history(end) );
+                end
+            end
         end
         
-        function [accuracy] = CheckAccuracy(obj)
-            accuracy = 0;
+        % Check accuracy of model with some given dataset
+        function [accuracy] = CheckAccuracy(obj, X, Y, num_samples, batchSize)
+            % Get 4-d tensor batch size
+            N = size(X,4);
+            
+            % Subsample the data (also shuffle)
+            if (~isempty(num_samples)) && (num_samples>N)
+                mask = randperm(N);
+                selIndex = mask(1:num_samples);
+                X = X(:,:,:,selIndex);
+                Y = Y(selIndex,:);
+                N = num_samples;
+            end
+            
+            % Compute predictions in batches
+            num_batches = N / batchSize;
+            if mod(N,batchSize) ~= 0
+                num_batches = num_batches+1;
+            end
+            y_pred = [];
+            for i=1:num_batches
+                start_idx = i * batchSize;
+                end_idx = (i+1) * batchSize;
+                scores = obj.m_model.Predict(X(:,:,:,start_idx:end_idx));
+                [~,y_pred(end+1)] = max(scores);
+            end
+            
+            accuracy = mean(y_pred == Y);
         end
+                
     end
     
 end
