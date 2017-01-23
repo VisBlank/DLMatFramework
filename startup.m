@@ -7,6 +7,8 @@ curdir = fileparts(mfilename('fullpath'));
 addpath(genpath(fullfile(curdir, 'learn/MatLiveScripts')));
 addpath(genpath(fullfile(curdir, 'utils')));
 addpath(genpath(fullfile(curdir, 'solver')));
+addpath(genpath(fullfile(curdir, 'test')));
+addpath(genpath(fullfile(curdir, 'datasets')));
 addpath(genpath(fullfile(curdir, 'layers')));
 addpath(genpath(fullfile(curdir, 'classifiers')));
 addpath(genpath(fullfile(curdir, 'loss')));

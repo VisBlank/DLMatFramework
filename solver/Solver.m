@@ -18,6 +18,7 @@ classdef Solver < handle
         m_lr_decay = 1;
         m_print_every = 1000;
         m_verbose = true;
+        m_data = [];
     end
     
     methods(Access = protected)
@@ -36,6 +37,8 @@ classdef Solver < handle
     methods(Access = public)
         function obj = Solver(model, data, optimizerType, config)
             obj.m_model = model;
+            % Get reference to your training data
+            obj.m_data = data;
             switch optimizerType
                 case 'sgd'
                     obj.m_optimizer = Sgd(config);
