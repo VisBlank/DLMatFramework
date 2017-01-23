@@ -31,10 +31,14 @@ classdef (Sealed) Dataset < handle
     end
     
     methods(Access = public)
-        function obj = Dataset(X,Y,rows, cols, channels,dimNumSamples)
+        function obj = Dataset(X,Y,rows, cols, channels,dimNumSamples, doOneHot)
             obj.m_X = X;
             obj.m_Y = Y;
-            obj.m_Y_one_hot = obj.oneHot(Y);
+            if doOneHot
+                obj.m_Y_one_hot = obj.oneHot(Y);
+            else
+                obj.m_Y_one_hot = Y;
+            end
             obj.m_trainingSize = size(X,dimNumSamples);
             
             % Create a shuffled index
@@ -45,10 +49,14 @@ classdef (Sealed) Dataset < handle
             obj.m_X_Tensor = reshape_row_major(X,[rows,cols,channels,obj.m_trainingSize]);
         end
         
-        function AddValidation(obj,X,Y,rows, cols, channels,dimNumSamples)
+        function AddValidation(obj,X,Y,rows, cols, channels,dimNumSamples, doOneHot)
             obj.m_X_val = X;
             obj.m_Y_val = Y;
-            obj.m_Y_val_one_hot = obj.oneHot(Y);
+            if doOneHot
+                obj.m_Y_val_one_hot = obj.oneHot(Y);
+            else
+                obj.m_Y_val_one_hot = Y;
+            end            
             obj.m_ValidationSize = size(X,dimNumSamples);
             
             % Create a shuffled index
@@ -59,7 +67,7 @@ classdef (Sealed) Dataset < handle
             obj.m_X_Val_Tensor = reshape_row_major(X,[rows,cols,channels,obj.m_ValidationSize]);
         end
         
-        function batch = GetBatch(obj,batchSize)
+        function batch = GetBatch(obj,batchSize)            
             selIndex = randperm(obj.m_trainingSize);
             selIndex = selIndex(1:batchSize);
             batch.X = obj.m_X_Tensor(:,:,:,selIndex);

@@ -8,8 +8,8 @@ rng(0,'v5uniform');
 
 %% Load data
 load mnist_oficial;
-data = Dataset(input_train, output_train_labels,1,784,1,1);
-data.AddValidation(input_test,output_test_labels,1,784,1,1);
+data = Dataset(input_train, output_train_labels,1,784,1,1,true);
+data.AddValidation(input_test,output_test_labels,1,784,1,1,true);
 %data.pushToGPU();
 
 %% Create network
