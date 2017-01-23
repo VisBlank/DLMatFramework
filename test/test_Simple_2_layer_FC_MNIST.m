@@ -26,6 +26,7 @@ net = DeepLearningModel(layers, LossFactory.GetLoss('cross_entropy'));
 %% Create solver and train
 solver = Solver(net, data, 'sgd',containers.Map({'learning_rate'}, {0.01}));
 solver.SetBatchSize(64);
+solver.SetEpochs(100);
 solver.Train();
 
 %% Test
@@ -52,3 +53,5 @@ for idx=1:10
 end
 errorPercentage = (errorCount*100) / 10;
 fprintf('Accuracy is %d percent \n',round((100-errorPercentage)));
+
+plot(solver.GetLossHistory)

@@ -63,6 +63,9 @@ classdef Solver < handle
         function SetBatchSize(obj,batchSize)
             obj.m_batch_size = batchSize;
         end
+        function SetEpochs(obj,epochs)
+            obj.m_num_epochs = epochs;
+        end
         
         function obj = Solver(model, data, optimizerType, config)
             obj.m_model = model;
