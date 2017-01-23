@@ -10,6 +10,7 @@ rng(0,'v5uniform');
 load mnist_oficial;
 data = Dataset(input_train, output_train_labels,1,784,1,1);
 data.AddValidation(input_test,output_test_labels,1,784,1,1);
+%data.pushToGPU();
 
 %% Create network
 layers = LayerContainer();    
@@ -25,7 +26,7 @@ net = DeepLearningModel(layers, LossFactory.GetLoss('cross_entropy'));
 
 %% Create solver and train
 solver = Solver(net, data, 'sgd',containers.Map({'learning_rate'}, {0.01}));
-solver.SetBatchSize(64);
+solver.SetBatchSize(10);
 solver.SetEpochs(100);
 solver.Train();
 

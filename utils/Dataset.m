@@ -60,12 +60,13 @@ classdef (Sealed) Dataset < handle
         end
         
         function batch = GetBatch(obj,batchSize)
-            selIndex = obj.m_shuffledIndex(1:batchSize);
+            selIndex = randperm(obj.m_trainingSize);
+            selIndex = selIndex(1:batchSize);
             batch.X = obj.m_X_Tensor(:,:,:,selIndex);
             batch.Y = obj.m_Y_one_hot(selIndex,:);
         end
         
-        function batch = GetValidationBatch(obj,batchSize)
+        function batch = GetValidationBatch(obj,batchSize)            
             selIndex = obj.m_shuffledIndexVal(1:batchSize);
             batch.X = obj.m_X_Val_Tensor(:,:,:,selIndex);
             batch.Y = obj.m_Y_val_one_hot(selIndex,:);
@@ -89,6 +90,11 @@ classdef (Sealed) Dataset < handle
         
         function dataSize = GetTrainSize(obj)
             dataSize = obj.m_trainingSize;
+        end
+        
+        function pushToGPU(obj)
+            obj.m_X_Tensor = gpuArray(obj.m_X_Tensor);
+            obj.m_Y_one_hot = gpuArray(obj.m_Y_one_hot);
         end
     end
     

@@ -34,7 +34,11 @@ classdef Solver < handle
             
             %% Get model loss and gradients(dw)
             [loss, grad] = obj.m_model.Loss(X_batch, Y_batch);
-            obj.m_loss_history(end+1) = loss;
+            if isa(loss,'gpuArray')
+                obj.m_loss_history(end+1) = gather(loss);
+            else
+                obj.m_loss_history(end+1) = loss;
+            end            
             
             %% Perform a parameter update
             weightsMap = obj.m_model.getWeights();

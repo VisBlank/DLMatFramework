@@ -36,6 +36,8 @@ classdef LayerContainer < handle
                     layerInst = FullyConnected(metaDataLayer.name, metaDataLayer.num_output, obj.numLayers+1, previousLayer);                
                 case 'relu'
                     layerInst = Relu(metaDataLayer.name, obj.numLayers+1, previousLayer);                                                
+                case 'sigmoid'
+                    layerInst = Sigmoid(metaDataLayer.name, obj.numLayers+1, previousLayer);
                 case 'softmax'
                     layerInst = Softmax(metaDataLayer.name, obj.numLayers+1, previousLayer);
                 otherwise
