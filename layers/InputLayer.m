@@ -25,11 +25,11 @@ classdef InputLayer < BaseLayer
             obj.numRows = numRows;
             obj.numCols = numCols;
             obj.numChannels = numChannels;
-            obj.batchSize = batchSize;            
-            obj.index = index; 
+            obj.batchSize = batchSize;
+            obj.index = index;
             obj.activationShape = [numRows numCols numChannels batchSize];
         end
-                        
+        
         function [activations] = ForwardPropagation(obj, scores, weights, bias)
             activations = obj.activations;
         end
@@ -49,8 +49,12 @@ classdef InputLayer < BaseLayer
         end
         
         function [actShape] = getActivationShape(obj)
-           actShape = obj.activationShape;
-       end
+            actShape = obj.activationShape;
+        end
+        
+        function gradient = EvalBackpropNumerically(obj, dout)
+            gradient = [];        
+        end
     end
     
 end

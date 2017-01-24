@@ -113,6 +113,14 @@ classdef DeepLearningModel < handle
         function biasGrad = getBiasGradients(obj)
             biasGrad = obj.gradBiasMap;
         end
+        
+        function EnableGradientCheck(obj, flag)
+            cellLayers = obj.layersContainer.getAllLayers();
+            for idxLayer = 1:numel(cellLayers)
+               currLayer =  cellLayers{idxLayer};
+               currLayer.EnableGradientCheck(flag);
+            end
+        end
     end
     
 end

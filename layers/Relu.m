@@ -33,7 +33,15 @@ classdef Relu < BaseLayer
             dout = dout.input;
             dx = dout .* (obj.previousInput >= 0);
             gradient.input = dx;
-        end                
+        end
+        
+        function gradient = EvalBackpropNumerically(obj, dout)
+            % Fully connected layers has 3 inputs so we have 3 gradients
+            relu_x = @(x) obj.ForwardPropagation(x,obj.weights, obj.biases);            
+            
+            % Evaluate
+            gradient.input = GradientCheck.Eval(relu_x,obj.previousInput) .* dout;            
+        end
     end
     
 end

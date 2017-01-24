@@ -18,16 +18,16 @@ classdef GradientCheck < handle
     end
     
     methods (Access = 'public', Static)
-        function grad = Eval(f,x)
+        function grad = Eval(f,x,dout)
             % Check if is a scalar
             if prod(size(x)) == 1
-                grad = GradientCheck.Eval_scalar_input(f, x);
+                grad = GradientCheck.Eval_scalar_input(f, x, dout);
             else
-                grad = GradientCheck.Eval_vector_input(f, x);
+                grad = GradientCheck.Eval_vector_input(f, x, dout);
             end
         end
         
-        function grad = Eval_vector_input(f,x)
+        function grad = Eval_vector_input(f,x,dout)
             % f will be a lambda of a function with a single parameter
             % x point(on any dimension) where to evalualte the gradient            
             h = 0.00001;
@@ -50,12 +50,12 @@ classdef GradientCheck < handle
                 x(i) = old_value;
                 
                 % Now compute the partial derivative
-                grad(i) = sum(f_x_plus_h-f_x_minus_h)./(2*h);
+                grad(i) = sum((f_x_plus_h-f_x_minus_h) .* dout)./(2*h);
                 
             end
         end
         % This function can be accelerated if we vectorize it
-        function grad = Eval_scalar_input(f, x)            
+        function grad = Eval_scalar_input(f, x, dout)            
             % f will be a lambda of a function with a single parameter
             % x point where to evalualte the gradient            
             h = 0.00001;
@@ -80,7 +80,8 @@ classdef GradientCheck < handle
                 x(i) = old_value;
                 
                 % Now compute the partial derivative
-                grad(i) = (f_x_plus_h-f_x_minus_h)./(2*h);
+                grad(i) = ((f_x_plus_h-f_x_minus_h)*dout)./(2*h);
+                %grad(i) = grad(i) * dout;
             end
         end
     end

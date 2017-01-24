@@ -42,6 +42,14 @@ classdef Softmax < BaseLayer
             % TODO
             gradient = [];
         end
+        
+        function gradient = EvalBackpropNumerically(obj, dout)
+            % Fully connected layers has 3 inputs so we have 3 gradients
+            softmax_x = @(x) obj.ForwardPropagation(x,obj.weights, obj.biases);            
+            
+            % Evaluate
+            gradient.input = GradientCheck.Eval(softmax_x,obj.previousInput) .* dout;            
+        end
     end
     
 end

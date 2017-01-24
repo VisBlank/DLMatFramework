@@ -79,6 +79,10 @@ classdef LayerContainer < handle
         function numLayers = getNumLayers(obj)
             numLayers = obj.layersContainer.Count;
         end
+        
+        function cellLayers = getAllLayers(obj)
+            cellLayers = obj.layersContainer.values;
+        end
                 
         
         function ShowStructure(obj)

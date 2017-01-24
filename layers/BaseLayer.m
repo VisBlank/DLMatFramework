@@ -15,14 +15,19 @@ classdef (Abstract) BaseLayer < handle
         name
         index
         activationShape
-        inputLayer
+        inputLayer        
+    end
+    
+    properties (Access = 'public')
+       doGradientCheck = false; 
     end
     
     methods(Abstract, Access = 'public')
         % Activations will be a tensor
         [activations] = ForwardPropagation(obj, inputs, weights, bias);
         % Gradient will be a struct with input, bias, weight
-        [gradient] = BackwardPropagation(obj);                
+        [gradient] = BackwardPropagation(obj);  
+        [gradient] = EvalBackpropNumerically(obj, dout);
     end
     
     methods(Access = 'public')
@@ -48,6 +53,10 @@ classdef (Abstract) BaseLayer < handle
        
        function [layer] = getInputLayer(obj)
           layer = obj.inputLayer; 
+       end
+       
+       function EnableGradientCheck(obj, flag)
+           obj.doGradientCheck = flag;
        end
               
     end
