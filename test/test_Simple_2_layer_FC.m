@@ -17,8 +17,8 @@ data.AddValidation(Xt,Yt,1,2,1,1,false);
 %% Create network
 layers = LayerContainer();    
 layers <= struct('name','ImageIn','type','input','rows',1,'cols',2,'depth',1, 'batchsize',1);
-layers <= struct('name','FC_1','type','fc', 'num_output',2);
-layers <= struct('name','Relu_1','type','relu');
+layers <= struct('name','FC_1','type','fc', 'num_output',3);
+layers <= struct('name','sigmoid_1','type','sigmoid');
 layers <= struct('name','FC_2','type','fc', 'num_output',1);
 layers <= struct('name','SigmoidOut','type','sigmoid');
 
@@ -31,8 +31,17 @@ net.EnableGradientCheck(true);
 %% Create solver and train
 solver = Solver(net, data, 'sgd',containers.Map({'learning_rate'}, {0.01}));
 solver.SetBatchSize(1); % or 4 for the whole dataset (Normal gradient descent)
-solver.SetEpochs(10);
+solver.SetEpochs(1000);
 solver.Train();
+
+% Use pre-trained weights
+weightsMap = net.getWeights();
+%weightsMap('FC_1') = [-0.9733  -1.9000  1.8941; -7.5503 5.1870 -6.2003];
+%weightsMap('FC_2') = [-5.3367   -8.2968   11.8310]';
+
+biasMap = net.getBias();
+%biasMap('FC_1') = [1 1 1];
+%biasMap('FC_2') =  -5.3367;
 
 %% Test
 batchValidation = data.GetValidationBatch(4);
