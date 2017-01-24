@@ -10,9 +10,9 @@ classdef GradientCheck < handle
     % sigmoid_forward = @(x) (1./(1+exp(-x)));
     % sigmoid_backward = @(x) 0.1e1 ./ (0.1e1 + exp(-x)).^2 .*exp(-x);
     % sigmoid_backward(0)
-    % GradientCheck.Eval(sigmoid_forward,0)
+    % GradientCheck.Eval(sigmoid_forward,0,1)
     % sigmoid_backward([0 1 2])
-    % GradientCheck.Eval(sigmoid_forward,[0 1 2])
+    % GradientCheck.Eval(sigmoid_forward,[0 1 2],1)
     
     properties
     end
@@ -80,7 +80,7 @@ classdef GradientCheck < handle
                 x(i) = old_value;
                 
                 % Now compute the partial derivative
-                grad(i) = ((f_x_plus_h-f_x_minus_h)*dout)./(2*h);
+                grad(i) = ((f_x_plus_h-f_x_minus_h).*dout)./(2*h);
                 %grad(i) = grad(i) * dout;
             end
         end

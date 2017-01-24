@@ -71,7 +71,7 @@ classdef FullyConnected < BaseLayer
                 diff_Input = sum(abs(evalGrad.input(:) - gradient.input(:)));
                 diff_Weights = sum(abs(evalGrad.weight(:) - gradient.weight(:)));
                 diff_Bias = sum(abs(evalGrad.bias(:) - gradient.bias(:)));
-                diff_vec = [diff_Input diff_Weights ]; % diff_Bias
+                diff_vec = [diff_Input diff_Weights diff_Bias]; % diff_Bias
                 diff = sum(diff_vec);
                 if diff > 0.0001
                     msgError = sprintf('%s gradient failed!\n',obj.name);
@@ -95,7 +95,7 @@ classdef FullyConnected < BaseLayer
             % Evaluate
             gradient.input = GradientCheck.Eval(fcProp_x,obj.previousInput,dout);
             gradient.weight = GradientCheck.Eval(fcProp_w,obj.weights,dout);
-            gradient.bias = GradientCheck.Eval(fcProp_b,obj.biases, dout);            
+            gradient.bias = GradientCheck.Eval(fcProp_b,obj.biases, sum(dout));            
         end
     end
     

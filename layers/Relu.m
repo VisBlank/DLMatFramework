@@ -33,6 +33,19 @@ classdef Relu < BaseLayer
             dout = dout.input;
             dx = dout .* (obj.previousInput >= 0);
             gradient.input = dx;
+            
+            if obj.doGradientCheck
+                evalGrad = obj.EvalBackpropNumerically(dout);
+                diff_Input = sum(abs(evalGrad.input(:) - gradient.input(:)));                
+                diff_vec = [diff_Input]; 
+                diff = sum(diff_vec);
+                if diff > 0.0001
+                    msgError = sprintf('%s gradient failed!\n',obj.name);
+                    error(msgError);
+                else
+                    %fprintf('%s gradient passed!\n',obj.name);
+                end
+            end
         end
         
         function gradient = EvalBackpropNumerically(obj, dout)
@@ -40,7 +53,7 @@ classdef Relu < BaseLayer
             relu_x = @(x) obj.ForwardPropagation(x,obj.weights, obj.biases);            
             
             % Evaluate
-            gradient.input = GradientCheck.Eval(relu_x,obj.previousInput) .* dout;            
+            gradient.input = GradientCheck.Eval(relu_x,obj.previousInput, dout);            
         end
     end
     
