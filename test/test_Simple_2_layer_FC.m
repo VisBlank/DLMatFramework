@@ -36,7 +36,7 @@ weightsMap('FC_2') = [-0.7704    0.5143]';
 biasMap('FC_1') = [0.7202   -0.4302];
 biasMap('FC_2') =  -0.0697;
 
-% Enable gradient check
+% Enable gradient check (Not working yet with mini-batch)
 net.EnableGradientCheck(true);
 
 %% Create solver and train

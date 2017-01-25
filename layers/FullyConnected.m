@@ -60,7 +60,10 @@ classdef FullyConnected < BaseLayer
             
             input_reshape = reshape(obj.previousInput,N,[]);
             
-            gradient.bias = sum(dout);
+            % The bias gradient should have the same shape as the original
+            % bias
+            gradient.bias = sum(dout,1);
+            
             gradient.weight = input_reshape' * dout;
             dx = (dout * obj.weights');
             dx = reshape(dx,size(obj.previousInput));
@@ -95,7 +98,7 @@ classdef FullyConnected < BaseLayer
             % Evaluate
             gradient.input = GradientCheck.Eval(fcProp_x,obj.previousInput,dout);
             gradient.weight = GradientCheck.Eval(fcProp_w,obj.weights,dout);
-            gradient.bias = GradientCheck.Eval(fcProp_b,obj.biases, sum(dout));            
+            gradient.bias = GradientCheck.Eval(fcProp_b,obj.biases, dout);            
         end
     end
     
