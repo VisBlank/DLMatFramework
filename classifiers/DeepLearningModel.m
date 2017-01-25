@@ -114,6 +114,10 @@ classdef DeepLearningModel < handle
             biasGrad = obj.gradBiasMap;
         end
         
+        function layers = getLayers(obj)
+            layers = obj.layersContainer.getLayerMap();
+        end
+        
         function EnableGradientCheck(obj, flag)
             cellLayers = obj.layersContainer.getAllLayers();
             for idxLayer = 1:numel(cellLayers)

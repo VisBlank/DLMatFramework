@@ -83,7 +83,10 @@ classdef LayerContainer < handle
         function cellLayers = getAllLayers(obj)
             cellLayers = obj.layersContainer.values;
         end
-                
+        
+        function layerCont = getLayerMap(obj)
+            layerCont = obj.layersContainer;
+        end                
         
         function ShowStructure(obj)
             % Iterate on all layers            
