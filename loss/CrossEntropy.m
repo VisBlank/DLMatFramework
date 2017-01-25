@@ -1,6 +1,7 @@
 classdef CrossEntropy < BaseLoss
-    %CROSSENTROPY Summary of this class goes here
-    %   Detailed explanation goes here
+    % Cross-Entropy loss
+    % References:
+    % https://www.ics.uci.edu/~pjsadows/notes.pdf
     
     properties
     end
@@ -8,22 +9,11 @@ classdef CrossEntropy < BaseLoss
     methods (Access = 'public')
         function [loss, gradients] = GetLossAndGradients(obj, prob, targets)
             N = size(prob,1);
-            % Considering that the scores are already converted to
-            % probabilities.
-            % Get the indexes of the correct classes
-            [~, idxCorrect] = max(targets,[],2);
+            h = prob;
+            loss = sum(sum((-targets).*log(h) - (1-targets).*log(1-h), 2))/N; 
             
-            % Get the probabilities of the correct classes
-            probCorrect = diag(prob(:,idxCorrect));
-
-            loss = -sum(log(probCorrect))/N;            
-            
-            % Get gradient of loss w.r.t to the correct score
-            gradients = prob;
-            gradients_correct = probCorrect - 1;
-            % Put the calculated correction back on 
-            gradients(sub2ind(size(gradients),[1:length(idxCorrect)]',idxCorrect)) = gradients_correct;            
-            gradients = gradients / N;
+            % dw is the derivative of the loss function over the scores
+            gradients = prob - targets;
         end
     end    
 end

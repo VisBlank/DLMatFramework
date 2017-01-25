@@ -21,7 +21,7 @@ layers <= struct('name','FC_2','type','fc','num_output',data.GetNumClasses());
 layers <= struct('name','Softmax','type','softmax');
 
 % Create DeepLearningModel instance
-net = DeepLearningModel(layers, LossFactory.GetLoss('cross_entropy'));
+net = DeepLearningModel(layers, LossFactory.GetLoss('multi_class_cross_entropy'));
 
 
 %% Create solver and train

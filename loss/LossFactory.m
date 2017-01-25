@@ -16,6 +16,8 @@ classdef (Sealed) LossFactory < handle
                         localObj = CrossEntropy();
                     case 'mean_squared_error'
                         localObj = MeanSquaredError();
+                    case 'multi_class_cross_entropy'
+                        localObj = MultiClassCrossEntropy();
                     otherwise
                         localObj =  [];
                 end

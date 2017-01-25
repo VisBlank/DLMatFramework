@@ -29,7 +29,7 @@ classdef DeepLearningModel < handle
                 layerName = currLayer.getName();
                 if isa(currLayer,'FullyConnected')
                     obj.weightsMap(layerName) = rand(prod(shapeInput),currLayer.getNumOutput());
-                    obj.BiasMap(layerName) = rand(1,currLayer.getNumOutput());                    
+                    obj.BiasMap(layerName) = zeros(1,currLayer.getNumOutput());                    
                 else
                     % Some layers (ie Relu, Softmax) has no parameters
                     obj.weightsMap(layerName) = [];
@@ -66,13 +66,13 @@ classdef DeepLearningModel < handle
             scores = obj.Predict(X);
             
             %% Get loss and gradient of the loss w.r.t to the scores
-            [loss, grad] = obj.lossFunction.GetLossAndGradients(scores, Y);            
+            [loss, grad_loss] = obj.lossFunction.GetLossAndGradients(scores, Y);            
                         
             %% Add regularization to loss
             
             %% Backprop
             % Start with gradient of loss w.r.t correct class probability
-            currDout.input = grad;
+            currDout.input = grad_loss;                       
             % Start by the last layer before Softmax
             for idxLayer=obj.layersContainer.getNumLayers()-1:-1:2
                 currLayer = obj.layersContainer.getLayerFromIndex(idxLayer);                
