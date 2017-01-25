@@ -17,7 +17,7 @@ data.AddValidation(Xt,Yt,1,2,1,1,false);
 %% Create network
 layers = LayerContainer();    
 layers <= struct('name','ImageIn','type','input','rows',1,'cols',2,'depth',1, 'batchsize',1);
-layers <= struct('name','FC_1','type','fc', 'num_output',3);
+layers <= struct('name','FC_1','type','fc', 'num_output',2);
 layers <= struct('name','sigmoid_1','type','sigmoid');
 layers <= struct('name','FC_2','type','fc', 'num_output',1);
 layers <= struct('name','SigmoidOut','type','sigmoid');
@@ -34,26 +34,29 @@ solver.SetBatchSize(1); % or 4 for the whole dataset (Normal gradient descent)
 solver.SetEpochs(1000);
 solver.Train();
 
-% Use pre-trained weights
+% Use pre-trained weights (AndrewNg based backprop)
+% W1_B1 = [1.8508 -3.3049 3.5370; -1.7704 -3.2914 3.0244]
+% W2_B2 = [1.5793   -3.6822    4.0742]
+% FC = X * W'
+% Does the bias trick
+% IN_ext = [1 In1 In2]
+% W_ext = [b W]
 weightsMap = net.getWeights();
-%weightsMap('FC_1') = [-0.9733  -1.9000  1.8941; -7.5503 5.1870 -6.2003];
-%weightsMap('FC_2') = [-5.3367   -8.2968   11.8310]';
+weightsMap('FC_1') = [-3.3049   -3.2914; 3.5370    3.0244];
+weightsMap('FC_2') = [-3.6822    4.0742]';
 
 biasMap = net.getBias();
-%biasMap('FC_1') = [1 1 1];
-%biasMap('FC_2') =  -5.3367;
+biasMap('FC_1') = [1.8508   -1.7704];
+biasMap('FC_2') =  1.5793;
 
 %% Test
-batchValidation = data.GetValidationBatch(4);
-[scores] = net.Predict(batchValidation.X);
-
-% [scores] = net.Predict(Xt(1,:));
-% fprintf('%d XOR %d = %d\n',Xt(1,1), Xt(1,2), round(scores));
-% [scores] = net.Predict(Xt(2,:));
-% fprintf('%d XOR %d = %d\n',Xt(2,1), Xt(2,2), round(scores));
-% [scores] = net.Predict(Xt(3,:));
-% fprintf('%d XOR %d = %d\n',Xt(3,1), Xt(3,2), round(scores));
-% [scores] = net.Predict(Xt(4,:));
-% fprintf('%d XOR %d = %d\n',Xt(4,1), Xt(4,2), round(scores));
+[scores] = net.Predict([0 0]);
+fprintf('%d XOR %d = %d\n',Xt(1,1), Xt(1,2), round(scores));
+[scores] = net.Predict([0 1]);
+fprintf('%d XOR %d = %d\n',Xt(2,1), Xt(2,2), round(scores));
+[scores] = net.Predict([1 0]);
+fprintf('%d XOR %d = %d\n',Xt(3,1), Xt(3,2), round(scores));
+[scores] = net.Predict([1 1]);
+fprintf('%d XOR %d = %d\n',Xt(4,1), Xt(4,2), round(scores));
 
 plot(solver.GetLossHistory);
