@@ -29,7 +29,7 @@ net = DeepLearningModel(layers, LossFactory.GetLoss('cross_entropy'));
 net.EnableGradientCheck(true);
 
 %% Create solver and train
-solver = Solver(net, data, 'sgd',containers.Map({'learning_rate'}, {0.01}));
+solver = Solver(net, data, 'sgd',containers.Map({'learning_rate'}, {0.1}));
 solver.SetBatchSize(1); % or 4 for the whole dataset (Normal gradient descent)
 solver.SetEpochs(1000);
 solver.Train();
@@ -42,12 +42,12 @@ solver.Train();
 % IN_ext = [1 In1 In2]
 % W_ext = [b W]
 weightsMap = net.getWeights();
-weightsMap('FC_1') = [-3.3049   -3.2914; 3.5370    3.0244];
-weightsMap('FC_2') = [-3.6822    4.0742]';
+%weightsMap('FC_1') = [-3.3049   -3.2914; 3.5370    3.0244];
+%weightsMap('FC_2') = [-3.6822    4.0742]';
 
 biasMap = net.getBias();
-biasMap('FC_1') = [1.8508   -1.7704];
-biasMap('FC_2') =  1.5793;
+%biasMap('FC_1') = [1.8508   -1.7704];
+%biasMap('FC_2') =  1.5793;
 
 %% Test
 [scores] = net.Predict([0 0]);
@@ -59,4 +59,25 @@ fprintf('%d XOR %d = %d\n',Xt(3,1), Xt(3,2), round(scores));
 [scores] = net.Predict([1 1]);
 fprintf('%d XOR %d = %d\n',Xt(4,1), Xt(4,2), round(scores));
 
+% Plot Prediction surface
+testInpx1 = [-0.5:0.1:1.5];
+testInpx2 = [-0.5:0.1:1.5];
+[X1, X2] = meshgrid(testInpx1, testInpx2);
+testOutRows = size(X1, 1);
+testOutCols = size(X1, 2);
+testOut = zeros(testOutRows, testOutCols);
+for row = [1:testOutRows]
+    for col = [1:testOutCols]
+        test = [X1(row, col), X2(row, col)];
+        %% Forward pass     
+        [A3] = net.Predict(test);
+        testOut(row, col) = A3;
+    end
+end
+figure(2);
+surf(X1, X2, testOut);
+title('Prediction surface');
+
+figure(1);
 plot(solver.GetLossHistory);
+title('Loss');
