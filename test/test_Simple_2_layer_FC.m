@@ -25,6 +25,17 @@ layers <= struct('name','SigmoidOut','type','sigmoid');
 % Create DeepLearningModel instance
 net = DeepLearningModel(layers, LossFactory.GetLoss('cross_entropy'));
 
+% Create references for weight/bias map
+weightsMap = net.getWeights();
+biasMap = net.getBias();
+
+% Fix a starting point (Initial weights) to compare different
+% implementation
+weightsMap('FC_1') = [0.1709   -0.0224; 0.6261    0.4194];
+weightsMap('FC_2') = [-0.7704    0.5143]';
+biasMap('FC_1') = [0.7202   -0.4302];
+biasMap('FC_2') =  -0.0697;
+
 % Enable gradient check
 net.EnableGradientCheck(true);
 
@@ -41,11 +52,9 @@ solver.Train();
 % Does the bias trick
 % IN_ext = [1 In1 In2]
 % W_ext = [b W]
-weightsMap = net.getWeights();
 %weightsMap('FC_1') = [-3.3049   -3.2914; 3.5370    3.0244];
 %weightsMap('FC_2') = [-3.6822    4.0742]';
 
-biasMap = net.getBias();
 %biasMap('FC_1') = [1.8508   -1.7704];
 %biasMap('FC_2') =  1.5793;
 

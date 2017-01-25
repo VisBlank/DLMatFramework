@@ -45,7 +45,7 @@ classdef (Abstract) BaseLayer < handle
        
        function [name] = getName(obj)
             name = obj.name;
-       end 
+       end              
        
        function [actShape] = getActivationShape(obj)
            actShape = obj.activationShape;
@@ -53,6 +53,14 @@ classdef (Abstract) BaseLayer < handle
        
        function [layer] = getInputLayer(obj)
           layer = obj.inputLayer; 
+       end
+       
+       function [weights] = getWeights(obj)
+          weights = obj.weights; 
+       end
+       
+       function [bias] = getBias(obj)
+          bias = obj.biases; 
        end
        
        function EnableGradientCheck(obj, flag)
