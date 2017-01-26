@@ -14,9 +14,7 @@ data = Dataset(X, Y',1,2,1,1,true);
 %% Create network
 layers = LayerContainer();    
 layers <= struct('name','ImageIn','type','input','rows',1,'cols',2,'depth',1, 'batchsize',1);
-layers <= struct('name','FC_1','type','fc', 'num_output',100);
-layers <= struct('name','Relu_1','type','relu');
-layers <= struct('name','FC_2','type','fc','num_output',data.GetNumClasses());
+layers <= struct('name','FC_1','type','fc', 'num_output',3);
 layers <= struct('name','Softmax','type','softmax');
 
 % Create DeepLearningModel instance
@@ -27,29 +25,17 @@ layerCont = net.getLayers();
 weightsMap = net.getWeights();
 biasMap = net.getBias();
 
-%% Load commom initialization point (Used to debug backprop)
-load ToyExample_Init_Weights;
-weightsMap('FC_1') = W1;
-weightsMap('FC_2') = W2;
-biasMap('FC_1') = b1;
-biasMap('FC_2') = b2;
 
 %% Create solver and train
-solver = Solver(net, data, 'sgd',containers.Map({'learning_rate'}, {0.2}));
+solver = Solver(net, data, 'sgd',containers.Map({'learning_rate'}, {0.1}));
 solver.SetBatchSize(300);
-solver.SetEpochs(10000);
+solver.SetEpochs(200);
 solver.Train();
 
 figure(1);
 plot(solver.GetLossHistory);
 title('Loss training');
 
-%% Load python toy pre-trained weights (Used to debug forward prop)
-%load ToyExample_Trained_Weights;
-%weightsMap('FC_1') = W1;
-%weightsMap('FC_2') = W2;
-%biasMap('FC_1') = b1;
-%biasMap('FC_2') = b2;
 
 %% Display prediction curves with original data
 % Some references between numpy and matlab

@@ -74,8 +74,12 @@ classdef DeepLearningModel < handle
             % Start with gradient of loss w.r.t correct class probability
             currDout.input = grad_loss;                       
             % Start by the last layer before Softmax
-            for idxLayer=obj.layersContainer.getNumLayers()-1:-1:2
-                currLayer = obj.layersContainer.getLayerFromIndex(idxLayer);                
+            for idxLayer=obj.layersContainer.getNumLayers()-1:-1:1
+                currLayer = obj.layersContainer.getLayerFromIndex(idxLayer);  
+                % There is no backprop on the input layer
+                if isa(currLayer,'InputLayer')
+                   continue; 
+                end
                 layerName = currLayer.getName();
                 currDout = currLayer.BackwardPropagation(currDout);                
                 % Save gradients on parametrizes layers
