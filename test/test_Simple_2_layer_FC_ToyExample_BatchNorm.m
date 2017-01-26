@@ -37,7 +37,6 @@ biasMap = net.getBias();
 
 %% Create solver and train
 solver = Solver(net, data, 'sgd',containers.Map({'learning_rate', 'L2_reg'}, {0.2, 0})); % Without L2 Reg
-%solver = Solver(net, data, 'sgd',containers.Map({'learning_rate', 'L2_reg'}, {0.2, 1e-2})); % With L2 Reg
 solver.SetBatchSize(300);
 solver.SetEpochs(10000);
 solver.Train();

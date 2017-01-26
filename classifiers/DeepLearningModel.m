@@ -36,6 +36,13 @@ classdef DeepLearningModel < handle
                     % Some layers (ie Relu, Softmax) has no parameters
                     obj.weightsMap(layerName) = [];
                     obj.BiasMap(layerName) = [];
+                    
+                    % On the batchnorm layer the weight(gammas) should be
+                    % initialized with ones and the bias(betas) as zeros
+                    if isa(currLayer,'BatchNorm')
+                        obj.weightsMap(layerName) = ones(1,prod(shapeInput));
+                        obj.BiasMap(layerName) = zeros(1,prod(shapeInput));
+                    end
                 end
             end
         end
@@ -89,7 +96,7 @@ classdef DeepLearningModel < handle
                 layerName = currLayer.getName();
                 currDout = currLayer.BackwardPropagation(currDout);                
                 % Save gradients on parametrizes layers
-                if isa(currLayer,'FullyConnected')
+                if isa(currLayer,'FullyConnected') || isa(currLayer,'BatchNorm')
                     obj.gradWeightsMap(layerName) = currDout.weight;
                     obj.gradBiasMap(layerName) = currDout.bias;
                     if (obj.regEffect ~= 0)

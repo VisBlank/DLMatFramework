@@ -15,8 +15,8 @@ classdef BatchNorm < BaseLayer
         isTraining
         eps
         momentum
-        running_mean
-        running_var
+        running_mean = []
+        running_var = []
         xhat
         xmu
         ivar
@@ -41,20 +41,25 @@ classdef BatchNorm < BaseLayer
             % Tensor format (rows,cols,channels, batch) on matlab
             % Get batch size            
             lenSizeActivations = length(size(input));
+            [~,D] = size(input);
             if (lenSizeActivations < 3)
                 N = size(input,1);
             else
                 N = size(input,ndims(input));
             end
             
-            if (obj.isTraining)
-                shapeInput = size(input);
-                
+            % Initialize for the first time running_mean and running_var
+            if isempty(obj.running_mean)
+                obj.running_mean = zeros(1,D);
+                obj.running_var = zeros(1,D);
+            end
+            
+            if (obj.isTraining)                                
                 % Step1: Calculate mean on the batch
                 mu = (1/N) * sum(input,1);
                 
-                % Step2: Calculate mean on the batch
-                obj.xmu = input - mu;
+                % Step2: Subtract the mean from each column
+                obj.xmu = input - repmat(mu,N,1);
                 
                 % Step3: Calculate denominator
                 sq = obj.xmu .^ 2;
@@ -69,15 +74,21 @@ classdef BatchNorm < BaseLayer
                 obj.ivar = 1./obj.sqrtvar;
                 
                 %Step7: Do normalization
-                obj.xhat = obj.xmu .* obj.ivar;
+                obj.xhat = obj.xmu .* repmat(obj.ivar,N,1);
                 
                 %Step8: Nor the two transformation steps
-                gammax = weights .* obj.xhat;
+                gammax = repmat(weights,N,1) .* obj.xhat;
                 
                 % Step9: Adjust with bias (Batchnorm output)
-                activations = gammax + bias;                                
-            else
+                activations = gammax + repmat(bias,N,1); 
                 
+                % Calculate running mean and variance to be used latter on
+                % prediction
+                obj.running_mean = (obj.momentum .* obj.running_mean) + (1.0 - obj.momentum) * mu;
+                obj.running_var = (obj.momentum .* obj.running_var) + (1.0 - obj.momentum) .* obj.var;
+            else
+                xbar = (input - repmat(obj.running_mean,N,1)) ./ repmat(sqrt(obj.running_var + obj.eps),N,1);
+                activations = (repmat(weights,N,1) .* xbar) + repmat(bias,N,1);
             end
             
             % Store stuff for backpropagation
@@ -88,9 +99,48 @@ classdef BatchNorm < BaseLayer
         
         function [gradient] = BackwardPropagation(obj, dout)
             dout = dout.input;
-                        
+            lenSizeActivations = length(size(obj.previousInput));
+            [~,D] = size(obj.previousInput);
+            if (lenSizeActivations < 3)
+                N = size(obj.previousInput,1);
+            else
+                N = size(obj.previousInput,ndims(obj.previousInput));
+            end
             
-            gradient.input = dx;
+            % Step9:
+            dbeta = sum(dout, 1);
+            dgammax = dout;
+            
+            % Step8:
+            dgamma = sum(dgammax.*obj.xhat, 1);
+            dxhat = dgammax .* repmat(obj.weights,N,1);
+            
+            % Step7:
+            divar = sum(dxhat.* obj.xmu, 1);
+            dxmu1 = dxhat .* repmat(obj.ivar,N,1);
+            
+            % Step6:
+            dsqrtvar = -1 ./ (obj.sqrtvar.^2) .* divar;
+                        
+            % Step 5:
+            dvar = 0.5 * 1 ./sqrt(obj.var+obj.eps) .* dsqrtvar;
+            
+            % Step 4:
+            dsq = 1 ./ N * ones(N,D) .* repmat(dvar,N,1);
+            
+            % Step 3:
+            dxmu2 = 2 .* obj.xmu .* dsq;
+            
+            % Step 2:
+            dx1 = (dxmu1 + dxmu2);
+            dmu = -1 .* sum(dxmu1+dxmu2, 1);
+            
+            % Step 1:
+            dx2 = 1. /N .* ones(N,D) .* repmat(dmu,N,1);
+            
+            gradient.input = dx1+dx2;
+            gradient.weight = dgamma;
+            gradient.bias = dbeta;
             
             if obj.doGradientCheck
                 evalGrad = obj.EvalBackpropNumerically(dout);
