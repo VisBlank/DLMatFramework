@@ -58,7 +58,7 @@ classdef DeepLearningModel < handle
             for idxLayer=2:obj.layersContainer.getNumLayers()
                 currLayer = obj.layersContainer.getLayerFromIndex(idxLayer);
                 layerName = currLayer.getName();
-                if isa(currLayer,'Dropout')
+                if isa(currLayer,'Dropout') || isa(currLayer,'BatchNorm')
                     currLayer.IsTraining(obj.isTraining);
                 end
                 currInput = currLayer.ForwardPropagation(currInput,obj.weightsMap(layerName),obj.BiasMap(layerName));
