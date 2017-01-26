@@ -20,6 +20,7 @@ classdef DeepLearningModel < handle
         gradWeightsMap = containers.Map('KeyType','char','ValueType','any');
         gradBiasMap = containers.Map('KeyType','char','ValueType','any');
         regEffect = 0;
+        isTraining = false;
     end
     
     methods (Access = 'protected')
@@ -57,6 +58,9 @@ classdef DeepLearningModel < handle
             for idxLayer=2:obj.layersContainer.getNumLayers()
                 currLayer = obj.layersContainer.getLayerFromIndex(idxLayer);
                 layerName = currLayer.getName();
+                if isa(currLayer,'Dropout')
+                    currLayer.IsTraining(obj.isTraining);
+                end
                 currInput = currLayer.ForwardPropagation(currInput,obj.weightsMap(layerName),obj.BiasMap(layerName));
             end
             scores = currInput;
@@ -141,6 +145,10 @@ classdef DeepLearningModel < handle
                currLayer =  cellLayers{idxLayer};
                currLayer.EnableGradientCheck(flag);
             end
+        end
+        
+        function IsTraining(obj, flag)
+           obj.isTraining = flag;
         end
     end
     

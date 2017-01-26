@@ -78,7 +78,7 @@ classdef Solver < handle
         end
         
         function obj = Solver(model, data, optimizerType, config)
-            obj.m_model = model;
+            obj.m_model = model;            
             % Get reference to your training data
             obj.m_data = data;
             switch optimizerType
@@ -96,6 +96,9 @@ classdef Solver < handle
         end
         
         function Train(obj)
+            % Indicate to model that training phase started
+            obj.m_model.IsTraining(true);
+            
             num_train = obj.m_data.GetTrainSize();
             iterations_per_epoch = max(num_train / obj.m_batch_size, 1);
             num_iterations = obj.m_num_epochs * iterations_per_epoch;
@@ -106,6 +109,9 @@ classdef Solver < handle
                     fprintf ('(Iteration %d / %d) loss: %d\n',(t + 1), num_iterations, obj.m_loss_history(end) );
                 end
             end
+            
+            % Indicate to model that training phase is over
+            obj.m_model.IsTraining(false);
         end
         
         % Check accuracy of model with some given dataset
