@@ -27,6 +27,13 @@ layerCont = net.getLayers();
 weightsMap = net.getWeights();
 biasMap = net.getBias();
 
+%% Load commom initialization point
+load ToyExample_Init_Weights;
+weightsMap('FC_1') = W1;
+weightsMap('FC_2') = W2;
+biasMap('FC_1') = b1;
+biasMap('FC_2') = b2;
+
 %% Create solver and train
 solver = Solver(net, data, 'sgd',containers.Map({'learning_rate'}, {0.2}));
 solver.SetBatchSize(300);
@@ -37,11 +44,11 @@ figure(1);
 plot(solver.GetLossHistory);
 
 %% Load python toy pre-trained weights
-load ToyExample_Trained_Weights;
-weightsMap('FC_1') = W1;
-weightsMap('FC_2') = W2;
-biasMap('FC_1') = b1;
-biasMap('FC_2') = b2;
+%load ToyExample_Trained_Weights;
+%weightsMap('FC_1') = W1;
+%weightsMap('FC_2') = W2;
+%biasMap('FC_1') = b1;
+%biasMap('FC_2') = b2;
 
 %% Display prediction curves with original data
 % Some references between numpy and matlab

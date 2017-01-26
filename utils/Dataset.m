@@ -69,6 +69,8 @@ classdef (Sealed) Dataset < handle
         
         function batch = GetBatch(obj,batchSize)            
             selIndex = randperm(obj.m_trainingSize);
+            %% TODO: I don't know if I need to reshufle every new batch
+            %selIndex = [1:1:batchSize];
             selIndex = selIndex(1:batchSize);
             batch.X = obj.m_X_Tensor(:,:,:,selIndex);
             batch.Y = obj.m_Y_one_hot(selIndex,:);
