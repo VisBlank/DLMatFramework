@@ -20,6 +20,7 @@ classdef Solver < handle
         m_verbose = true;
         m_data = [];
         m_loss_history = [];
+        m_l2_reg = 0;
     end
     
     methods(Access = protected)
@@ -49,6 +50,11 @@ classdef Solver < handle
                 weight = weightsMap(keys{idx});
                 if ~isempty(weight)
                     bias = biasMap(keys{idx});                    
+                    
+                    % Add regularization gradient contribution
+                    grad.weights(keys{idx}) = grad.weights(keys{idx}) + (obj.m_l2_reg * weight);
+                    
+                    % Use optimizer to calculate new weights
                     next_w = obj.m_optimizer.Optimize(weight,grad.weights(keys{idx}));
                     next_b = obj.m_optimizer.Optimize(bias,grad.bias(keys{idx}));
                     
@@ -83,6 +89,10 @@ classdef Solver < handle
                 otherwise
                     fprintf('Optimizer not implemented\n');
             end
+            
+            % Both solver and model needs reguarization information
+            obj.m_l2_reg = config('L2_reg');
+            obj.m_model.L2Regularization(obj.m_l2_reg);
         end
         
         function Train(obj)

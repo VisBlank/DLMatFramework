@@ -28,14 +28,15 @@ weightsMap = net.getWeights();
 biasMap = net.getBias();
 
 %% Load commom initialization point (Used to debug backprop)
-load ToyExample_Init_Weights;
-weightsMap('FC_1') = W1;
-weightsMap('FC_2') = W2;
-biasMap('FC_1') = b1;
-biasMap('FC_2') = b2;
+%load ToyExample_Init_Weights;
+%weightsMap('FC_1') = W1;
+%weightsMap('FC_2') = W2;
+%biasMap('FC_1') = b1;
+%biasMap('FC_2') = b2;
 
 %% Create solver and train
-solver = Solver(net, data, 'sgd',containers.Map({'learning_rate'}, {0.2}));
+solver = Solver(net, data, 'sgd',containers.Map({'learning_rate', 'L2_reg'}, {0.2, 0})); % Without L2 Reg
+%solver = Solver(net, data, 'sgd',containers.Map({'learning_rate', 'L2_reg'}, {0.2, 1e-2})); % With L2 Reg
 solver.SetBatchSize(300);
 solver.SetEpochs(10000);
 solver.Train();

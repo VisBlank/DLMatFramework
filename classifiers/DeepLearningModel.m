@@ -19,6 +19,7 @@ classdef DeepLearningModel < handle
         BiasMap = containers.Map('KeyType','char','ValueType','any');
         gradWeightsMap = containers.Map('KeyType','char','ValueType','any');
         gradBiasMap = containers.Map('KeyType','char','ValueType','any');
+        regEffect = 0;
     end
     
     methods (Access = 'protected')
@@ -66,12 +67,13 @@ classdef DeepLearningModel < handle
             scores = obj.Predict(X);
             
             %% Get loss and gradient of the loss w.r.t to the scores
-            [loss, grad_loss] = obj.lossFunction.GetLossAndGradients(scores, Y);            
-                        
-            %% Add regularization to loss
+            [data_loss, grad_loss] = obj.lossFunction.GetLossAndGradients(scores, Y);                                                            
             
             %% Backprop
             % Start with gradient of loss w.r.t correct class probability
+            % Also to save loop time we get the square sum of the weights
+            % to be used on the regularization            
+            squared_W_reg = [];
             currDout.input = grad_loss;                       
             % Start by the last layer before Softmax
             for idxLayer=obj.layersContainer.getNumLayers()-1:-1:1
@@ -85,12 +87,19 @@ classdef DeepLearningModel < handle
                 % Save gradients on parametrizes layers
                 if isa(currLayer,'FullyConnected')
                     obj.gradWeightsMap(layerName) = currDout.weight;
-                    obj.gradBiasMap(layerName) = currDout.bias;                    
+                    obj.gradBiasMap(layerName) = currDout.bias;
+                    if (obj.regEffect ~= 0)
+                        W_flat = currLayer.getWeights; W_flat = W_flat(:);
+                        squared_W_reg(end+1) = 0.5 * obj.regEffect * sum(W_flat .* W_flat);                        
+                    end                    
                 end
             end
             
-            %% Return loss and gradients
-            lossVal = loss;
+            %% Calculate regularization part
+            reg_loss = sum(squared_W_reg);
+            
+            %% Return loss (Including regularization part) and gradients
+            lossVal = data_loss + reg_loss;
             gradients.weights = obj.gradWeightsMap;
             gradients.bias = obj.gradBiasMap;
         end
@@ -120,6 +129,10 @@ classdef DeepLearningModel < handle
         
         function layers = getLayers(obj)
             layers = obj.layersContainer.getLayerMap();
+        end
+        
+        function L2Regularization(obj,regVal)
+           obj.regEffect = regVal;
         end
         
         function EnableGradientCheck(obj, flag)
