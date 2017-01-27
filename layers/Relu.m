@@ -20,7 +20,9 @@ classdef Relu < BaseLayer
             obj.index = index;
             obj.inputLayer = inLayer;
             % Relu does not change the shape of it's output
-            obj.activationShape = obj.inputLayer.getActivationShape();
+            if ~isempty(inLayer)
+                obj.activationShape = obj.inputLayer.getActivationShape();
+            end
         end
         
         function [activations] = ForwardPropagation(obj, input, weights, bias)
