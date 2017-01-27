@@ -16,7 +16,7 @@ layers = LayerContainer();
 layers <= struct('name','ImageIn','type','input','rows',1,'cols',2,'depth',1, 'batchsize',1);
 layers <= struct('name','FC_1','type','fc', 'num_output',100);
 layers <= struct('name','Relu_1','type','relu');
-layers <= struct('name','DRP_1','type','dropout','prob',0.2);
+layers <= struct('name','DRP_1','type','dropout','prob',0.9);
 layers <= struct('name','FC_2','type','fc','num_output',data.GetNumClasses());
 layers <= struct('name','Softmax','type','softmax');
 

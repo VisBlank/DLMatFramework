@@ -40,7 +40,7 @@ biasMap('FC_2') =  -0.0697;
 net.EnableGradientCheck(true);
 
 %% Create solver and train
-solver = Solver(net, data, 'sgd',containers.Map({'learning_rate'}, {0.1}));
+solver = Solver(net, data, 'sgd',containers.Map({'learning_rate', 'L2_reg'}, {0.1, 0})); % Without L2 Reg
 solver.SetBatchSize(1); % or 4 for the whole dataset (Normal gradient descent)
 solver.SetEpochs(1000);
 solver.Train();

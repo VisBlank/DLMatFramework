@@ -1,6 +1,8 @@
 classdef Dropout < BaseLayer
-    %RELU Summary of this class goes here
+    %Dropout Summary of this class goes here
     % Reference: https://github.com/leonardoaraujosantos/DLMatFramework/blob/master/learn/cs231n/assignment2/cs231n/layers.py
+    % http://caffe.berkeleyvision.org/doxygen/classcaffe_1_1DropoutLayer.html#af3d3f94306230950edf514e0fbb8f710
+    % https://github.com/pfnet/chainer/blob/a6a4e373071c6be3215bdc1367cb3d40fbcd8a2a/chainer/functions/noise/dropout.py
     
     properties (Access = 'protected') 
         weights
@@ -24,8 +26,9 @@ classdef Dropout < BaseLayer
             obj.isTraining = true;
             obj.dropoutProb = prob;
             obj.inputLayer = inLayer;
-            % Relu does not change the shape of it's output
-            obj.activationShape = obj.inputLayer.getActivationShape();
+            if ~isempty(inLayer)
+                obj.activationShape = obj.inputLayer.getActivationShape();
+            end
         end
         
         function [activations] = ForwardPropagation(obj, input, weights, bias)
@@ -35,7 +38,11 @@ classdef Dropout < BaseLayer
                 shapeInput = size(input);
                 % Inverted dropout (Forward during prediction will be
                 % transparent)
-                obj.dropoutMask = (rand(shapeInput) < obj.dropoutProb) / obj.dropoutProb;
+                %obj.dropoutMask = (rand(shapeInput) < obj.dropoutProb) / obj.dropoutProb;                
+                obj.dropoutMask = (rand(shapeInput) >= obj.dropoutProb) ./ (1-obj.dropoutProb);
+                % Uncomment if you want to compare with python results
+                % (rand from python has results transposed w.r.t to matlab)
+                %obj.dropoutMask = (rand(shapeInput)' >= obj.dropoutProb) ./ (1-obj.dropoutProb);
                 activations = input .* obj.dropoutMask;
             else
                 activations = input;
