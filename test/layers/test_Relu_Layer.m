@@ -23,6 +23,9 @@ gradDout.input = dout;
 % Create Relu layer
 rl = Relu('RL_1',[],[]);
 
+% Some error on gradient check Issue #11
+%rl.EnableGradientCheck(true);
+
 % Do forward pass
 activations = rl.ForwardPropagation(x, [], []);
 % Do backward pass
