@@ -15,16 +15,16 @@ data.pushToGPU();
 %% Create network
 layers = LayerContainer();    
 layers <= struct('name','ImageIn','type','input','rows',1,'cols',784,'depth',1, 'batchsize',1);
-layers <= struct('name','FC_1','type','fc', 'num_output',50);
+layers <= struct('name','FC_1','type','fc', 'num_output',200);
 layers <= struct('name','BN_1','type','batchnorm','eps',1e-5, 'momentum', 0.9);
 layers <= struct('name','Relu_1','type','relu');
-%layers <= struct('name','FC_2','type','fc', 'num_output',10);
-%layers <= struct('name','BN_2','type','batchnorm','eps',1e-5, 'momentum', 0.9);
-%layers <= struct('name','Relu_2','type','relu');
-%layers <= struct('name','FC_3','type','fc', 'num_output',200);
-%layers <= struct('name','BN_3','type','batchnorm','eps',1e-5, 'momentum', 0.9);
-%layers <= struct('name','Relu_3','type','relu');
-%layers <= struct('name','DRP_1','type','dropout','prob',0.5);
+layers <= struct('name','FC_2','type','fc', 'num_output',100);
+layers <= struct('name','BN_2','type','batchnorm','eps',1e-5, 'momentum', 0.9);
+layers <= struct('name','Relu_2','type','relu');
+layers <= struct('name','FC_3','type','fc', 'num_output',50);
+layers <= struct('name','BN_3','type','batchnorm','eps',1e-5, 'momentum', 0.9);
+layers <= struct('name','Relu_3','type','relu');
+layers <= struct('name','DRP_1','type','dropout','prob',0.5);
 layers <= struct('name','FC_4','type','fc','num_output',data.GetNumClasses());
 layers <= struct('name','Softmax','type','softmax');
 
@@ -42,7 +42,8 @@ solver.Train();
 testBatchSize = size(input_test,1);
 figure(2);
 batchValidation = data.GetValidationBatch(testBatchSize);
-%display_MNIST_Data(reshape_row_major(batchValidation.X,[testBatchSize,784]));
+batchImg = gather(batchValidation.X(:,:,:,1:20));
+display_MNIST_Data(reshape_row_major(batchImg,[20,784]));
 title('Images on validation');
 errorCount = 0;
 
@@ -58,7 +59,7 @@ idxCorrect = idxCorrect - 1;
 for idx=1:testBatchSize    
     if idxScoresMax(idx) ~= idxCorrect(idx)
         errorCount = errorCount + 1;
-        %fprintf('Predicted %d and should be %d\n',idxScoresMax(idx),idxCorrect(idx));
+        fprintf('Predicted %d and should be %d\n',idxScoresMax(idx),idxCorrect(idx));
     end    
 end
 errorPercentage = (errorCount*100) / testBatchSize;
