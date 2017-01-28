@@ -105,7 +105,7 @@ classdef (Sealed) Dataset < handle
         function pushToGPU(obj)
             obj.m_X_Tensor = gpuArray(obj.m_X_Tensor);
             obj.m_Y_one_hot = gpuArray(obj.m_Y_one_hot);
-            if ~isempty(m_X_Val_Tensor)
+            if ~isempty(obj.m_X_Val_Tensor)
                 obj.m_X_Val_Tensor = gpuArray(obj.m_X_Val_Tensor);
                 obj.m_Y_val_one_hot = gpuArray(obj.m_Y_val_one_hot);
             end

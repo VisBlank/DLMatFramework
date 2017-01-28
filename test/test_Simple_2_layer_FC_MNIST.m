@@ -15,12 +15,12 @@ data.pushToGPU();
 %% Create network
 layers = LayerContainer();    
 layers <= struct('name','ImageIn','type','input','rows',1,'cols',784,'depth',1, 'batchsize',1);
-layers <= struct('name','FC_1','type','fc', 'num_output',20);
-%layers <= struct('name','BN_1','type','batchnorm','eps',1e-5, 'momentum', 0.9);
+layers <= struct('name','FC_1','type','fc', 'num_output',50);
+layers <= struct('name','BN_1','type','batchnorm','eps',1e-5, 'momentum', 0.9);
 layers <= struct('name','Relu_1','type','relu');
-layers <= struct('name','FC_2','type','fc', 'num_output',20);
+%layers <= struct('name','FC_2','type','fc', 'num_output',10);
 %layers <= struct('name','BN_2','type','batchnorm','eps',1e-5, 'momentum', 0.9);
-layers <= struct('name','Relu_2','type','relu');
+%layers <= struct('name','Relu_2','type','relu');
 %layers <= struct('name','FC_3','type','fc', 'num_output',200);
 %layers <= struct('name','BN_3','type','batchnorm','eps',1e-5, 'momentum', 0.9);
 %layers <= struct('name','Relu_3','type','relu');
@@ -33,9 +33,9 @@ net = DeepLearningModel(layers, LossFactory.GetLoss('multi_class_cross_entropy')
 
 
 %% Create solver and train
-solver = Solver(net, data, 'sgd',containers.Map({'learning_rate', 'L2_reg'}, {0.001, 0}));
+solver = Solver(net, data, 'sgd',containers.Map({'learning_rate', 'L2_reg'}, {0.01, 0}));
 solver.SetBatchSize(200);
-solver.SetEpochs(100);
+solver.SetEpochs(60);
 solver.Train();
 
 %% Test
