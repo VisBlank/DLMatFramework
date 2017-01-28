@@ -14,5 +14,14 @@ classdef (Abstract) Optimizer < handle
         [weights] = Optimize(obj, w, dw);
     end
     
+    methods (Access = public)
+        function SetLearningRate(obj, lrRate)
+           obj.m_base_lr = lrRate;
+        end
+        function [lr] = GetLearningRate(obj)
+           lr = obj.m_base_lr;
+        end
+    end
+    
 end
 

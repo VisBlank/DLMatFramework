@@ -21,6 +21,7 @@ classdef Solver < handle
         m_data = [];
         m_loss_history = [];
         m_l2_reg = 0;
+        m_currEpoch = 0;
     end
     
     methods(Access = protected)
@@ -39,17 +40,17 @@ classdef Solver < handle
                 obj.m_loss_history(end+1) = gather(loss);
             else
                 obj.m_loss_history(end+1) = loss;
-            end            
+            end
             
             %% Perform a parameter update
             weightsMap = obj.m_model.getWeights();
             keys = weightsMap.keys;
-            biasMap = obj.m_model.getBias();            
+            biasMap = obj.m_model.getBias();
             numParameters = numel(keys);
             for idx = 1:numParameters
                 weight = weightsMap(keys{idx});
                 if ~isempty(weight)
-                    bias = biasMap(keys{idx});                    
+                    bias = biasMap(keys{idx});
                     
                     % Add regularization gradient contribution
                     grad.weights(keys{idx}) = grad.weights(keys{idx}) + (obj.m_l2_reg * weight);
@@ -78,7 +79,7 @@ classdef Solver < handle
         end
         
         function obj = Solver(model, data, optimizerType, config)
-            obj.m_model = model;            
+            obj.m_model = model;
             % Get reference to your training data
             obj.m_data = data;
             switch optimizerType
@@ -88,6 +89,13 @@ classdef Solver < handle
                     obj.m_optimizer = SgdMomentum(config);
                 otherwise
                     fprintf('Optimizer not implemented\n');
+            end
+            
+            % Get learning rate decay parameter (Step decay)
+            if isKey(config,'lr_decay')
+                obj.m_lr_decay = config('lr_decay');
+            else
+                obj.m_lr_decay = 1.0;
             end
             
             % Both solver and model needs reguarization information
@@ -105,8 +113,20 @@ classdef Solver < handle
             
             for t=1:num_iterations
                 obj.Step();
+                % Print something once and while
                 if (obj.m_verbose) && (mod(t,obj.m_print_every) == 0)
-                    fprintf ('(Iteration %d / %d) loss: %d\n',(t + 1), num_iterations, obj.m_loss_history(end) );
+                    fprintf ('(Iteration %d / %d) loss: %d\n',(t), num_iterations, obj.m_loss_history(end) );                    
+                end
+                
+                % At the end of the epoch increment counter and decay
+                % learning rate
+                epoch_end = mod((t + 1), iterations_per_epoch) == 0;
+                if epoch_end                    
+                    obj.m_currEpoch = obj.m_currEpoch+1;
+                    % Do Step weight decay
+                    currLearningRate = obj.m_optimizer.GetLearningRate();
+                    currLearningRate = currLearningRate*obj.m_lr_decay;
+                    obj.m_optimizer.SetLearningRate(currLearningRate);
                 end
             end
             
