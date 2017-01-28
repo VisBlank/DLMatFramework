@@ -50,8 +50,8 @@ classdef GradientCheck < handle
                 x(i) = old_value;
                 
                 % Now compute the partial derivative
-                grad(i) = sum((f_x_plus_h-f_x_minus_h) .* dout)./(2*h);
-                
+                firstPart = (f_x_plus_h-f_x_minus_h) .* dout;
+                grad(i) = sum(firstPart(:))/(2*h);                
             end
         end
         % This function can be accelerated if we vectorize it

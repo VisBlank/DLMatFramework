@@ -36,6 +36,7 @@ fc = FullyConnected('FC_1',numOutput,[],[]);
 out = fc.ForwardPropagation(x,w,b);
 
 % Do backward pass
+fc.EnableGradientCheck(true);
 gradients = fc.BackwardPropagation(gradDout);
 
 % Compare differences

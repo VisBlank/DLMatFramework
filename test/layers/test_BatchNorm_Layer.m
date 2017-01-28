@@ -40,6 +40,7 @@ bn = BatchNorm('BN_1',1e-5,0.9,[],[]);
 % Do forward pass
 bn.ForwardPropagation(x, gamma, beta);
 % Do backward pass
+bn.EnableGradientCheck(true);
 gradients = bn.BackwardPropagation(gradDout);
 
 % Compare differences

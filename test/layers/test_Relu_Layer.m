@@ -29,6 +29,7 @@ rl = Relu('RL_1',[],[]);
 % Do forward pass
 activations = rl.ForwardPropagation(x, [], []);
 % Do backward pass
+rl.EnableGradientCheck(true);
 gradients = rl.BackwardPropagation(gradDout);
 
 % Compare differences

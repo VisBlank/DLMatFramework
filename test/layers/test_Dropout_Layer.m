@@ -41,7 +41,7 @@ diff_db = sum(abs(out(:) - out_mat(:)));
 
 % Will automatically raise an error if the gradient does not match with the
 % numerical estimation
-%dp.EnableGradientCheck(true);
+dp.EnableGradientCheck(true);
 gradients = dp.BackwardPropagation(gradDout);
 
 % We cannot compare, if first we transpose the rand call on dropout forward

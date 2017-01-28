@@ -36,6 +36,14 @@ classdef Dropout < BaseLayer
             
             if (obj.isTraining)
                 shapeInput = size(input);
+                
+                % If we're using gradient check we need to use a fixed
+                % seed, but this is actually not needed if you are not
+                % using gradient check
+                if obj.doGradientCheck
+                    rand('twister', 123);
+                end
+                
                 % Inverted dropout (Forward during prediction will be
                 % transparent)
                 %obj.dropoutMask = (rand(shapeInput) < obj.dropoutProb) / obj.dropoutProb;                
@@ -43,6 +51,7 @@ classdef Dropout < BaseLayer
                 % Uncomment if you want to compare with python results
                 % (rand from python has results transposed w.r.t to matlab)
                 %obj.dropoutMask = (rand(shapeInput)' >= obj.dropoutProb) ./ (1-obj.dropoutProb);
+                
                 activations = input .* obj.dropoutMask;
             else
                 activations = input;
