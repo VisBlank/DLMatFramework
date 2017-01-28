@@ -62,6 +62,6 @@ for idx=1:testBatchSize
     end    
 end
 errorPercentage = (errorCount*100) / testBatchSize;
-fprintf('Accuracy is %d percent \n',round((100-errorPercentage)));
+fprintf('Validation Accuracy is %d percent \n',round((100-errorPercentage)));
 figure;
 plot(solver.GetLossHistory)
