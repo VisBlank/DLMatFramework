@@ -34,6 +34,8 @@ classdef LayerContainer < handle
                     layerInst = InputLayer(metaDataLayer.name, metaDataLayer.rows,metaDataLayer.cols,metaDataLayer.depth, metaDataLayer.batchsize, obj.numLayers+1);
                 case 'fc'                    
                     layerInst = FullyConnected(metaDataLayer.name, metaDataLayer.num_output, obj.numLayers+1, previousLayer);                
+                case 'conv'                    
+                    layerInst = ConvolutionLayer(metaDataLayer.name, metaDataLayer.kh, metaDataLayer.kw, metaDataLayer.stride, metaDataLayer.pad, obj.numLayers+1, previousLayer);                
                 case 'relu'
                     layerInst = Relu(metaDataLayer.name, obj.numLayers+1, previousLayer);                                                
                 case 'dropout'

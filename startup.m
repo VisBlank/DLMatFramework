@@ -11,6 +11,7 @@ addpath(genpath(fullfile(curdir, 'test')));
 addpath(genpath(fullfile(curdir, 'datasets')));
 addpath(genpath(fullfile(curdir, 'layers')));
 addpath(genpath(fullfile(curdir, 'classifiers')));
+addpath(genpath(fullfile(curdir, 'vanilla_examples')));
 addpath(genpath(fullfile(curdir, 'loss')));
 
 if ~verLessThan('matlab','8.4')
