@@ -30,7 +30,9 @@ classdef DeepLearningModel < handle
                 shapeInput = currLayer.getInputLayer().getActivationShape();
                 layerName = currLayer.getName();
                 if isa(currLayer,'FullyConnected')
-                    obj.weightsMap(layerName) = rand(prod(shapeInput),currLayer.getNumOutput());
+                    fan_in = prod(shapeInput);
+                    fan_out = currLayer.getNumOutput();                    
+                    obj.weightsMap(layerName) = randn(fan_in,fan_out) / sqrt(fan_in);
                     obj.BiasMap(layerName) = zeros(1,currLayer.getNumOutput());                    
                 else
                     % Some layers (ie Relu, Softmax) has no parameters
