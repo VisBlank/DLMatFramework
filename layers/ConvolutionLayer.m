@@ -6,6 +6,7 @@ classdef ConvolutionLayer < BaseLayer
     % https://github.com/leonardoaraujosantos/DLMatFramework/blob/master/learn/cs231n/assignment3/cs231n/fast_layers.py#L13
     % https://github.com/leonardoaraujosantos/DLMatFramework/blob/master/learn/cs231n/assignment3/cs231n/fast_layers.py#L106
     % http://sunshineatnoon.github.io/Using.Computation.Graph.to.Understand.and.Implement.Backpropagation/
+    % https://uk.mathworks.com/matlabcentral/newsreader/view_thread/279051
     
     properties (Access = 'protected')
         weights
@@ -24,6 +25,7 @@ classdef ConvolutionLayer < BaseLayer
         m_kernelWidth
         m_stride
         m_padding
+        previousInput_im2col
     end
     
     methods (Access = 'public')
@@ -72,6 +74,10 @@ classdef ConvolutionLayer < BaseLayer
                 im_col = im2col_ref(im,HH,WW,obj.m_stride,obj.m_padding,1);
                 mul = (filter_col * im_col) + bias_m;
                 activations(:,:,:,idxBatch) =  reshape_row_major(mul,[H_prime W_prime size(mul,1)]);
+                
+                % Not so fast way to concatenate the im2col result we need
+                % to find a way to have im2col batch
+                obj.previousInput_im2col = [obj.previousInput_im2col im_col];
             end
             
             
@@ -79,17 +85,43 @@ classdef ConvolutionLayer < BaseLayer
             obj.activations = activations;
             obj.weights = weights;
             obj.biases = bias;
-            obj.previousInput = input;
+            obj.previousInput = input;            
         end
         
         function [gradient] = BackwardPropagation(obj, dout)
-            dout = dout.input;                        
+            dout = dout.input;     
+            [filter_height, filter_width, ~, num_filters] = size(obj.weights);                                    
             
+            % Get the bias gradient which will be the sum of dout over the
+            % dimensions (batches(4), rows(1), cols(2))
+            gradient.bias = sum(sum(sum(dout, 1), 2), 4);
+            
+            % Get the weight gradient (Still wrong, need to debug)                                  
+            dout_perm = permute(dout,[2,4,1,3]);  % On python was 1,2,3,0                        
+            N = numel(dout) / num_filters;
+            dout_reshape = reshape_row_major(dout_perm,[num_filters,N]);            
+            
+            % Result im2col is wrong compared to other version
+            im2col = obj.previousInput_im2col';
+            dw = dout_reshape * im2col;
+            gradient.weight = reshape_row_major(dw, size(obj.weights));
+            %gradient.weight = reshape(dw, size(obj.weights));
+            
+            % Get the input gradient
+            N = numel(obj.weights) / num_filters;
+            w_reshape = reshape_row_major(obj.weights, [num_filters,N]);
+            w_reshape = w_reshape';
+            % Matches here with python debug....
+            dx_cols = w_reshape * dout_reshape;
+            % Now we should do col2_img on dx_cols to have the same shape
+            % as the input
+            [H,W,C,N] = size(obj.previousInput);
+            gradient.input = col2im_batch_ref(dx_cols,H,W,C,N);
+            %gradient.input =  reshape_row_major(dx_cols,size(obj.previousInput));
             % Evaluate numerically for now
-            evalGrad = obj.EvalBackpropNumerically(dout);
-            gradient.input = evalGrad.input;
-            gradient.weight = evalGrad.weight;
-            gradient.bias = evalGrad.bias;
+            
+            %evalGrad = obj.EvalBackpropNumerically(dout);
+            %gradient.input = evalGrad.input;            
             
             if obj.doGradientCheck
                 evalGrad = obj.EvalBackpropNumerically(dout);

@@ -110,14 +110,23 @@ def conv_backward_im2col(dout, cache):
   """
   x, w, b, conv_param, x_cols = cache
   stride, pad = conv_param['stride'], conv_param['pad']
+  num_filters, _, filter_height, filter_width = w.shape
 
+  # Bias gradient (Sum on dout dimensions (batch, rows, cols)
   db = np.sum(dout, axis=(0, 2, 3))
 
-  num_filters, _, filter_height, filter_width = w.shape
-  dout_reshaped = dout.transpose(1, 2, 3, 0).reshape(num_filters, -1)
-  dw = dout_reshaped.dot(x_cols.T).reshape(w.shape)
+  # Weight gradient
+  # Transpose dout to (channels, rows, cols, batches)
+  dout_transposed = dout.transpose(1, 2, 3, 0)
+  # Reshape to matrix [num_filters x "necessery cols to be able to do dot product with x_cols.T"]
+  dout_reshaped = dout_transposed.reshape(num_filters, -1)
+  dw = dout_reshaped.dot(x_cols.T)
+  dw = dw.reshape(w.shape)
 
-  dx_cols = w.reshape(num_filters, -1).T.dot(dout_reshaped)
+  # Input gradient
+  w_reshape = w.reshape(num_filters, -1)
+  w_reshape = w_reshape.T
+  dx_cols = w_reshape.dot(dout_reshaped)
   # dx = col2im_indices(dx_cols, x.shape, filter_height, filter_width, pad, stride)
   dx = col2im_cython(dx_cols, x.shape[0], x.shape[1], x.shape[2], x.shape[3],
                      filter_height, filter_width, pad, stride)
