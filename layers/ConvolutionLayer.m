@@ -3,6 +3,9 @@ classdef ConvolutionLayer < BaseLayer
     % Reference:
     % https://github.com/leonardoaraujosantos/DLMatFramework/blob/master/learn/cs231n/assignment2/cs231n/layers.py
     % https://leonardoaraujosantos.gitbooks.io/artificial-inteligence/content/convolution_layer.html
+    % https://github.com/leonardoaraujosantos/DLMatFramework/blob/master/learn/cs231n/assignment3/cs231n/fast_layers.py#L13
+    % https://github.com/leonardoaraujosantos/DLMatFramework/blob/master/learn/cs231n/assignment3/cs231n/fast_layers.py#L106
+    % http://sunshineatnoon.github.io/Using.Computation.Graph.to.Understand.and.Implement.Backpropagation/
     
     properties (Access = 'protected')
         weights
@@ -49,15 +52,15 @@ classdef ConvolutionLayer < BaseLayer
             activations = zeros([H_prime,W_prime,F,N]);
             
             % Preparing filter weights
-            filter_col = reshape(w,[HH*WW*C F]);
+            filter_col = reshape(weights,[HH*WW*C F]);
             filter_col = filter_col';
             
             % Preparing bias
             if ~isempty(bias)
-                bias = repmat(bias,[1 H_prime*W_prime]);
+                bias_m = repmat(bias,[1 H_prime*W_prime]);
             else
-                b = single(zeros(size(filter_col,1),1));
-                bias = repmat(b,[1 H_prime*W_prime]);
+                b = zeros(size(filter_col,1),1);
+                bias_m = repmat(b,[1 H_prime*W_prime]);
             end
             
             % Here we convolve each image on the batch in a for-loop, but the im2col
@@ -66,9 +69,9 @@ classdef ConvolutionLayer < BaseLayer
             % par-for implementation with OpenMP on CPU
             for idxBatch = 1:N
                 im = input(:,:,:,idxBatch);    
-                im_col = im2col_ref(im,HH,WW,stride,pad_num,1);
-                mul = (filter_col * im_col) + bias;
-                activations(:,:,:,ii) =  reshape_row_major(mul,[H_prime W_prime size(mul,1)]);
+                im_col = im2col_ref(im,HH,WW,obj.m_stride,obj.m_padding,1);
+                mul = (filter_col * im_col) + bias_m;
+                activations(:,:,:,idxBatch) =  reshape_row_major(mul,[H_prime W_prime size(mul,1)]);
             end
             
             
@@ -80,16 +83,13 @@ classdef ConvolutionLayer < BaseLayer
         end
         
         function [gradient] = BackwardPropagation(obj, dout)
-            dout = dout.input;
-            % Recover cache
-            lenSizeActivations = length(size(obj.previousInput));
-            if (lenSizeActivations < 3)
-                N = size(obj.previousInput,1);
-            else
-                N = size(obj.previousInput,ndims(obj.previousInput));
-            end
+            dout = dout.input;                        
             
-            
+            % Evaluate numerically for now
+            evalGrad = obj.EvalBackpropNumerically(dout);
+            gradient.input = evalGrad.input;
+            gradient.weight = evalGrad.weight;
+            gradient.bias = evalGrad.bias;
             
             if obj.doGradientCheck
                 evalGrad = obj.EvalBackpropNumerically(dout);

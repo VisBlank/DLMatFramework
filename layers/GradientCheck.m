@@ -30,7 +30,7 @@ classdef GradientCheck < handle
         function grad = Eval_vector_input(f,x,dout)
             % f will be a lambda of a function with a single parameter
             % x point(on any dimension) where to evalualte the gradient            
-            h = 0.00001;
+            h = 0.000001;
             grad = zeros(size(x));
             
             % Iterate on all dimensions of the vector x
