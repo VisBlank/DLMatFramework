@@ -55,7 +55,7 @@ classdef ConvolutionLayer < BaseLayer
             
             % Preparing filter weights
             filter_col = reshape(weights,[HH*WW*C F]);
-            filter_col = filter_col';
+            filter_col_T = filter_col';
             
             % Preparing bias
             if ~isempty(bias)
@@ -72,8 +72,8 @@ classdef ConvolutionLayer < BaseLayer
             for idxBatch = 1:N
                 im = input(:,:,:,idxBatch);    
                 im_col = im2col_ref(im,HH,WW,obj.m_stride,obj.m_padding,1);
-                mul = (filter_col * im_col) + bias_m;
-                activations(:,:,:,idxBatch) =  reshape_row_major(mul,[H_prime W_prime size(mul,1)]);
+                mul = (filter_col_T * im_col) + bias_m;
+                activations(:,:,:,idxBatch) =  reshape_row_major(mul,[H_prime W_prime C]);                
                 
                 % Not so fast way to concatenate the im2col result we need
                 % to find a way to have im2col batch
