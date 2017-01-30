@@ -75,6 +75,10 @@ dictSaveMat['filter_height']=filter_height
 dictSaveMat['filter_width']=filter_width
 scipy.io.savemat('im2col_with_batch_cs231n',dictSaveMat)
 
-x_simple_channel_1 = np.array('[1 1 1 1 1; 2 2 2 2 2; 3 3 3 3 3; 4 4 4 4 4; 5 5 5 5 5]')
-x_simple_channel_2 = np.array('[10 10 10 10 10; 20 20 20 20 20; 30 30 30 30 30; 40 40 40 40 40; 50 50 50 50 50]')
-x_simple_channel_3 = np.array('[11 11 11 11 11; 21 21 21 21 21; 31 31 31 31 31; 41 41 41 41 41; 51 51 51 51 51]')
+dictMat = scipy.io.loadmat('SimpleInput.mat')
+x_simple = dictMat['x_simple']
+x_simple = x_simple.transpose(3,2,0,1)
+x_simple = x_simple.astype('float')
+x_simple = x_simple.reshape(2, 3, 4, 4)
+x_cols_simple = im2col_cython(x_simple, 2, 2, 0, 1)
+1+1

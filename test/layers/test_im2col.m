@@ -3,7 +3,11 @@ load im2col_with_batch_cs231n
 
 % Fix the tensor dimensions between python and matlab
 x = permute(x,[3,4,2,1]);
-%x = x(:,:,:,1);
+
+% Also create a simpler input
+x_simple = [1:1:48];
+x_simple = reshape_row_major(x_simple,[4,4,3,1]);
+x_simple(:,:,:,2) = x_simple(:,:,:,1)*10;
 
 % Pass values to double
 P = double(pad);
