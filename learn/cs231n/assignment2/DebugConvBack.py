@@ -46,4 +46,35 @@ print ('dx error: ', rel_error(dx, dx_num))
 print ('dw error: ', rel_error(dw, dw_num))
 print ('db error: ', rel_error(db, db_num))
 
+# Some tests with im2col (Preparing the image x to be convolved with a 3,3 kernel with stride:1 pad:1
+H = 5
+W = 5
+filter_height = 3
+filter_width = 3
+pad = 1
+stride = 1
 
+# Calculate spatial output sizes
+out_height = (H + 2 * pad - filter_height) / stride + 1
+out_width = (W + 2 * pad - filter_width) / stride + 1
+
+print('\n\noriginal x: ', x.shape)
+x_cols = im2col_cython(x, filter_height, filter_width, pad, stride)
+print('im2col result: ', x_cols.shape)
+print('Conv out height: %d width: %d' % (out_height, out_width))
+
+# Save vectors to matlab for tests
+import scipy.io
+
+dictSaveMat={}
+dictSaveMat['x']=x.astype('float')
+dictSaveMat['x_cols']=x_cols.astype('float')
+dictSaveMat['pad']=pad
+dictSaveMat['stride']=stride
+dictSaveMat['filter_height']=filter_height
+dictSaveMat['filter_width']=filter_width
+scipy.io.savemat('im2col_with_batch_cs231n',dictSaveMat)
+
+x_simple_channel_1 = np.array('[1 1 1 1 1; 2 2 2 2 2; 3 3 3 3 3; 4 4 4 4 4; 5 5 5 5 5]')
+x_simple_channel_2 = np.array('[10 10 10 10 10; 20 20 20 20 20; 30 30 30 30 30; 40 40 40 40 40; 50 50 50 50 50]')
+x_simple_channel_3 = np.array('[11 11 11 11 11; 21 21 21 21 21; 31 31 31 31 31; 41 41 41 41 41; 51 51 51 51 51]')
