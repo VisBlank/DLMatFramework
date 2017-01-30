@@ -57,6 +57,7 @@ def col2im(mul,h_prime,w_prime,C):
         for i in range(F):
             col = mul[:,i]
             out[i,:,:] = np.reshape(col,(C,h_prime,w_prime))
+
     return out
 
 def col2im_back(dim_col,h_prime,w_prime,stride,hh,ww,c):
@@ -148,6 +149,9 @@ def conv_backward_naive_im2col(dout, cache):
   dx = np.zeros(x.shape)
   db = np.zeros(b.shape)
 
+  # Bias gradient (Sum on dout dimensions (batch, rows, cols)
+  db = np.sum(dout, axis=(0, 2, 3))
+
   for i in range(N):
       im = x[i,:,:,:]
       im_pad = np.pad(im,((0,0),(pad_num,pad_num),(pad_num,pad_num)),'constant')
@@ -159,7 +163,7 @@ def conv_backward_naive_im2col(dout, cache):
       dbias_sum = dbias_sum.T
 
       #bias_sum = mul + b
-      db += np.sum(dbias_sum,axis=0)
+      #db += np.sum(dbias_sum,axis=0)
       dmul = dbias_sum
 
       #mul = im_col * filter_col
@@ -206,6 +210,15 @@ print ('dx error: ', rel_error(dx, dx_num))
 print ('dw error: ', rel_error(dw, dw_num))
 print ('db error: ', rel_error(db, db_num))
 
+out, cache = conv_forward_naive_im2col(x, w, b, conv_param)
+dx, dw, db = conv_backward_naive_im2col(dout, cache)
+print ('Testing conv_backward_naive_im2col function')
+print ('dx error: ', rel_error(dx, dx_num))
+print ('dw error: ', rel_error(dw, dw_num))
+print ('db error: ', rel_error(db, db_num))
+
+
+
 # Some tests with im2col (Preparing the image x to be convolved with a 3,3 kernel with stride:1 pad:1
 H = 5
 W = 5
@@ -218,7 +231,7 @@ stride = 1
 out_height = (H + 2 * pad - filter_height) / stride + 1
 out_width = (W + 2 * pad - filter_width) / stride + 1
 
-print('\n\noriginal x: ', x.shape)
+print("original x: ", x.shape)
 x_cols = im2col_cython(x, filter_height, filter_width, pad, stride)
 print('im2col result: ', x_cols.shape)
 print('Conv out height: %d width: %d' % (out_height, out_width))
@@ -241,4 +254,9 @@ x_simple = x_simple.transpose(3,2,0,1)
 x_simple = x_simple.astype('float')
 x_simple = x_simple.reshape(2, 3, 4, 4)
 x_cols_simple = im2col_cython(x_simple, 2, 2, 0, 1)
+
+# This im2col does not accept multiple batches
+x_cols_simple_2 = im2col(x_simple[0,:,:,:], 2, 2, 1)
+# Transpose, and it will be the same as the docs.
+x_cols_simple_2 = x_cols_simple_2.T
 1+1
