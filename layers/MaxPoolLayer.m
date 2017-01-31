@@ -1,5 +1,5 @@
-classdef ConvolutionLayer < BaseLayer
-    %ConvolutionLayer Summary of this class goes here
+classdef MaxPoolLayer < BaseLayer
+    %MaxPoolLayer Summary of this class goes here
     % Reference:
     % https://github.com/leonardoaraujosantos/DLMatFramework/blob/master/learn/cs231n/assignment2/cs231n/layers.py
     % https://leonardoaraujosantos.gitbooks.io/artificial-inteligence/content/convolution_layer.html
@@ -20,15 +20,14 @@ classdef ConvolutionLayer < BaseLayer
         inputLayer
         numOutput
         
-        % Some data used for convolution
+        % Some data used for maxpool
         m_kernelHeight
         m_kernelWidth
-        m_stride
-        m_padding        
+        m_stride        
     end
     
     methods (Access = 'public')
-        function [obj] = ConvolutionLayer(name, kH, kW, stride, pad,index, inLayer)
+        function [obj] = MaxPoolLayer(name, kH, kW, stride, index, inLayer)
             obj.name = name;
             obj.index = index;
             %obj.numOutput = numOutput;
@@ -36,50 +35,34 @@ classdef ConvolutionLayer < BaseLayer
             %obj.activationShape = [1 numOutput];
             obj.m_kernelHeight = kH;
             obj.m_kernelWidth = kW;
-            obj.m_stride = stride;
-            obj.m_padding = pad;
+            obj.m_stride = stride;            
         end
         
         function [activations] = ForwardPropagation(obj, input, weights, bias)
             % Tensor format (rows,cols,channels, batch) on matlab
-            [H,W,~,N] = size(input);
-            [HH,WW,C,F] = size(weights);
-            
+            [H,W,C,N] = size(input);
+                        
             % Calculate output sizes
-            H_prime = (H+2*obj.m_padding-HH)/obj.m_stride +1;
-            W_prime = (W+2*obj.m_padding-WW)/obj.m_stride +1;
+            H_prime = (H-obj.m_kernelHeight)/obj.m_stride +1;
+            W_prime = (W-obj.m_kernelWidth)/obj.m_stride +1;
             
             % Alocate memory for output
-            activations = zeros([H_prime,W_prime,F,N]);
+            activations = zeros([H_prime,W_prime,C,N]);            
+            %reshape so our im2col produces an output we can use
+            im_split = reshape(input, H, W, 1, C*N); 
+            im_col = im2col_ref_batch(im_split,obj.m_kernelHeight,obj.m_kernelWidth,obj.m_stride,0,0);
             
-            % Preparing filter weights
-            filter_col = reshape(weights,[HH*WW*C F]);
-            filter_col_T = filter_col';
+            %max pooling on each column (patch)   
+            max_pool = max(im_col,[],1);
             
-            % Preparing bias
-            if ~isempty(bias)
-                bias_m = repmat(bias,[1 H_prime*W_prime]);
-            else
-                b = zeros(size(filter_col,1),1);
-                bias_m = repmat(b,[1 H_prime*W_prime]);
-            end
-            
-            % Here we convolve each image on the batch in a for-loop, but the im2col
-            % could also handle a image batch at the input, so all computations would
-            % be just one big matrix multiplication. We opted now for this to test the
-            % par-for implementation with OpenMP on CPU
-            for idxBatch = 1:N
-                im = input(:,:,:,idxBatch);    
-                im_col = im2col_ref(im,HH,WW,obj.m_stride,obj.m_padding,1);
-                mul = (filter_col_T * im_col) + bias_m;
-                activations(:,:,:,idxBatch) =  reshape_row_major(mul,[H_prime W_prime size(mul,1)]);                                                
-            end
-            
+            %reshape to desired image output
+            activations = reshape_row_major(max_pool,[H_prime W_prime C N]); 
+                                    
             
             % Cache results for backpropagation
             obj.activations = activations;
-            obj.weights = weights;
-            obj.biases = bias;
+            obj.weights = [];
+            obj.biases = [];
             obj.previousInput = input;            
         end
         
