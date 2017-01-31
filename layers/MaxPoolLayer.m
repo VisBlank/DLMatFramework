@@ -68,55 +68,27 @@ classdef MaxPoolLayer < BaseLayer
         
         function [gradient] = BackwardPropagation(obj, dout)
             dout = dout.input;  
-            [H,W,~,N] = size(obj.previousInput);
-            [HH,WW,C,F] = size(obj.weights);  
+            [H,W,C,N] = size(obj.previousInput);            
             
             % Calculate output sizes
-            H_prime = (H+2*obj.m_padding-HH)/obj.m_stride +1;
-            W_prime = (W+2*obj.m_padding-WW)/obj.m_stride +1;
+            H_prime = (H-obj.m_kernelHeight)/obj.m_stride +1;
+            W_prime = (W-obj.m_kernelWidth)/obj.m_stride +1;                        
             
-            % Preparing filter weights            
-            filter_col_T = reshape_row_major(obj.weights,[F HH*WW*C]);                                                
-            
-            % Initialize gradients
-            dw = zeros(size(obj.weights));
+            % Initialize gradients            
             dx = zeros(size(obj.previousInput));            
-            % Get the bias gradient which will be the sum of dout over the
-            % dimensions (batches(4), rows(1), cols(2))
-            db = sum(sum(sum(dout, 1), 2), 4);
             
-            for idxBatch = 1:N
-                im = obj.previousInput(:,:,:,idxBatch);    
-                im_col = im2col_ref(im,HH,WW,obj.m_stride,obj.m_padding,1);
-                dout_i = dout(:,:,:,idxBatch);
-                                                
-                dout_i_reshaped = reshape_row_major(dout_i,[F, H*W]);                
-                
-                dw_before_reshape = dout_i_reshaped * im_col';                
-                dw_i = reshape(dw_before_reshape',[HH, WW, C, F]);
-                dw = dw + dw_i;
-                
-                % We now have the gradient just before the im2col
-                grad_before_im2col = (dout_i_reshaped' * filter_col_T);                
-                % Now we need to backpropagate im2col (im2col_back),
-                % results will padded by one always
-                dx_padded = im2col_back_ref(grad_before_im2col,H_prime, W_prime, obj.m_stride, HH, WW, C);                
-                % Now we need to take out the pading
-                dx(:,:,:,idxBatch) = dx_padded(2:end-1, 2:end-1,:);
-            end
+            % Basically we just need to multiply dout by a mask created
+            % from the cells that we selected on the previous forward
+            % propagation
 
             %% Output gradients    
-            gradient.bias = db;
+            gradient.bias = [];
             gradient.input = dx;  
-            gradient.weight = dw;
+            gradient.weight = [];
             
             if obj.doGradientCheck
                 evalGrad = obj.EvalBackpropNumerically(dout);
-                diff_Input = sum(abs(evalGrad.input(:) - gradient.input(:)));
-                diff_Weights = sum(abs(evalGrad.weight(:) - gradient.weight(:)));
-                diff_Bias = sum(abs(evalGrad.bias(:) - gradient.bias(:)));
-                diff_vec = [diff_Input diff_Weights diff_Bias]; % diff_Bias
-                diff = sum(diff_vec);
+                diff = sum(abs(evalGrad.input(:) - gradient.input(:)));                                               
                 if diff > 1e-5
                     msgError = sprintf('%s gradient failed!\n',obj.name);
                     error(msgError);
