@@ -145,10 +145,12 @@ def conv_backward_naive_im2col(dout, cache):
   H_prime = (H+2*pad_num-HH) // stride + 1
   W_prime = (W+2*pad_num-WW) // stride + 1
 
+  # Initialize variables
   dw = np.zeros(w.shape)
   dx = np.zeros(x.shape)
   db = np.zeros(b.shape)
 
+  # Get bias gradient
   # Bias gradient (Sum on dout dimensions (batch, rows, cols)
   db = np.sum(dout, axis=(0, 2, 3))
 
@@ -170,8 +172,12 @@ def conv_backward_naive_im2col(dout, cache):
       dfilter_col = (im_col.T).dot(dmul)
       dim_col = dmul.dot(filter_col.T)
 
+      # im2col Backward propagation
       dx_padded = col2im_back(dim_col,H_prime,W_prime,stride,HH,WW,C)
+
+      # Take out padding
       dx[i,:,:,:] = dx_padded[:,pad_num:H+pad_num,pad_num:W+pad_num]
+
       dw += np.reshape(dfilter_col.T,(F,C,HH,WW))
   return dx, dw, db
 
