@@ -77,7 +77,8 @@ def col2im_back(dim_col,h_prime,w_prime,stride,hh,ww,c):
         row = dim_col[i,:]
         h_start = (i / w_prime) * stride
         w_start = (i % w_prime) * stride
-        dx[:,h_start:h_start+hh,w_start:w_start+ww] += np.reshape(row,(c,hh,ww))
+        patch = np.reshape(row, (c, hh, ww))
+        dx[:,h_start:h_start+hh,w_start:w_start+ww] += patch
     return dx
 
 def conv_forward_naive_im2col(x, w, b, conv_param):

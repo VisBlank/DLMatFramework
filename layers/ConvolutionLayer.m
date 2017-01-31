@@ -88,6 +88,10 @@ classdef ConvolutionLayer < BaseLayer
             [H,W,~,N] = size(obj.previousInput);
             [HH,WW,C,F] = size(obj.weights);  
             
+            % Calculate output sizes
+            H_prime = (H+2*obj.m_padding-HH)/obj.m_stride +1;
+            W_prime = (W+2*obj.m_padding-WW)/obj.m_stride +1;
+            
             % Preparing filter weights
             filter_col = reshape(obj.weights,[HH*WW*C F]);            
             filter_col_T = filter_col';
@@ -112,9 +116,11 @@ classdef ConvolutionLayer < BaseLayer
                 dw = dw + dw_i;
                 
                 % We now have the gradient just before the im2col
-                dx_before_im2col = (filter_col_T * im_col);
+                grad_before_im2col = (dout_i_reshaped' * filter_col_T);
                 % Now we need to backpropagate im2col (im2col_back)
-                1+1;                                
+                dx_padded = im2col_back_ref(grad_before_im2col,H_prime, W_prime, obj.m_stride, HH, WW, C);
+                % Now we need to take out the pading
+                dx(:,:,:,N) = dx_padded(2:end-1, 2:end-1,:);
             end
             
             
