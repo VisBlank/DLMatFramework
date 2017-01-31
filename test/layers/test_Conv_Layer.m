@@ -42,6 +42,7 @@ b = b';
 out = permute(out,[3,4,2,1]);
 
 dout = permute(dout,[3,4,2,1]);
+dx_num_before_permute = dx_num;
 dx_num = permute(dx_num,[3,4,2,1]);
 dw_num = permute(dw_num,[3,4,2,1]);
 db_num = db_num';
@@ -58,7 +59,7 @@ conv = ConvolutionLayer('CONV_1',k_rows, k_cols, 1, 1,[],[]);
 % Do forward pass
 out_conv = conv.ForwardPropagation(x,w,b);
 % Do backward pass
-%conv.EnableGradientCheck(true);
+conv.EnableGradientCheck(true);
 gradients = conv.BackwardPropagation(gradDout);
 
 % Compare differences
@@ -67,7 +68,7 @@ diff_dw = sum(abs(gradients.weight(:) - dw_num(:)));
 diff_dx = sum(abs(gradients.input(:) - dx_num(:)));
 diff = sum([diff_db diff_dw diff_dx]);
 
-if diff > 1e-5
+if diff > 1e-7
     error('CONV backward pass failed');
 else
     fprintf('CONV backward pass passed\n');    

@@ -12,12 +12,19 @@ W = (dout_W - 1) * S + WW;
 img_grad = zeros(H,W,C);
 
 for ii=1:(dout_H*dout_W)
-    col = dout(:,ii);
-    h_start = (ii / dout_W) * S;
-    w_start = mod(ii,dout_W) * S;
+    row = dout(ii,:);
     
-    %patch = reshape_row_major(col,[HH,WW,C]);
-    1+1;
+    % Create a patch from the row
+    patch = reshape_row_major(row,[HH WW C]);
+    %patch = reshape(row,[HH WW C]);
+    
+    % Calculate indexes on dx
+    h_start = floor(((ii-1) / dout_W) * S);    
+    w_start = mod((ii-1),dout_W) * S;
+    h_start = h_start + 1;
+    w_start = w_start + 1;
+        
+    img_grad(h_start:h_start+HH-1, w_start:w_start+WW-1, :) = img_grad(h_start:h_start+HH-1, w_start:w_start+WW-1, :) + patch;    
 end
 
 end

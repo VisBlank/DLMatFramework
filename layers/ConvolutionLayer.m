@@ -92,17 +92,15 @@ classdef ConvolutionLayer < BaseLayer
             H_prime = (H+2*obj.m_padding-HH)/obj.m_stride +1;
             W_prime = (W+2*obj.m_padding-WW)/obj.m_stride +1;
             
-            % Preparing filter weights
-            filter_col = reshape(obj.weights,[HH*WW*C F]);            
-            filter_col_T = filter_col';
+            % Preparing filter weights            
+            filter_col_T = reshape_row_major(obj.weights,[F HH*WW*C]);                                                
             
             % Initialize gradients
             dw = zeros(size(obj.weights));
-            dx = zeros(size(obj.previousInput));
-            
+            dx = zeros(size(obj.previousInput));            
             % Get the bias gradient which will be the sum of dout over the
             % dimensions (batches(4), rows(1), cols(2))
-            gradient.bias = sum(sum(sum(dout, 1), 2), 4);
+            db = sum(sum(sum(dout, 1), 2), 4);
             
             for idxBatch = 1:N
                 im = obj.previousInput(:,:,:,idxBatch);    
@@ -116,17 +114,17 @@ classdef ConvolutionLayer < BaseLayer
                 dw = dw + dw_i;
                 
                 % We now have the gradient just before the im2col
-                grad_before_im2col = (dout_i_reshaped' * filter_col_T);
-                % Now we need to backpropagate im2col (im2col_back)
-                dx_padded = im2col_back_ref(grad_before_im2col,H_prime, W_prime, obj.m_stride, HH, WW, C);
+                grad_before_im2col = (dout_i_reshaped' * filter_col_T);                
+                % Now we need to backpropagate im2col (im2col_back),
+                % results will padded by one always
+                dx_padded = im2col_back_ref(grad_before_im2col,H_prime, W_prime, obj.m_stride, HH, WW, C);                
                 % Now we need to take out the pading
-                dx(:,:,:,N) = dx_padded(2:end-1, 2:end-1,:);
+                dx(:,:,:,idxBatch) = dx_padded(2:end-1, 2:end-1,:);
             end
-            
-            
-            
-            evalGrad = obj.EvalBackpropNumerically(dout);
-            gradient.input = evalGrad.input;  
+
+            %% Output gradients    
+            gradient.bias = db;
+            gradient.input = dx;  
             gradient.weight = dw;
             
             if obj.doGradientCheck
@@ -136,7 +134,7 @@ classdef ConvolutionLayer < BaseLayer
                 diff_Bias = sum(abs(evalGrad.bias(:) - gradient.bias(:)));
                 diff_vec = [diff_Input diff_Weights diff_Bias]; % diff_Bias
                 diff = sum(diff_vec);
-                if diff > 0.0001
+                if diff > 1e-5
                     msgError = sprintf('%s gradient failed!\n',obj.name);
                     error(msgError);
                 else

@@ -177,7 +177,8 @@ def conv_backward_naive_im2col(dout, cache):
       dx_padded = col2im_back(dim_col,H_prime,W_prime,stride,HH,WW,C)
 
       # Take out padding
-      dx[i,:,:,:] = dx_padded[:,pad_num:H+pad_num,pad_num:W+pad_num]
+      dx_unpad = dx_padded[:,pad_num:H+pad_num,pad_num:W+pad_num]
+      dx[i,:,:,:] = dx_unpad
 
       dw += np.reshape(dfilter_col.T,(F,C,HH,WW))
   return dx, dw, db
@@ -219,6 +220,11 @@ print ('db error: ', rel_error(db, db_num))
 
 out, cache = conv_forward_naive_im2col(x, w, b, conv_param)
 dx, dw, db = conv_backward_naive_im2col(dout, cache)
+
+dx_img1 = dx[0,:,:,:]
+dx_img1 = dx[1,:,:,:]
+dx_img1 = dx[2,:,:,:]
+
 print ('Testing conv_backward_naive_im2col function')
 print ('dx error: ', rel_error(dx, dx_num))
 print ('dw error: ', rel_error(dw, dw_num))
@@ -255,15 +261,15 @@ dictSaveMat['filter_height']=filter_height
 dictSaveMat['filter_width']=filter_width
 scipy.io.savemat('im2col_with_batch_cs231n',dictSaveMat)
 
-dictMat = scipy.io.loadmat('SimpleInput.mat')
-x_simple = dictMat['x_simple']
-x_simple = x_simple.transpose(3,2,0,1)
-x_simple = x_simple.astype('float')
-x_simple = x_simple.reshape(2, 3, 4, 4)
-x_cols_simple = im2col_cython(x_simple, 2, 2, 0, 1)
+#dictMat = scipy.io.loadmat('SimpleInput.mat')
+#x_simple = dictMat['x_simple']
+#x_simple = x_simple.transpose(3,2,0,1)
+#x_simple = x_simple.astype('float')
+#x_simple = x_simple.reshape(2, 3, 4, 4)
+#x_cols_simple = im2col_cython(x_simple, 2, 2, 0, 1)
 
 # This im2col does not accept multiple batches
-x_cols_simple_2 = im2col(x_simple[0,:,:,:], 2, 2, 1)
+#x_cols_simple_2 = im2col(x_simple[0,:,:,:], 2, 2, 1)
 # Transpose, and it will be the same as the docs.
-x_cols_simple_2 = x_cols_simple_2.T
+#x_cols_simple_2 = x_cols_simple_2.T
 1+1
