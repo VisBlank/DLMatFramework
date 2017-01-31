@@ -23,7 +23,9 @@ classdef MaxPoolLayer < BaseLayer
         % Some data used for maxpool
         m_kernelHeight
         m_kernelWidth
-        m_stride        
+        m_stride 
+        selectedItems
+        prevImcol
     end
     
     methods (Access = 'public')
@@ -53,7 +55,7 @@ classdef MaxPoolLayer < BaseLayer
             im_col = im2col_ref_batch(im_split,obj.m_kernelHeight,obj.m_kernelWidth,obj.m_stride,0,0);
             
             %max pooling on each column (patch)   
-            max_pool = max(im_col,[],1);
+            [max_pool, idxSelected] = max(im_col,[],1);
             
             %reshape to desired image output
             activations = reshape_row_major(max_pool,[H_prime W_prime C N]); 
@@ -63,7 +65,9 @@ classdef MaxPoolLayer < BaseLayer
             obj.activations = activations;
             obj.weights = [];
             obj.biases = [];
-            obj.previousInput = input;            
+            obj.previousInput = input;  
+            obj.selectedItems = idxSelected;
+            obj.prevImcol = im_col;
         end
         
         function [gradient] = BackwardPropagation(obj, dout)
@@ -75,7 +79,13 @@ classdef MaxPoolLayer < BaseLayer
             W_prime = (W-obj.m_kernelWidth)/obj.m_stride +1;                        
             
             % Initialize gradients            
-            dx = zeros(size(obj.previousInput));            
+            dx = zeros(size(obj.previousInput));                        
+            
+            % Reshape dout (
+            dout_reshaped = permute(dout,[2,1,4,3]);
+            dout_reshaped = dout_reshaped(:);
+            dx_cols = zeros(size(obj.prevImcol));
+            %dx_cols(obj.selectedItems, :) = dout_reshaped;
             
             % Basically we just need to multiply dout by a mask created
             % from the cells that we selected on the previous forward
