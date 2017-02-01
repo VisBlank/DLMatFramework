@@ -45,6 +45,8 @@ poolOut = maxpool.ForwardPropagation(x,[],[]);
 maxpool.EnableGradientCheck(true);
 gradients = maxpool.BackwardPropagation(gradDout);
 
+dx = gradients.input;
+
 % Compare differences
 diff = sum(abs(gradients.input(:) - dx_num(:)));
 

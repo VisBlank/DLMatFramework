@@ -55,7 +55,7 @@ classdef MaxPoolLayer < BaseLayer
             
             %% Decide between im2col or fast implementation
             same_kernel_size = (obj.m_kernelHeight == obj.m_kernelWidth);
-            tile = (mod(H,obj.m_kernelHeight) == 0) && (mod(H,obj.m_kernelWidth) == 0);
+            tile = (mod(H,obj.m_kernelHeight) == 0) && (mod(H,obj.m_kernelWidth) == 0);            
             if same_kernel_size && tile
                 % Can do the fast mode (vectorized max)
                 obj.m_canDoFast = true;
@@ -111,18 +111,32 @@ classdef MaxPoolLayer < BaseLayer
             
             %% The backpropagation will depend on mode used on forward prop
             if obj.m_canDoFast
+                dx_reshaped = zeros(size(obj.m_reshapedInputForFast));
                 
-            end
-            
-            % Reshape dout (
-            dout_reshaped = permute(dout,[2,1,4,3]);
-            dout_reshaped = dout_reshaped(:);
-            dx_cols = zeros(size(obj.prevImcol));
-            %dx_cols(obj.selectedItems, :) = dout_reshaped;
-            
-            % Basically we just need to multiply dout by a mask created
-            % from the cells that we selected on the previous forward
-            % propagation
+                % Create a version of activation if added dimensions, so
+                % for example if activations are [4x4x2x3] we would like
+                % [4x1x4x1x2x3]                
+                activ_new_axis = reshape(obj.activations,[1 H_prime 1 W_prime C N]);
+                
+                % Get the mask               
+                % Do a repmat (lack of broadcast on matlab2016a) on
+                % active_new_axis to match the dimensions of x_reshaped
+                % Basically we want to repeat 2 the first and third
+                % dimensions
+                activ_new_axis = repmat(activ_new_axis,[2,1,2,1,1,1]);
+                mask = (obj.m_reshapedInputForFast == activ_new_axis);
+                
+                dout_new_axis = reshape(dout,[1 H_prime 1 W_prime C N]);
+                dout_new_axis = repmat(dout_new_axis,[2,1,2,1,1,1]);                                
+                
+                dx_reshaped(mask) = dout_new_axis(mask);
+                
+                % Reshape back the the input shape
+                dx = reshape(dx_reshaped, size(obj.previousInput));
+            else
+                % Backpropagation on the case that we fall back to the
+                % im2col implementation
+            end                                                
             
             %% Output gradients
             gradient.bias = [];

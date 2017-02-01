@@ -2,13 +2,9 @@
 
 import numpy as np
 import scipy.io
-import matplotlib.pyplot as plt
-from cs231n.classifiers.cnn import *
-from cs231n.data_utils import get_CIFAR10_data
-from cs231n.gradient_check import eval_numerical_gradient_array, eval_numerical_gradient
 from cs231n.layers import *
 from cs231n.fast_layers import *
-from cs231n.solver import Solver
+from time import time
 
 
 def rel_error(x, y):
@@ -31,14 +27,29 @@ dout = dictMat['dout']
 
 pool_param = {'pool_height': 2, 'pool_width': 2, 'stride': 2}
 
-# Test max_pool_forward/backward fast
+# Test max_pool_forward/backward naive
+t0 = time()
 out, cache = max_pool_forward_naive(x, pool_param)
 dx = max_pool_backward_naive(dout, cache)
+t1 = time()
+timeNaive = t1-t0
+print ('Forward/Backward maxpool naive: %fs' % (timeNaive))
+print ('Testing max_pool naive functions')
+print ('dx error: ', rel_error(dx, dx_num))
 
 print ('Shape of x', x.shape)
 print ('Shape of dx', dx.shape)
 print ('Shape of out', out.shape)
 print ('Shape of dout', dout.shape)
+
+# Test max_pool_forward/backward fast
+t0 = time()
+out, cache = max_pool_forward_fast(x, pool_param)
+dx = max_pool_backward_fast(dout, cache)
+t1 = time()
+timeFast = t1-t0
+print ('Forward/Backward maxpool fast: %fs' % (timeFast))
+print ('Speedup: %fx' % (timeNaive / timeFast))
 
 # Your errors should be around 1e-9'
 print ('Testing max_pool fast functions')
