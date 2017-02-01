@@ -157,6 +157,10 @@ def max_pool_forward_fast(x, pool_param):
 
   same_size = pool_height == pool_width == stride
   tiles = H % pool_height == 0 and W % pool_width == 0
+
+  # Force the im2col (Just for debug)
+  #tiles = 0
+
   if same_size and tiles:
     out, reshape_cache = max_pool_forward_reshape(x, pool_param)
     cache = ('reshape', reshape_cache)
@@ -252,7 +256,11 @@ def max_pool_forward_im2col(x, pool_param):
   out_width = (W - pool_width) / stride + 1
 
   x_split = x.reshape(N * C, 1, H, W)
-  x_cols = im2col(x_split, pool_height, pool_width, padding=0, stride=stride)
+
+  # Both versions work
+  x_cols = im2col_indices(x_split, pool_height, pool_width, padding=0, stride=stride)
+  #x_cols = im2col_cython(x_split, pool_height, pool_width, padding=0, stride=stride)
+
   x_cols_argmax = np.argmax(x_cols, axis=0)
   x_cols_max = x_cols[x_cols_argmax, np.arange(x_cols.shape[1])]
   out = x_cols_max.reshape(out_height, out_width, N, C).transpose(2, 3, 0, 1)
@@ -275,9 +283,15 @@ def max_pool_backward_im2col(dout, cache):
 
   dout_reshaped = dout.transpose(2, 3, 0, 1).flatten()
   dx_cols = np.zeros_like(x_cols)
+
+  # Put on dx_cols the values of dout on the position that was the max value (calculated on the forwardprop)
   dx_cols[x_cols_argmax, np.arange(dx_cols.shape[1])] = dout_reshaped
-  dx = col2im_indices(dx_cols, (N * C, 1, H, W), pool_height, pool_width,
-              padding=0, stride=stride)
+
+  # Both versions work it's basically the col2im
+  #dx = col2im_indices(dx_cols, (N * C, 1, H, W), pool_height, pool_width,padding=0, stride=stride)
+  dx = col2im_cython(dx_cols, N * C, 1, H, W, pool_height, pool_width, padding=0, stride=stride)
+
+  # Reshape dx to the same shape as the input
   dx = dx.reshape(x.shape)
 
   return dx
