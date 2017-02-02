@@ -7,6 +7,8 @@ classdef MaxPoolLayer < BaseLayer
     % https://github.com/leonardoaraujosantos/DLMatFramework/blob/master/learn/cs231n/assignment3/cs231n/fast_layers.py#L106
     % http://sunshineatnoon.github.io/Using.Computation.Graph.to.Understand.and.Implement.Backpropagation/
     % https://uk.mathworks.com/matlabcentral/newsreader/view_thread/279051
+    % Mastering matrix indexing in matlab
+    % https://uk.mathworks.com/company/newsletters/articles/matrix-indexing-in-matlab.html
     
     properties (Access = 'protected')
         weights
@@ -56,6 +58,7 @@ classdef MaxPoolLayer < BaseLayer
             %% Decide between im2col or fast implementation
             same_kernel_size = (obj.m_kernelHeight == obj.m_kernelWidth);
             tile = (mod(H,obj.m_kernelHeight) == 0) && (mod(H,obj.m_kernelWidth) == 0);            
+            tile = 0;
             if same_kernel_size && tile
                 % Can do the fast mode (vectorized max)
                 obj.m_canDoFast = true;
@@ -136,6 +139,17 @@ classdef MaxPoolLayer < BaseLayer
             else
                 % Backpropagation on the case that we fall back to the
                 % im2col implementation
+                dout_reshape = permute(dout,[3,4,1,2]);
+                dout_reshape = dout_reshape(:);
+                dx_cols = zeros(size(obj.prevImcol));
+                
+                % Set on dx_cols the values of dout_shape at the positions
+                % that the forward propagation found max values                
+                dx_cols(sub2ind(size(dx_cols), obj.selectedItems, [1:size(dx_cols,2)])) = dout_reshape;
+                
+                % Now we need to convert the im2col back to the image
+                % format (col2im)
+                dx = col2im_batch_ref(dx_cols,H,W,C,N);                
             end                                                
             
             %% Output gradients

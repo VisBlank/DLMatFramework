@@ -159,7 +159,7 @@ def max_pool_forward_fast(x, pool_param):
   tiles = H % pool_height == 0 and W % pool_width == 0
 
   # Force the im2col (Just for debug)
-  #tiles = 0
+  tiles = 0
 
   if same_size and tiles:
     out, reshape_cache = max_pool_forward_reshape(x, pool_param)

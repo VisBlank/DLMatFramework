@@ -42,7 +42,7 @@ maxpool = MaxPoolLayer('MAX_P1',2, 2, 2,[],[]);
 poolOut = maxpool.ForwardPropagation(x,[],[]);
 
 % Do backward pass
-maxpool.EnableGradientCheck(true);
+maxpool.EnableGradientCheck(false);
 gradients = maxpool.BackwardPropagation(gradDout);
 
 dx = gradients.input;
