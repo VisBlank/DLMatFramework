@@ -55,7 +55,6 @@ def col2im_indices(cols, x_shape, field_height=3, field_width=3, padding=1,
 
 # This is just a copy and paste from the cython version that I did to help debugging
 def col2im_slow(cols, N,  C, H, W, k_h, k_w, padding, stride):
-    x = np.empty((N, C, H, W), dtype=cols.dtype)
     HH = (H + 2 * padding - k_h) / stride + 1
     WW = (W + 2 * padding - k_w) / stride + 1
     x_padded = np.zeros((N, C, H + 2 * padding, W + 2 * padding),dtype=cols.dtype)

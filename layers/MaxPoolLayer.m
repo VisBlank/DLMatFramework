@@ -150,7 +150,7 @@ classdef MaxPoolLayer < BaseLayer
                 % Now we need to convert the im2col back to the image
                 % format (col2im)
                 dx = zeros(H,W,1,N*C);
-                %dx = col2im_batch_ref(dx_cols,H,W,1,N*C);                 
+                dx = col2im_batch_ref(dx_cols,H,W,1,N*C,obj.m_kernelHeight, obj.m_kernelWidth,0,obj.m_stride);                 
                 
                 % Now we need to reshape back dx to the shape of the input
                 dx = reshape(dx,size(obj.previousInput));                
