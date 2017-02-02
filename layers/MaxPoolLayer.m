@@ -149,10 +149,11 @@ classdef MaxPoolLayer < BaseLayer
                 
                 % Now we need to convert the im2col back to the image
                 % format (col2im)
-                dx = col2im_batch_ref(dx_cols,H,W,1,N*C);  
+                dx = zeros(H,W,1,N*C);
+                %dx = col2im_batch_ref(dx_cols,H,W,1,N*C);                 
                 
                 % Now we need to reshape back dx to the shape of the input
-                dx = reshape(size(obj.previousInput));
+                dx = reshape(dx,size(obj.previousInput));                
             end                                                
             
             %% Output gradients

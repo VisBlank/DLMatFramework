@@ -76,28 +76,29 @@ def col2im_slow(cols, N,  C, H, W, k_h, k_w, padding, stride):
     return x_padded
 
 
-def im2col_slow(x, field_height, field_width, padding, stride):
+def im2col_slow(x, k_h, k_w, padding, stride):
     N = x.shape[0]
     C = x.shape[1]
     H = x.shape[2]
     W = x.shape[3]
 
-    HH = (H + 2 * padding - field_height) / stride + 1
-    WW = (W + 2 * padding - field_width) / stride + 1
+    HH = (H + 2 * padding - k_h) / stride + 1
+    WW = (W + 2 * padding - k_w) / stride + 1
 
     p = padding
+    # Pad image if needed
     x_padded = np.pad(x,((0, 0), (0, 0), (p, p), (p, p)), mode='constant')
 
-    cols = np.zeros((C * field_height * field_width, N * HH * WW),dtype=x.dtype)
+    # Allocate output 2d matrix
+    cols = np.zeros((C * k_h * k_w, N * HH * WW),dtype=x.dtype)
 
-    # Moving the inner loop to a C function with no bounds checking works, but does
-    # not seem to help performance in any measurable way.
+    # This was a separate function (Again Just to help debugging)
     for c in range(C):
         for yy in range(HH):
             for xx in range(WW):
-                for ii in range(field_height):
-                    for jj in range(field_width):
-                        row = c * field_width * field_height + ii * field_height + jj
+                for ii in range(k_h):
+                    for jj in range(k_w):
+                        row = c * k_w * k_h + ii * k_h + jj
                         for i in range(N):
                             col = yy * WW * N + xx * N + i
                             cols[row, col] = x_padded[i, c, stride * yy + ii, stride * xx + jj]
