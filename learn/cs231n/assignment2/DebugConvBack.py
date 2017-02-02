@@ -81,6 +81,7 @@ def col2im_back(dim_col,h_prime,w_prime,stride,hh,ww,c):
         dx[:,h_start:h_start+hh,w_start:w_start+ww] += patch
     return dx
 
+# Example from blog Convolution with im2col
 def conv_forward_naive_im2col(x, w, b, conv_param):
   """
   A naive implementation of the forward pass for a convolutional layer.
@@ -123,6 +124,7 @@ def conv_forward_naive_im2col(x, w, b, conv_param):
   cache = (x, w, b, conv_param)
   return out, cache
 
+# Example from blog Convolution with im2col
 def conv_backward_naive_im2col(dout, cache):
   """
   A naive implementation of the backward pass for a convolutional layer.
@@ -245,7 +247,8 @@ out_height = (H + 2 * pad - filter_height) / stride + 1
 out_width = (W + 2 * pad - filter_width) / stride + 1
 
 print("original x: ", x.shape)
-x_cols = im2col_cython(x, filter_height, filter_width, pad, stride)
+#x_cols = im2col_cython(x, filter_height, filter_width, pad, stride)
+x_cols = im2col_slow(x, filter_height, filter_width, pad, stride)
 print('im2col result: ', x_cols.shape)
 print('Conv out height: %d width: %d' % (out_height, out_width))
 

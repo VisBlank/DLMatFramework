@@ -3,9 +3,9 @@ try:
   from cs231n.im2col_cython import col2im_cython, im2col_cython
   from cs231n.im2col_cython import col2im_6d_cython
 except ImportError:
-  print 'run the following from the cs231n directory and try again:'
-  print 'python setup.py build_ext --inplace'
-  print 'You may also need to restart your iPython kernel'
+  print ('run the following from the cs231n directory and try again:')
+  print ('python setup.py build_ext --inplace')
+  print ('You may also need to restart your iPython kernel')
 
 from cs231n.im2col import *
 
@@ -32,7 +32,8 @@ def conv_forward_im2col(x, w, b, conv_param):
   w_reshape = w.reshape((w.shape[0], -1))
 
   # x_cols = im2col_indices(x, w.shape[2], w.shape[3], pad, stride)
-  x_cols = im2col_cython(x, w.shape[2], w.shape[3], pad, stride)
+  # x_cols = im2col_cython(x, w.shape[2], w.shape[3], pad, stride)
+  x_cols = im2col_slow(x, w.shape[2], w.shape[3], pad, stride)
   res = w_reshape.dot(x_cols) + b.reshape(-1, 1)
 
   # Put the result back to the shape of the image (col2img)
@@ -132,8 +133,8 @@ def conv_backward_im2col(dout, cache):
   w_reshape = w_reshape.T
   dx_cols = w_reshape.dot(dout_reshaped)
   # dx = col2im_indices(dx_cols, x.shape, filter_height, filter_width, pad, stride)
-  dx = col2im_cython(dx_cols, x.shape[0], x.shape[1], x.shape[2], x.shape[3],
-                     filter_height, filter_width, pad, stride)
+  #dx = col2im_cython(dx_cols, x.shape[0], x.shape[1], x.shape[2], x.shape[3],filter_height, filter_width, pad, stride)
+  dx = col2im_slow(dx_cols, x.shape[0], x.shape[1], x.shape[2], x.shape[3],filter_height, filter_width, pad, stride)
 
   return dx, dw, db
 
@@ -258,8 +259,9 @@ def max_pool_forward_im2col(x, pool_param):
   x_split = x.reshape(N * C, 1, H, W)
 
   # Both versions work
-  x_cols = im2col_indices(x_split, pool_height, pool_width, padding=0, stride=stride)
+  #x_cols = im2col_indices(x_split, pool_height, pool_width, padding=0, stride=stride)
   #x_cols = im2col_cython(x_split, pool_height, pool_width, padding=0, stride=stride)
+  x_cols = im2col_slow(x_split, pool_height, pool_width, padding=0, stride=stride)
 
   x_cols_argmax = np.argmax(x_cols, axis=0)
   x_cols_max = x_cols[x_cols_argmax, np.arange(x_cols.shape[1])]
@@ -289,7 +291,8 @@ def max_pool_backward_im2col(dout, cache):
 
   # Both versions work it's basically the col2im
   #dx = col2im_indices(dx_cols, (N * C, 1, H, W), pool_height, pool_width,padding=0, stride=stride)
-  dx = col2im_cython(dx_cols, N * C, 1, H, W, pool_height, pool_width, padding=0, stride=stride)
+  #dx = col2im_cython(dx_cols, N * C, 1, H, W, pool_height, pool_width, padding=0, stride=stride)
+  dx = col2im_slow(dx_cols, N * C, 1, H, W, pool_height, pool_width, padding=0, stride=stride)
 
   # Reshape dx to the same shape as the input
   dx = dx.reshape(x.shape)
