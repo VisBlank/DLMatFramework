@@ -55,8 +55,9 @@ def col2im_indices(cols, x_shape, field_height=3, field_width=3, padding=1,
 
 # This is just a copy and paste from the cython version that I did to help debugging
 def col2im_slow(cols, N,  C, H, W, k_h, k_w, padding, stride):
-    HH = (H + 2 * padding - k_h) / stride + 1
-    WW = (W + 2 * padding - k_w) / stride + 1
+    # The // will force the division result to be integer
+    HH = (H + 2 * padding - k_h) // stride + 1
+    WW = (W + 2 * padding - k_w) // stride + 1
     x_padded = np.zeros((N, C, H + 2 * padding, W + 2 * padding),dtype=cols.dtype)
 
     # This was a separate function (Again Just to help debugging)
@@ -81,8 +82,9 @@ def im2col_slow(x, k_h, k_w, padding, stride):
     H = x.shape[2]
     W = x.shape[3]
 
-    HH = (H + 2 * padding - k_h) / stride + 1
-    WW = (W + 2 * padding - k_w) / stride + 1
+    # The // will force the division result to be integer
+    HH = (H + 2 * padding - k_h) // stride + 1
+    WW = (W + 2 * padding - k_w) // stride + 1
 
     p = padding
     # Pad image if needed

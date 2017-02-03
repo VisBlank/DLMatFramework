@@ -103,16 +103,20 @@ classdef ConvolutionLayer < BaseLayer
             db = sum(sum(sum(dout, 1), 2), 4);
             
             for idxBatch = 1:N
-                im = obj.previousInput(:,:,:,idxBatch);    
-                im_col = im2col_ref(im,HH,WW,obj.m_stride,obj.m_padding,1);
-                dout_i = dout(:,:,:,idxBatch);
-                                                
+                % Reshape dout
+                dout_i = dout(:,:,:,idxBatch);                                                
                 dout_i_reshaped = reshape_row_major(dout_i,[F, H*W]);                
                 
+                % Calculate im2col (Could be cached....)
+                im = obj.previousInput(:,:,:,idxBatch);    
+                im_col = im2col_ref(im,HH,WW,obj.m_stride,obj.m_padding,1);
+                                
+                % Get dw
                 dw_before_reshape = dout_i_reshaped * im_col';                
                 dw_i = reshape(dw_before_reshape',[HH, WW, C, F]);
                 dw = dw + dw_i;
                 
+                % Get dx
                 % We now have the gradient just before the im2col
                 grad_before_im2col = (dout_i_reshaped' * filter_col_T);                
                 % Now we need to backpropagate im2col (im2col_back),
