@@ -44,6 +44,8 @@ classdef LayerContainer < handle
                     layerInst = Dropout(metaDataLayer.name, metaDataLayer.prob, obj.numLayers+1, previousLayer);                                                
                 case 'batchnorm'
                     layerInst = BatchNorm(metaDataLayer.name, metaDataLayer.eps, metaDataLayer.momentum, obj.numLayers+1, previousLayer);                                                
+                case 'sp_batchnorm'
+                    layerInst = SpatialBatchNorm(metaDataLayer.name, metaDataLayer.eps, metaDataLayer.momentum, obj.numLayers+1, previousLayer);
                 case 'sigmoid'
                     layerInst = Sigmoid(metaDataLayer.name, obj.numLayers+1, previousLayer);
                 case 'softmax'

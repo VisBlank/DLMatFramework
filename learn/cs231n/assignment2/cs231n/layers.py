@@ -731,7 +731,8 @@ def spatial_batchnorm_forward(x, gamma, beta, bn_param):
   out, cache = batchnorm_forward(x_flat, gamma, beta, bn_param)
 
   # Reshape/transpose back the to normal input dimensions
-  out = out.reshape((N,H,W,C)).transpose(0,3,1,2)
+  out_reshape = out.reshape((N,H,W,C))
+  out = out_reshape.transpose(0,3,1,2)
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
