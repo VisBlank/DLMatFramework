@@ -15,15 +15,18 @@ load mnist_oficial;
 data = Dataset(input_train, output_train_labels,28,28,1,1,true);
 data.AddValidation(input_test,output_test_labels,28,28,1,1,true);
 
+batch = data.GetBatch(10);
+implay(batch.X);
+
 %% Create network
 layers = LayerContainer();    
 layers <= struct('name','ImageIn','type','input','rows',28,'cols',28,'depth',1, 'batchsize',1);
-layers <= struct('name','CONV1','type','conv', 'num_output',200); % K:5 Input:1 Output:32 stride:1 pad 2
+layers <= struct('name','CONV1','type','conv', 'kh',5,'kw',5,'stride',1,'pad',2,'num_output', 32); 
 layers <= struct('name','Relu_1','type','relu');
-layers <= struct('name','MP1','type','maxpool'); % K:2 stride:2
-layers <= struct('name','CONV2','type','fc', 'num_output',100); % K:5 Input:32 Output:64 stride:1 pad 2
+layers <= struct('name','MP1','type','maxpool', 'kh',2, 'kw',2, 'stride',2); 
+layers <= struct('name','CONV1','type','conv', 'kh',5,'kw',5,'stride',1,'pad',2,'num_output', 64); 
 layers <= struct('name','Relu_2','type','relu');
-layers <= struct('name','MP2','type','maxpool'); % K:2 stride:2
+layers <= struct('name','MP2','type','maxpool', 'kh',2, 'kw',2, 'stride',2); 
 layers <= struct('name','FC_3','type','fc', 'num_output',1024);
 layers <= struct('name','Relu_3','type','relu');
 layers <= struct('name','DRP_1','type','dropout','prob',0.5);
@@ -35,8 +38,8 @@ net = DeepLearningModel(layers, LossFactory.GetLoss('multi_class_cross_entropy')
 
 
 %% Create solver and train
-solver = Solver(net, data, 'sgd',containers.Map({'learning_rate', 'L2_reg'}, {0.01, 0}));
-solver.SetBatchSize(200);
+solver = Solver(net, data, 'sgd',containers.Map({'learning_rate', 'L2_reg'}, {0.001, 0}));
+solver.SetBatchSize(128);
 solver.SetEpochs(60);
 solver.Train();
 

@@ -28,10 +28,10 @@ classdef ConvolutionLayer < BaseLayer
     end
     
     methods (Access = 'public')
-        function [obj] = ConvolutionLayer(name, kH, kW, stride, pad,index, inLayer)
+        function [obj] = ConvolutionLayer(name, kH, kW, stride, pad, numOutF ,index, inLayer)
             obj.name = name;
             obj.index = index;
-            %obj.numOutput = numOutput;
+            obj.numOutput = numOutF;
             obj.inputLayer = inLayer;
             %obj.activationShape = [1 numOutput];
             obj.m_kernelHeight = kH;

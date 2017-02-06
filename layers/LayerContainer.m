@@ -35,7 +35,7 @@ classdef LayerContainer < handle
                 case 'fc'                    
                     layerInst = FullyConnected(metaDataLayer.name, metaDataLayer.num_output, obj.numLayers+1, previousLayer);                
                 case 'conv'                    
-                    layerInst = ConvolutionLayer(metaDataLayer.name, metaDataLayer.kh, metaDataLayer.kw, metaDataLayer.stride, metaDataLayer.pad, obj.numLayers+1, previousLayer);                
+                    layerInst = ConvolutionLayer(metaDataLayer.name, metaDataLayer.kh, metaDataLayer.kw, metaDataLayer.stride, metaDataLayer.pad, metaDataLayer.num_output, obj.numLayers+1, previousLayer);                
                 case 'maxpool'                    
                     layerInst = MaxPoolLayer(metaDataLayer.name, metaDataLayer.kh, metaDataLayer.kw, metaDataLayer.stride, obj.numLayers+1, previousLayer);
                 case 'relu'
