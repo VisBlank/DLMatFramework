@@ -48,14 +48,15 @@ classdef SpatialBatchNorm < BaseLayer
             [H,W,C,N] = size(input);
             
             % Permute the dimensions to the following format 
-            % (rows, batch, channel,cols), remember that on matlab the
-            % original format is (rows(1),cols(2),channel(3),batch(4))
-            % channel)                        
+            % (cols, channel, rows, batch)    
             % On python was: x.transpose((0,2,3,1))
-            inputTransposed = permute(input,[2,3,1,4]);                        
+            % Python tensor format:
+            % (batch(0), channel(1), rows(2), cols(3))
+            % Matlab tensor format:
+            % (rows(1), cols(2), channel(3), batch(4))
+            inputTransposed = permute(input,[2,3,1,4]);                                    
             
-            
-            % Flat the input            
+            % Flat the input (On python the reshape is row-major)           
             inputFlat = reshape_row_major(inputTransposed,[(numel(inputTransposed) / C),C]);
             
             % Call the forward propagation of normal batchnorm
@@ -73,14 +74,33 @@ classdef SpatialBatchNorm < BaseLayer
         end
         
         function [gradient] = BackwardPropagation(obj, dout)
+            % Observe that we use the same reshape/permutes from forward
+            % propagation
             dout = dout.input;
+            [H,W,C,N] = size(dout);
+            % On python was: x.transpose((0,2,3,1))
+            dout_transp = permute(dout,[2,3,1,4]);
             
+            % Flat the input            
+            dout_flat = reshape_row_major(dout_transp,[(numel(dout_transp) / C),C]);
             
-            if obj.doGradientCheck
+            % Call the backward propagation of normal batchnorm
+            gradDout.input = dout_flat;
+            gradient = obj.normalBatchNorm.BackwardPropagation(gradDout);
+            
+            % Reshape/transpose back the signal, on python was (N,H,W,C)
+            gradient.input = reshape_row_major(gradient.input, [W,C,H,N]);
+            % On python was transpose(0,3,1,2)
+            gradient.input = permute(gradient.input,[3 1 2 4]);
+            
+            % Evalulate numerically if needed
+            if obj.doGradientCheck     
                 evalGrad = obj.EvalBackpropNumerically(dout);
-                diff_Input = sum(abs(evalGrad.input(:) - gradient.input(:)));                
-                diff_vec = [diff_Input]; 
-                diff = sum(diff_vec);
+                diff_Input = sum(abs(evalGrad.input(:) - gradient.input(:)));
+                diff_Weights = sum(abs(evalGrad.weight(:) - gradient.weight(:)));
+                diff_Bias = sum(abs(evalGrad.bias(:) - gradient.bias(:)));
+                diff_vec = [diff_Input diff_Weights diff_Bias]; % diff_Bias
+                diff = sum(diff_vec);                                
                 if diff > 0.0001
                     msgError = sprintf('%s gradient failed!\n',obj.name);
                     error(msgError);
@@ -92,10 +112,14 @@ classdef SpatialBatchNorm < BaseLayer
         
         function gradient = EvalBackpropNumerically(obj, dout)
             % Fully connected layers has 3 inputs so we have 3 gradients
-            dropout_x = @(x) obj.ForwardPropagation(x,obj.weights, obj.biases);            
+            spatial_bn_x = @(x) obj.ForwardPropagation(x,obj.weights, obj.biases);  
+            spatial_bn_gamma = @(x) obj.ForwardPropagation(obj.previousInput,x, obj.biases);
+            spatial_bn_beta = @(x) obj.ForwardPropagation(obj.previousInput,obj.weights, x);                                    
             
-            % Evaluate
-            gradient.input = GradientCheck.Eval(dropout_x,obj.previousInput, dout);            
+            % Evaluate            
+            gradient.input = GradientCheck.Eval(spatial_bn_x,obj.previousInput,dout);
+            gradient.weight = GradientCheck.Eval(spatial_bn_gamma,obj.weights,dout);
+            gradient.bias = GradientCheck.Eval(spatial_bn_beta,obj.biases, dout);
         end
         
         function IsTraining(obj, flag)

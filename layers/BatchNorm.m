@@ -144,11 +144,14 @@ classdef BatchNorm < BaseLayer
             gradient.weight = dgamma;
             gradient.bias = dbeta;
             
-            if obj.doGradientCheck
+            % Evalulate numerically if needed
+            if obj.doGradientCheck     
                 evalGrad = obj.EvalBackpropNumerically(dout);
-                diff_Input = sum(abs(evalGrad.input(:) - gradient.input(:)));                
-                diff_vec = [diff_Input]; 
-                diff = sum(diff_vec);
+                diff_Input = sum(abs(evalGrad.input(:) - gradient.input(:)));
+                diff_Weights = sum(abs(evalGrad.weight(:) - gradient.weight(:)));
+                diff_Bias = sum(abs(evalGrad.bias(:) - gradient.bias(:)));
+                diff_vec = [diff_Input diff_Weights diff_Bias]; % diff_Bias
+                diff = sum(diff_vec);                                
                 if diff > 0.0001
                     msgError = sprintf('%s gradient failed!\n',obj.name);
                     error(msgError);
@@ -160,10 +163,14 @@ classdef BatchNorm < BaseLayer
         
         function gradient = EvalBackpropNumerically(obj, dout)
             % Fully connected layers has 3 inputs so we have 3 gradients
-            dropout_x = @(x) obj.ForwardPropagation(x,obj.weights, obj.biases);            
+            bn_x = @(x) obj.ForwardPropagation(x,obj.weights, obj.biases);  
+            bn_gamma = @(x) obj.ForwardPropagation(obj.previousInput,x, obj.biases);
+            bn_beta = @(x) obj.ForwardPropagation(obj.previousInput,obj.weights, x);                                    
             
-            % Evaluate
-            gradient.input = GradientCheck.Eval(dropout_x,obj.previousInput, dout);            
+            % Evaluate            
+            gradient.input = GradientCheck.Eval(bn_x,obj.previousInput,dout);
+            gradient.weight = GradientCheck.Eval(bn_gamma,obj.weights,dout);
+            gradient.bias = GradientCheck.Eval(bn_beta,obj.biases, dout);
         end
         
         function IsTraining(obj, flag)

@@ -4,6 +4,7 @@ import numpy as np
 import scipy.io
 from cs231n.layers import *
 from cs231n.fast_layers import *
+from cs231n.gradient_check import eval_numerical_gradient_array, eval_numerical_gradient
 
 
 def rel_error(x, y):
@@ -11,6 +12,7 @@ def rel_error(x, y):
   return np.max(np.abs(x - y) / (np.maximum(1e-8, np.abs(x) + np.abs(y))))
 
 
+############################### FORWARD TRAIN ############################################
 # Check the training-time forward pass by checking means and variances
 # of features both before and after spatial batch normalization
 N, C, H, W = 2, 3, 4, 5
@@ -49,3 +51,44 @@ dictSaveMat['gamma']=gamma.astype('float')
 dictSaveMat['beta']=beta.astype('float')
 dictSaveMat['out']=out.astype('float')
 scipy.io.savemat('spatial_batchnorm_forward',dictSaveMat)
+
+############################### BACKWARD ############################################
+# Check backward pass
+N, C, H, W = 2, 3, 4, 5
+#x = 5 * np.random.randn(N, C, H, W) + 12
+#gamma = np.random.randn(C)
+#beta = np.random.randn(C)
+#dout = np.random.randn(N, C, H, W)
+
+# Load data from matlab file to help debugging
+dictMat = scipy.io.loadmat('../../../test/layers/spatial_batchnorm_backward.mat')
+x = dictMat['x']
+gamma = dictMat['gamma']
+beta = dictMat['beta']
+dout = dictMat['dout']
+
+bn_param = {'mode': 'train'}
+fx = lambda x: spatial_batchnorm_forward(x, gamma, beta, bn_param)[0]
+fg = lambda a: spatial_batchnorm_forward(x, gamma, beta, bn_param)[0]
+fb = lambda b: spatial_batchnorm_forward(x, gamma, beta, bn_param)[0]
+
+dx_num = eval_numerical_gradient_array(fx, x, dout)
+da_num = eval_numerical_gradient_array(fg, gamma, dout)
+db_num = eval_numerical_gradient_array(fb, beta, dout)
+
+_, cache = spatial_batchnorm_forward(x, gamma, beta, bn_param)
+dx, dgamma, dbeta = spatial_batchnorm_backward(dout, cache)
+print ('dx error: ', rel_error(dx_num, dx))
+print ('dgamma error: ', rel_error(da_num, dgamma))
+print ('dbeta error: ', rel_error(db_num, dbeta))
+
+# Save data to matlab file
+dictSaveMat={}
+dictSaveMat['x']=x.astype('float')
+dictSaveMat['gamma']=gamma.astype('float')
+dictSaveMat['beta']=beta.astype('float')
+dictSaveMat['dx_num']=dx_num.astype('float')
+dictSaveMat['dgamma_num']=da_num.astype('float')
+dictSaveMat['dbeta_num']=db_num.astype('float')
+dictSaveMat['dout']=dout.astype('float')
+scipy.io.savemat('spatial_batchnorm_backward',dictSaveMat)
