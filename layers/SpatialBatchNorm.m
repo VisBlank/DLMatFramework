@@ -123,6 +123,7 @@ classdef SpatialBatchNorm < BaseLayer
         end
         
         function IsTraining(obj, flag)
+            obj.normalBatchNorm.IsTraining(flag);
             obj.isTraining = flag;
         end
     end

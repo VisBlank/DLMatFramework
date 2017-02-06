@@ -15,18 +15,23 @@ disp('Before batch normalization:');
 % Means from axis batch,rows,cols
 mean_rows_cols_batch = mean(mean(mean(x, 1), 2), 4);
 mean_rows_cols_batch = reshape(mean_rows_cols_batch,[1,3]);
-std_rows_cols_batch = std(std(std(x,0,1),0,2),0,4);
+
+% Std from axis batch,rows,cols
+std_rows_cols_batch = std(std(std(x,1,1),1,2),1,4);
 std_rows_cols_batch = reshape(std_rows_cols_batch,[1,3]);
+
 fprintf('x.shape(): '); disp(size(x));
 fprintf('means: '); disp(mean_rows_cols_batch); 
-%fprintf('std: '); disp(std(x,1));
+fprintf('std: '); disp(std_rows_cols_batch);
 
 activations = bn.ForwardPropagation(x, gamma, beta);
 
 mean_rows_cols_batch_act = mean(mean(mean(activations, 1), 2), 4);
 mean_rows_cols_batch_act = reshape(mean_rows_cols_batch_act,[1,3]);
+std_rows_cols_batch = std(std(std(activations,1,1),1,2),1,4);
+std_rows_cols_batch = reshape(std_rows_cols_batch,[1,3]);
 fprintf('means: '); disp(round(mean_rows_cols_batch_act));
-%fprintf('std: '); disp(std(activations,1));
+fprintf('std: '); disp(std_rows_cols_batch);
 
 % Compare results
 diff = sum(abs(activations(:) - out(:)));
