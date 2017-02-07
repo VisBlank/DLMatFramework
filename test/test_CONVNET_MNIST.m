@@ -16,6 +16,12 @@ rng(0,'v5uniform');
 
 %% Load data
 load mnist_oficial;
+% Crop data to make faster to train
+input_train = input_train(1:5000,:);
+input_test = input_test(1:500,:);
+output_test_labels = output_test_labels(1:500,:);
+output_train_labels = output_train_labels(1:5000,:);
+
 data = Dataset(input_train, output_train_labels,28,28,1,1,true);
 data.AddValidation(input_test,output_test_labels,28,28,1,1,true);
 
@@ -54,6 +60,7 @@ testBatchSize = size(input_test,1);
 figure(2);
 batchValidation = data.GetValidationBatch(testBatchSize);
 batchImg = gather(batchValidation.X(:,:,:,1:20));
+batchImg = permute(batchImg,[2,1,3,4]);
 display_MNIST_Data(reshape_row_major(batchImg,[20,784]));
 title('Images on validation');
 errorCount = 0;
