@@ -78,6 +78,10 @@ classdef Solver < handle
             obj.m_num_epochs = epochs;
         end
         
+        function PrintEvery(obj,numIter)
+            obj.m_print_every = numIter;
+        end
+        
         function obj = Solver(model, data, optimizerType, config)
             obj.m_model = model;
             % Get reference to your training data

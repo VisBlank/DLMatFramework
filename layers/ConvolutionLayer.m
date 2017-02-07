@@ -38,6 +38,8 @@ classdef ConvolutionLayer < BaseLayer
             obj.m_kernelWidth = kW;
             obj.m_stride = stride;
             obj.m_padding = pad;
+            % Uncomment only if you want to force gradient check
+            %obj.doGradientCheck = true;
             
             % Calculate the activation shape to be used to correctly
             % initialize the parameters of the next layers
@@ -112,6 +114,7 @@ classdef ConvolutionLayer < BaseLayer
             % Get the bias gradient which will be the sum of dout over the
             % dimensions (batches(4), rows(1), cols(2))
             db = sum(sum(sum(dout, 1), 2), 4);
+            db = reshape(db,size(obj.biases));
             
             for idxBatch = 1:N
                 % Reshape dout
@@ -133,10 +136,8 @@ classdef ConvolutionLayer < BaseLayer
                 % Now we need to backpropagate im2col (im2col_back),
                 % results will padded by one always
                 dx_padded = im2col_back_ref(grad_before_im2col,H_prime, W_prime, obj.m_stride, HH, WW, C);                
-                % Now we need to take out the pading
-                %dx(:,:,:,idxBatch) = dx_padded(2:end-1, 2:end-1,:);
-                % NOTE SURE IF THIS IS RIGHT (CHECK WITH GRADIENT CHECK!!)
-                dx(:,:,:,idxBatch) = dx_padded(2*(obj.m_padding):end-1, 2*(obj.m_padding):end-1,:);
+                % Now we need to take out the pading                
+                dx(:,:,:,idxBatch) = dx_padded(obj.m_padding+1:obj.m_padding+H, obj.m_padding+1:obj.m_padding+H,:);                
             end
 
             %% Output gradients    
