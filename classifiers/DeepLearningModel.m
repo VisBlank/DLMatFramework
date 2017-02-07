@@ -29,11 +29,21 @@ classdef DeepLearningModel < handle
                 currLayer = obj.layersContainer.getLayerFromIndex(idxLayer);
                 shapeInput = currLayer.getInputLayer().getActivationShape();
                 layerName = currLayer.getName();
-                if isa(currLayer,'FullyConnected')
-                    fan_in = prod(shapeInput);
-                    fan_out = currLayer.getNumOutput();                    
-                    obj.weightsMap(layerName) = randn(fan_in,fan_out) / sqrt(fan_in);
-                    obj.BiasMap(layerName) = zeros(1,currLayer.getNumOutput());                    
+                if isa(currLayer,'FullyConnected') || isa(currLayer,'ConvolutionLayer')
+                    if isa(currLayer,'FullyConnected')
+                        fan_in = abs(prod(shapeInput));
+                        fan_out = currLayer.getNumOutput();                    
+                        obj.weightsMap(layerName) = randn(fan_in,fan_out) / sqrt(fan_in);
+                        obj.BiasMap(layerName) = zeros(1,currLayer.getNumOutput());                    
+                    else
+                        % Convolution layer                        
+                        fan_in = abs(prod(shapeInput));
+                        C = shapeInput(3);
+                        [kernel] = currLayer.getFilterSpatialDims();
+                        F = currLayer.getNumOutput();                    
+                        obj.weightsMap(layerName) = randn(kernel(1),kernel(2),C,F) / sqrt(fan_in);
+                        obj.BiasMap(layerName) = zeros(F,1);
+                    end
                 else
                     % Some layers (ie Relu, Softmax) has no parameters
                     obj.weightsMap(layerName) = [];
@@ -98,7 +108,7 @@ classdef DeepLearningModel < handle
                 layerName = currLayer.getName();
                 currDout = currLayer.BackwardPropagation(currDout);                
                 % Save gradients on parametrizes layers
-                if isa(currLayer,'FullyConnected') || isa(currLayer,'BatchNorm')
+                if isa(currLayer,'FullyConnected') || isa(currLayer,'BatchNorm') || isa(currLayer,'ConvolutionLayer')
                     obj.gradWeightsMap(layerName) = currDout.weight;
                     obj.gradBiasMap(layerName) = currDout.bias;
                     if (obj.regEffect ~= 0)

@@ -18,7 +18,7 @@ b = b';
 [k_rows,k_cols,C,F] = size(w);
 
 % Create FC layer
-conv = ConvolutionLayer('CONV_1',k_rows, k_cols, 2, 1,[],[]);
+conv = ConvolutionLayer('CONV_1',k_rows, k_cols, 2, 1,[],[],[]);
 
 % Do forward pass
 out_conv = conv.ForwardPropagation(x,w,b);
@@ -54,7 +54,7 @@ gradDout.input = dout;
 [k_rows,k_cols,C,F] = size(w);
 
 % Create FC layer
-conv = ConvolutionLayer('CONV_1',k_rows, k_cols, 1, 1,[],[]);
+conv = ConvolutionLayer('CONV_1',k_rows, k_cols, 1, 1,[],[],[]);
 
 % Do forward pass
 out_conv = conv.ForwardPropagation(x,w,b);

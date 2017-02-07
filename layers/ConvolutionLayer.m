@@ -38,6 +38,17 @@ classdef ConvolutionLayer < BaseLayer
             obj.m_kernelWidth = kW;
             obj.m_stride = stride;
             obj.m_padding = pad;
+            
+            % Calculate the activation shape to be used to correctly
+            % initialize the parameters of the next layers
+            % Calculate output sizes
+            if ~isempty(inLayer)
+                inShape = inLayer.getActivationShape();
+                H = inShape(1); W = inShape(2); C = inShape(3);
+                H_prime = (H+2*pad-kH)/stride +1;
+                W_prime = (W+2*pad-kW)/stride +1;
+                obj.activationShape = [H_prime W_prime numOutF -1];
+            end
         end
         
         function [activations] = ForwardPropagation(obj, input, weights, bias)
@@ -123,7 +134,9 @@ classdef ConvolutionLayer < BaseLayer
                 % results will padded by one always
                 dx_padded = im2col_back_ref(grad_before_im2col,H_prime, W_prime, obj.m_stride, HH, WW, C);                
                 % Now we need to take out the pading
-                dx(:,:,:,idxBatch) = dx_padded(2:end-1, 2:end-1,:);
+                %dx(:,:,:,idxBatch) = dx_padded(2:end-1, 2:end-1,:);
+                % NOTE SURE IF THIS IS RIGHT (CHECK WITH GRADIENT CHECK!!)
+                dx(:,:,:,idxBatch) = dx_padded(2*(obj.m_padding):end-1, 2*(obj.m_padding):end-1,:);
             end
 
             %% Output gradients    
@@ -149,6 +162,10 @@ classdef ConvolutionLayer < BaseLayer
         
         function [numOut] = getNumOutput(obj)
             numOut = obj.numOutput;
+        end
+        
+        function [kernel] = getFilterSpatialDims(obj)             
+            kernel = [obj.m_kernelHeight obj.m_kernelWidth];
         end
         
         function gradient = EvalBackpropNumerically(obj, dout)

@@ -3,6 +3,10 @@
 % https://www.tensorflow.org/tutorials/mnist/pros/
 % https://github.com/aymericdamien/TensorFlow-Examples/blob/master/notebooks/3_NeuralNetworks/convolutional_network.ipynb
 % https://github.com/aymericdamien/TensorFlow-Examples/blob/master/examples/3_NeuralNetworks/convolutional_network.py
+% https://github.com/leonardoaraujosantos/DLMatFramework/blob/master/learn/cs231n/assignment2/ConvolutionalNetworks.ipynb
+% https://github.com/leonardoaraujosantos/DLMatFramework/blob/master/learn/cs231n/assignment2/cs231n/classifiers/cnn.py
+% http://wiseodd.github.io/techblog/2016/07/18/convnet-maxpool-layer/
+% https://github.com/aymericdamien/TensorFlow-Examples
 
 clear all;
 
@@ -15,8 +19,9 @@ load mnist_oficial;
 data = Dataset(input_train, output_train_labels,28,28,1,1,true);
 data.AddValidation(input_test,output_test_labels,28,28,1,1,true);
 
-batch = data.GetBatch(10);
-implay(batch.X);
+% Test to display batch
+%batch = data.GetBatch(10);
+%implay(batch.X);
 
 %% Create network
 layers = LayerContainer();    
@@ -24,7 +29,7 @@ layers <= struct('name','ImageIn','type','input','rows',28,'cols',28,'depth',1, 
 layers <= struct('name','CONV1','type','conv', 'kh',5,'kw',5,'stride',1,'pad',2,'num_output', 32); 
 layers <= struct('name','Relu_1','type','relu');
 layers <= struct('name','MP1','type','maxpool', 'kh',2, 'kw',2, 'stride',2); 
-layers <= struct('name','CONV1','type','conv', 'kh',5,'kw',5,'stride',1,'pad',2,'num_output', 64); 
+layers <= struct('name','CONV2','type','conv', 'kh',5,'kw',5,'stride',1,'pad',2,'num_output', 64); 
 layers <= struct('name','Relu_2','type','relu');
 layers <= struct('name','MP2','type','maxpool', 'kh',2, 'kw',2, 'stride',2); 
 layers <= struct('name','FC_3','type','fc', 'num_output',1024);

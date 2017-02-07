@@ -42,6 +42,17 @@ classdef MaxPoolLayer < BaseLayer
             obj.m_kernelHeight = kH;
             obj.m_kernelWidth = kW;
             obj.m_stride = stride;
+            
+            % Calculate the activation shape to be used to correctly
+            % initialize the parameters of the next layers
+            % Calculate output sizes
+            if ~isempty(inLayer)
+                inShape = inLayer.getActivationShape();
+                H = inShape(1); W = inShape(2); C = inShape(3);
+                H_prime = (H-kH)/stride +1;
+                W_prime = (W-kW)/stride +1;
+                obj.activationShape = [H_prime W_prime C -1];
+            end
         end
         
         function [activations] = ForwardPropagation(obj, input, weights, bias)
@@ -58,7 +69,7 @@ classdef MaxPoolLayer < BaseLayer
             %% Decide between im2col or fast implementation
             same_kernel_size = (obj.m_kernelHeight == obj.m_kernelWidth);
             tile = (mod(H,obj.m_kernelHeight) == 0) && (mod(H,obj.m_kernelWidth) == 0);
-            tile = 0;
+            %tile = 0;
             if same_kernel_size && tile
                 % Can do the fast mode (vectorized max)
                 obj.m_canDoFast = true;
@@ -79,6 +90,7 @@ classdef MaxPoolLayer < BaseLayer
                 % Cache reshaped input
                 obj.m_reshapedInputForFast = x_reshaped;
             else
+                error('Not implemented yet');
                 % Fall back to im2col or naive
                 %reshape so our im2col produces an output we can use
 %                 im_split = reshape(input, H, W, 1, C*N);
