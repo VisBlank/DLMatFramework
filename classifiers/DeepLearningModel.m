@@ -32,15 +32,15 @@ classdef DeepLearningModel < handle
                 if isa(currLayer,'FullyConnected') || isa(currLayer,'ConvolutionLayer')
                     if isa(currLayer,'FullyConnected')
                         fan_in = abs(prod(shapeInput));
-                        fan_out = currLayer.getNumOutput();                    
+                        fan_out = currLayer.getNumOutput();
                         obj.weightsMap(layerName) = randn(fan_in,fan_out) / sqrt(fan_in);
-                        obj.BiasMap(layerName) = zeros(1,currLayer.getNumOutput());                    
+                        obj.BiasMap(layerName) = zeros(1,currLayer.getNumOutput());
                     else
-                        % Convolution layer                        
+                        % Convolution layer
                         fan_in = abs(prod(shapeInput));
                         C = shapeInput(3);
                         [kernel] = currLayer.getFilterSpatialDims();
-                        F = currLayer.getNumOutput();                    
+                        F = currLayer.getNumOutput();
                         obj.weightsMap(layerName) = randn(kernel(1),kernel(2),C,F) / sqrt(fan_in);
                         obj.BiasMap(layerName) = zeros(F,1);
                     end
@@ -51,9 +51,15 @@ classdef DeepLearningModel < handle
                     
                     % On the batchnorm layer the weight(gammas) should be
                     % initialized with ones and the bias(betas) as zeros
-                    if isa(currLayer,'BatchNorm')
-                        obj.weightsMap(layerName) = ones(1,prod(shapeInput));
-                        obj.BiasMap(layerName) = zeros(1,prod(shapeInput));
+                    if isa(currLayer,'BatchNorm') || isa(currLayer,'SpatialBatchNorm')
+                        if isa(currLayer,'SpatialBatchNorm')
+                            C = shapeInput(3);
+                            obj.weightsMap(layerName) = ones(1,C);
+                            obj.BiasMap(layerName) = zeros(1,C);
+                        else
+                            obj.weightsMap(layerName) = ones(1,abs(prod(shapeInput)));
+                            obj.BiasMap(layerName) = zeros(1,abs(prod(shapeInput)));
+                        end
                     end
                 end
             end
@@ -77,7 +83,7 @@ classdef DeepLearningModel < handle
             for idxLayer=2:obj.layersContainer.getNumLayers()
                 currLayer = obj.layersContainer.getLayerFromIndex(idxLayer);
                 layerName = currLayer.getName();
-                if isa(currLayer,'Dropout') || isa(currLayer,'BatchNorm')
+                if isa(currLayer,'Dropout') || isa(currLayer,'BatchNorm') || isa(currLayer,'SpatialBatchNorm')
                     currLayer.IsTraining(obj.isTraining);
                 end
                 currInput = currLayer.ForwardPropagation(currInput,obj.weightsMap(layerName),obj.BiasMap(layerName));
@@ -90,31 +96,31 @@ classdef DeepLearningModel < handle
             scores = obj.Predict(X);
             
             %% Get loss and gradient of the loss w.r.t to the scores
-            [data_loss, grad_loss] = obj.lossFunction.GetLossAndGradients(scores, Y);                                                            
+            [data_loss, grad_loss] = obj.lossFunction.GetLossAndGradients(scores, Y);
             
             %% Backprop
             % Start with gradient of loss w.r.t correct class probability
             % Also to save loop time we get the square sum of the weights
-            % to be used on the regularization            
+            % to be used on the regularization
             squared_W_reg = [];
-            currDout.input = grad_loss;                       
+            currDout.input = grad_loss;
             % Start by the last layer before Softmax
             for idxLayer=obj.layersContainer.getNumLayers()-1:-1:1
-                currLayer = obj.layersContainer.getLayerFromIndex(idxLayer);  
+                currLayer = obj.layersContainer.getLayerFromIndex(idxLayer);
                 % There is no backprop on the input layer
                 if isa(currLayer,'InputLayer')
-                   continue; 
+                    continue;
                 end
                 layerName = currLayer.getName();
-                currDout = currLayer.BackwardPropagation(currDout);                
+                currDout = currLayer.BackwardPropagation(currDout);
                 % Save gradients on parametrizes layers
-                if isa(currLayer,'FullyConnected') || isa(currLayer,'BatchNorm') || isa(currLayer,'ConvolutionLayer')
+                if isa(currLayer,'FullyConnected') || isa(currLayer,'BatchNorm') || isa(currLayer,'ConvolutionLayer') || isa(currLayer,'SpatialBatchNorm')
                     obj.gradWeightsMap(layerName) = currDout.weight;
                     obj.gradBiasMap(layerName) = currDout.bias;
                     if (obj.regEffect ~= 0)
                         W_flat = currLayer.getWeights; W_flat = W_flat(:);
-                        squared_W_reg(end+1) = 0.5 * obj.regEffect * sum(W_flat .* W_flat);                        
-                    end                    
+                        squared_W_reg(end+1) = 0.5 * obj.regEffect * sum(W_flat .* W_flat);
+                    end
                 end
             end
             
@@ -140,7 +146,7 @@ classdef DeepLearningModel < handle
         
         function bias = getBias(obj)
             bias = obj.BiasMap;
-        end                                
+        end
         
         function weightsGrad = getWeightsGradients(obj)
             weightsGrad = obj.gradWeightsMap;
@@ -155,19 +161,19 @@ classdef DeepLearningModel < handle
         end
         
         function L2Regularization(obj,regVal)
-           obj.regEffect = regVal;
+            obj.regEffect = regVal;
         end
         
         function EnableGradientCheck(obj, flag)
             cellLayers = obj.layersContainer.getAllLayers();
             for idxLayer = 1:numel(cellLayers)
-               currLayer =  cellLayers{idxLayer};
-               currLayer.EnableGradientCheck(flag);
+                currLayer =  cellLayers{idxLayer};
+                currLayer.EnableGradientCheck(flag);
             end
         end
         
         function IsTraining(obj, flag)
-           obj.isTraining = flag;
+            obj.isTraining = flag;
         end
     end
     

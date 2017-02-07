@@ -17,10 +17,10 @@ rng(0,'v5uniform');
 %% Load data
 load mnist_oficial;
 % Crop data to make faster to train
-input_train = input_train(1:5000,:);
-input_test = input_test(1:500,:);
-output_test_labels = output_test_labels(1:500,:);
-output_train_labels = output_train_labels(1:5000,:);
+%input_train = input_train(1:5000,:);
+%input_test = input_test(1:500,:);
+%output_test_labels = output_test_labels(1:500,:);
+%output_train_labels = output_train_labels(1:5000,:);
 
 data = Dataset(input_train, output_train_labels,28,28,1,1,true);
 data.AddValidation(input_test,output_test_labels,28,28,1,1,true);
@@ -33,12 +33,15 @@ data.AddValidation(input_test,output_test_labels,28,28,1,1,true);
 layers = LayerContainer();    
 layers <= struct('name','ImageIn','type','input','rows',28,'cols',28,'depth',1, 'batchsize',1);
 layers <= struct('name','CONV1','type','conv', 'kh',5,'kw',5,'stride',1,'pad',2,'num_output', 32); 
+layers <= struct('name','SBN_1','type','sp_batchnorm','eps',1e-5, 'momentum', 0.9);
 layers <= struct('name','Relu_1','type','relu');
 layers <= struct('name','MP1','type','maxpool', 'kh',2, 'kw',2, 'stride',2); 
 layers <= struct('name','CONV2','type','conv', 'kh',5,'kw',5,'stride',1,'pad',2,'num_output', 64); 
+layers <= struct('name','SBN_2','type','sp_batchnorm','eps',1e-5, 'momentum', 0.9);
 layers <= struct('name','Relu_2','type','relu');
 layers <= struct('name','MP2','type','maxpool', 'kh',2, 'kw',2, 'stride',2); 
 layers <= struct('name','FC_3','type','fc', 'num_output',1024);
+layers <= struct('name','BN_3','type','batchnorm','eps',1e-5, 'momentum', 0.9);
 layers <= struct('name','Relu_3','type','relu');
 layers <= struct('name','DRP_1','type','dropout','prob',0.5);
 layers <= struct('name','FC_4','type','fc','num_output',data.GetNumClasses());
