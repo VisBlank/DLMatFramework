@@ -53,7 +53,7 @@ net = DeepLearningModel(layers, LossFactory.GetLoss('multi_class_cross_entropy')
 
 %% Create solver and train
 solver = Solver(net, data, 'sgd',containers.Map({'learning_rate', 'L2_reg'}, {0.1, 0}));
-solver.SetBatchSize(256);
+solver.SetBatchSize(1000);
 solver.SetEpochs(10);
 solver.PrintEvery(10);
 solver.Train();
@@ -81,6 +81,10 @@ for idx=1:testBatchSize
     if idxScoresMax(idx) ~= idxCorrect(idx)
         errorCount = errorCount + 1;
         fprintf('Predicted %d and should be %d\n',idxScoresMax(idx),idxCorrect(idx));
+        % Uncomment if you want to pause on each error
+        %img = batchValidation.X;
+        %imshow(img(:,:,:,idx));
+        %pause;
     end    
 end
 errorPercentage = (errorCount*100) / testBatchSize;

@@ -89,7 +89,12 @@ classdef BatchNorm < BaseLayer
                 obj.running_mean = (obj.momentum .* obj.running_mean) + (1.0 - obj.momentum) * mu;
                 obj.running_var = (obj.momentum .* obj.running_var) + (1.0 - obj.momentum) .* obj.var;
             else
+                % Normalization with running means and variance infered
+                % during training time
                 xbar = (input - repmat(obj.running_mean,N,1)) ./ repmat(sqrt(obj.running_var + obj.eps),N,1);
+                
+                % Apply learned gamma(weights) and betas(bias) also learnt
+                % during training time.
                 activations = (repmat(weights,N,1) .* xbar) + repmat(bias,N,1);
             end
             
