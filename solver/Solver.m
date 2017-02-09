@@ -116,10 +116,12 @@ classdef Solver < handle
             num_iterations = obj.m_num_epochs * iterations_per_epoch;
             
             for t=1:num_iterations
+                tic;
                 obj.Step();
+                elapsedTime = toc;
                 % Print something once and while
                 if (obj.m_verbose) && (mod(t,obj.m_print_every) == 0)
-                    fprintf ('(Iteration %d / %d) loss: %d\n',(t), num_iterations, obj.m_loss_history(end) );                    
+                    fprintf ('(Iteration %d / %d) loss: %d stepTime: %.3f\n',(t), num_iterations, obj.m_loss_history(end), elapsedTime );                    
                 end
                 
                 % At the end of the epoch increment counter and decay

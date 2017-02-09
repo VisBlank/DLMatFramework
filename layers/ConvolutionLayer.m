@@ -83,7 +83,8 @@ classdef ConvolutionLayer < BaseLayer
             % par-for implementation with OpenMP on CPU
             for idxBatch = 1:N
                 im = input(:,:,:,idxBatch);    
-                im_col = im2col_ref(im,HH,WW,obj.m_stride,obj.m_padding,1);
+                %im_col = im2col_ref(im,HH,WW,obj.m_stride,obj.m_padding,1);
+                [im_col,~,~] = mex_im2col(im,HH,WW,obj.m_stride,obj.m_padding); 
                 mul = (filter_col_T * im_col) + bias_m;
                 activations(:,:,:,idxBatch) =  reshape_row_major(mul,[H_prime W_prime size(mul,1)]);                                                
             end
@@ -123,7 +124,8 @@ classdef ConvolutionLayer < BaseLayer
                 
                 % Calculate im2col (Could be cached....)
                 im = obj.previousInput(:,:,:,idxBatch);    
-                im_col = im2col_ref(im,HH,WW,obj.m_stride,obj.m_padding,1);
+                %im_col = im2col_ref(im,HH,WW,obj.m_stride,obj.m_padding,1);
+                [im_col,~,~] = mex_im2col(im,HH,WW,obj.m_stride,obj.m_padding); 
                                 
                 % Get dw
                 dw_before_reshape = dout_i_reshaped * im_col';                

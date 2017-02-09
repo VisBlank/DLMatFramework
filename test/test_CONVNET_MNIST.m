@@ -22,8 +22,8 @@ load mnist_oficial;
 %output_test_labels = output_test_labels(1:500,:);
 %output_train_labels = output_train_labels(1:5000,:);
 
-data = Dataset(input_train, output_train_labels,28,28,1,1,true);
-data.AddValidation(input_test,output_test_labels,28,28,1,1,true);
+data = Dataset(single(input_train), single(output_train_labels),28,28,1,1,true);
+data.AddValidation(single(input_test),single(output_test_labels),28,28,1,1,true);
 
 % Test to display batch
 %batch = data.GetBatch(10);

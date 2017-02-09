@@ -33,16 +33,16 @@ classdef DeepLearningModel < handle
                     if isa(currLayer,'FullyConnected')
                         fan_in = abs(prod(shapeInput));
                         fan_out = currLayer.getNumOutput();
-                        obj.weightsMap(layerName) = randn(fan_in,fan_out) / sqrt(fan_in);
-                        obj.BiasMap(layerName) = zeros(1,currLayer.getNumOutput());
+                        obj.weightsMap(layerName) = single(randn(fan_in,fan_out) / sqrt(fan_in));
+                        obj.BiasMap(layerName) = single(zeros(1,currLayer.getNumOutput()));
                     else
                         % Convolution layer
                         fan_in = abs(prod(shapeInput));
                         C = shapeInput(3);
                         [kernel] = currLayer.getFilterSpatialDims();
                         F = currLayer.getNumOutput();
-                        obj.weightsMap(layerName) = randn(kernel(1),kernel(2),C,F) / sqrt(fan_in);
-                        obj.BiasMap(layerName) = zeros(F,1);
+                        obj.weightsMap(layerName) = single(randn(kernel(1),kernel(2),C,F) / sqrt(fan_in));
+                        obj.BiasMap(layerName) = single(zeros(F,1));
                     end
                 else
                     % Some layers (ie Relu, Softmax) has no parameters
@@ -54,11 +54,11 @@ classdef DeepLearningModel < handle
                     if isa(currLayer,'BatchNorm') || isa(currLayer,'SpatialBatchNorm')
                         if isa(currLayer,'SpatialBatchNorm')
                             C = shapeInput(3);
-                            obj.weightsMap(layerName) = ones(1,C);
-                            obj.BiasMap(layerName) = zeros(1,C);
+                            obj.weightsMap(layerName) = single(ones(1,C));
+                            obj.BiasMap(layerName) = single(zeros(1,C));
                         else
-                            obj.weightsMap(layerName) = ones(1,abs(prod(shapeInput)));
-                            obj.BiasMap(layerName) = zeros(1,abs(prod(shapeInput)));
+                            obj.weightsMap(layerName) = single(ones(1,abs(prod(shapeInput))));
+                            obj.BiasMap(layerName) = single(zeros(1,abs(prod(shapeInput))));
                         end
                     end
                 end
