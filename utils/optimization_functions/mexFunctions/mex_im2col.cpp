@@ -1,11 +1,11 @@
-/* 
+/*
  * mex_matMult2D.c - Matlab bridge for im2col.
  *
- * Calculate im2col on an input image A. 
+ * Calculate im2col on an input image A.
  *
  * We are ROW MAJOR in C/C++ so you need to transpose the
- * Output to get the result you would normally expect.   
- * 
+ * Output to get the result you would normally expect.
+ *
  * The calling syntax is:
  *
  *		C = im2col(A, kernel_size, pad, stride)
@@ -24,7 +24,7 @@
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-    
+
 if(nlhs != 3) {
     mexErrMsgIdAndTxt("matMul2D:nlhs",
                       "Three outputs required.");
@@ -35,15 +35,19 @@ if(nrhs != 5) {
                       "Five inputs required.");
 }
 
-if ( !mxIsSingle(prhs[0])|| mxIsComplex(prhs[0]))  {
-    mexErrMsgIdAndTxt("matMul2D:notSingle","Input matrix must be type single.");
+bool isFloat = false;
+if (mxIsComplex(prhs[0])) {
+  mexErrMsgIdAndTxt("im2col:isComplex","Input matrix must not be complex.");
+}
+// Detect the typename
+if ( !mxIsSingle(prhs[0]))  {
+    isFloat = false;
+} else {
+  isFloat = true;
 }
 
 
 /* variable declarations here */
-float * inMatrixA;
-
-float * outMatrix;   
 double *executionTime;
 double *transferTime;
 
@@ -62,7 +66,6 @@ int inStride;
 int nDims;
 
 /* read input data */
-inMatrixA = (float *)mxGetPr(prhs[0]);
 inKernelY = mxGetScalar(prhs[1]);
 inKernelX = mxGetScalar(prhs[2]);
 inStride = mxGetScalar(prhs[3]);
@@ -92,16 +95,25 @@ width_out = (ncolsA + 2 * inPad - inKernelX) / inStride + 1;
 outMatrix_height = nchanA*inKernelY*inKernelX;
 outMatrix_width = height_out * width_out;
 
-/* creat ouput matrix */ 
-plhs[0] = mxCreateNumericMatrix(outMatrix_height,outMatrix_width,mxSINGLE_CLASS,mxREAL);
-outMatrix = (float *)mxGetPr(plhs[0]);
-
+// Create execution time double scalar
 plhs[1] = mxCreateNumericMatrix(1,1,mxDOUBLE_CLASS,mxREAL);
 executionTime = (double *)mxGetPr(plhs[1]);
 
+// Create transfer time double scalar
 plhs[2] = mxCreateNumericMatrix(1,1,mxDOUBLE_CLASS,mxREAL);
 transferTime = (double *)mxGetPr(plhs[2]);
 
-im2col(inMatrixA, nchanA, nrowsA, ncolsA, inKernelY, inKernelX, inStride, inPad, outMatrix, executionTime, transferTime);
+if (isFloat){
+  /* creat ouput matrix as float(single)*/
+  plhs[0] = mxCreateNumericMatrix(outMatrix_height,outMatrix_width,mxSINGLE_CLASS,mxREAL);
+  float *outMatrix = (float *)mxGetPr(plhs[0]);
+  im2col<float>((float *)mxGetPr(prhs[0]), nchanA, nrowsA, ncolsA, inKernelY, inKernelX, inStride, inPad, outMatrix, executionTime, transferTime);
+} else {  
+  /* creat ouput matrix as float(single)*/
+  plhs[0] = mxCreateNumericMatrix(outMatrix_height,outMatrix_width,mxDOUBLE_CLASS,mxREAL);
+  double *outMatrix = (double *)mxGetPr(plhs[0]);
+  im2col<double>((double *)mxGetPr(prhs[0]), nchanA, nrowsA, ncolsA, inKernelY, inKernelX, inStride, inPad, outMatrix, executionTime, transferTime);
+}
+
 
 }

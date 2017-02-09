@@ -21,7 +21,8 @@ A[i][j] == A[(j*num_rows_A)+i]
 (((j) * (height)) + (i) + ((k) * (height) * (width)))
 #endif
 
-void im2col(float *data_im, int channels, int height, int width, int ky, int kx, int stride, int pad, float *data_col, double *execTime, double *trfTime) {
+template <typename T>
+void im2col(T *data_im, int channels, int height, int width, int ky, int kx, int stride, int pad, T *data_col, double *execTime, double *trfTime) {
 
   /*Clear scren to help debug*/
   /*system("clear");*/
@@ -157,3 +158,7 @@ void im2col(float *data_im, int channels, int height, int width, int ky, int kx,
   *execTime = wall_time_sec;
   *trfTime = 0.0;
 }
+
+// Explicit declare available versions to avoid linker error.
+template void im2col<double>(double* data_im, int channels,  int height,  int width, int ky, int kx, int stride, int pad, double* data_col, double *execTime, double *trfTime);
+template void im2col<float>(float* data_im, int channels,  int height,  int width, int ky, int kx, int stride, int pad, float* data_col, double *execTime, double *trfTime);
