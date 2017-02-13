@@ -49,9 +49,9 @@ classdef (Sealed) Dataset < handle
             obj.m_X_Tensor = reshape_row_major(X,[rows,cols,channels,obj.m_trainingSize]);
             
             % Transpose rows,cols if image
-            if (rows > 1 && cols > 1)
-                obj.m_X_Tensor = permute(obj.m_X_Tensor,[2 1 3 4]);
-            end
+            % if (rows > 1 && cols > 1)
+            %   obj.m_X_Tensor = permute(obj.m_X_Tensor,[2 1 3 4]);
+            % end
         end
         
         function AddValidation(obj,X,Y,rows, cols, channels,dimNumSamples, doOneHot)
@@ -72,9 +72,9 @@ classdef (Sealed) Dataset < handle
             obj.m_X_Val_Tensor = reshape_row_major(X,[rows,cols,channels,obj.m_ValidationSize]);
             
             % Transpose rows,cols if image
-            if (rows > 1 && cols > 1)
-                obj.m_X_Val_Tensor = permute(obj.m_X_Val_Tensor,[2 1 3 4]);
-            end
+            %if (rows > 1 && cols > 1)
+            %    obj.m_X_Val_Tensor = permute(obj.m_X_Val_Tensor,[2 1 3 4]);
+            %end
         end
         
         function batch = GetBatch(obj,batchSize)            
