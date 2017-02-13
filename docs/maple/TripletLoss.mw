@@ -97,7 +97,7 @@
 </Input>
 </Group></Presentation-Block><Presentation-Block>
 <Group view="presentation" inline-output="false" labelreference="L87" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
-<Input><Text-field style="Normal" layout="Normal">The triplet loss is ofen uses on perseon re-indentification or face recognition problems, the idea of triplet loss is to receive 3 scores, with 1 pair related to the score of similar classes and an extra score related to a &quot;negative class&quot;. The training objective will minimize this loss by making related scores similar while making the difference between the related scores and the negative score larger.</Text-field>
+<Input><Text-field style="Normal" layout="Normal">The triplet loss is often used on person re-indentification or face recognition problems, the idea of triplet loss is to receive 3 scores, 1 anchor score, a related psoitive score and an extra negative score related to a &quot;negative class&quot;. The training objective will minimize this loss by making related scores similar while making the difference between the anchor scores and the negative score larger.</Text-field>
 </Input>
 </Group></Presentation-Block><Presentation-Block>
 <Group view="presentation" inline-output="false" labelreference="L148" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
@@ -105,7 +105,7 @@
 </Input>
 </Group></Presentation-Block><Presentation-Block>
 <Group view="presentation" inline-output="false" labelreference="L149" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
-<Input><Text-field style="Text" layout="Normal">The triplet loss has 3 inputs, which are the output of a neural network for 3 classes, a class called &quot;anchor class&quot;, another class that is positive, and a negative class. This concept for person reindentification or face recognition is important because for example the anchor class could be a person, and positive class could be the same person under other circunstance, and a negative class.</Text-field>
+<Input><Text-field style="Text" layout="Normal">The triplet loss has 3 inputs, which are the output of a neural network, a class called &quot;anchor class&quot;, another class that is positive, and a negative class.  On a face recognition problem the anchor class could be a person, and positive class could be the same person under other ilumination, and a negative class a different person.</Text-field>
 </Input>
 </Group></Presentation-Block><Presentation-Block>
 <Group view="presentation" inline-output="false" labelreference="L154" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
@@ -117,7 +117,7 @@
 <Group view="presentation" inline-output="false" labelreference="L166" drawlabel="true" applyint="true" applyrational="true" applyexponent="false"><Text-field opaque="false" subscript="false" underline="false" superscript="false" bold="false" foreground="[0,0,0]" italic="false" executable="false" selection-placeholder="false" size="12" readonly="false" background="[255,255,255]" placeholder="false" family="Times New Roman" spaceabove="0" linebreak="space" rightmargin="0" linespacing="0.0" initial="0" firstindent="0" leftmargin="0" bulletsuffix="" alignment="centred" bullet="none" spacebelow="0" pagebreak-before="false"></Text-field>
 </Group></Presentation-Block><Presentation-Block>
 <Group view="presentation" inline-output="false" labelreference="L158" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
-<Input><Text-field style="Text" layout="Normal">Here the inputs of the triplet loss comes from 3 different networks what share the same weights, but this also can be achieved by using a single network and building the batch with the anchor, positive and negative class. This also implies that if the triplet loss has 3 inputs during backpropagation we should return 3 gradients.</Text-field>
+<Input><Text-field style="Text" layout="Normal">Sometimes the inputs of the triplet loss comes from 3 different networks that share the same weights, but this also can be achieved by using a single network and building the batch with the anchor, positive and negative class. This also implies that if the triplet loss has 3 inputs during backpropagation we should return 3 gradients.</Text-field>
 </Input>
 </Group></Presentation-Block><Presentation-Block>
 <Group view="presentation" inline-output="false" labelreference="L349" drawlabel="true" applyint="true" applyrational="true" applyexponent="false">
