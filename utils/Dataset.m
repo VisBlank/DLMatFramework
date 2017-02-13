@@ -12,6 +12,7 @@ classdef (Sealed) Dataset < handle
         m_Y_one_hot;m_Y_val_one_hot;
         m_X_Tensor;m_X_Val_Tensor;
         m_trainingSize;
+        m_inputAreImages;
         m_ValidationSize;
         m_shuffledIndex;m_shuffledIndexVal;
     end
@@ -48,10 +49,12 @@ classdef (Sealed) Dataset < handle
             % [rows, cols, depth, batch]
             obj.m_X_Tensor = reshape_row_major(X,[rows,cols,channels,obj.m_trainingSize]);
             
-            % Transpose rows,cols if image
-            % if (rows > 1 && cols > 1)
-            %   obj.m_X_Tensor = permute(obj.m_X_Tensor,[2 1 3 4]);
-            % end
+            % Detect if we're dealing with images 
+            if (rows > 1 && cols > 1)
+                obj.m_inputAreImages = true;
+                % Transpose rows,cols if image
+                %obj.m_X_Tensor = permute(obj.m_X_Tensor,[2 1 3 4]);
+            end
         end
         
         function AddValidation(obj,X,Y,rows, cols, channels,dimNumSamples, doOneHot)
@@ -61,7 +64,7 @@ classdef (Sealed) Dataset < handle
                 obj.m_Y_val_one_hot = obj.oneHot(Y);
             else
                 obj.m_Y_val_one_hot = Y;
-            end            
+            end
             obj.m_ValidationSize = size(X,dimNumSamples);
             
             % Create a shuffled index
@@ -77,7 +80,11 @@ classdef (Sealed) Dataset < handle
             %end
         end
         
-        function batch = GetBatch(obj,batchSize)            
+        function batch = GetBatch(obj,batchSize)
+            % Select the whole dataset if batchSize is negative
+            if (batchSize <= 0)
+                batchSize = obj.m_trainingSize;
+            end
             selIndex = randperm(obj.m_trainingSize);
             %% TODO: I don't know if I need to reshufle every new batch
             %selIndex = [1:1:batchSize];
@@ -86,7 +93,7 @@ classdef (Sealed) Dataset < handle
             batch.Y = obj.m_Y_one_hot(selIndex,:);
         end
         
-        function batch = GetValidationBatch(obj,batchSize)            
+        function batch = GetValidationBatch(obj,batchSize)
             selIndex = obj.m_shuffledIndexVal(1:batchSize);
             batch.X = obj.m_X_Val_Tensor(:,:,:,selIndex);
             batch.Y = obj.m_Y_val_one_hot(selIndex,:);
