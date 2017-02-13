@@ -49,3 +49,30 @@ solver.SetBatchSize(1000);
 solver.SetEpochs(10);
 solver.PrintEvery(10);
 solver.Train();
+
+%% Test
+batchValidation = data.GetValidationBatch(-1);
+testBatchSize = size(batchValidation.Y,1);
+
+% Predict the batch
+scores = net.Predict(batchValidation.X);
+[~, idxScoresMax] = max(scores,[],2);
+[~, idxCorrect] = max(batchValidation.Y,[],2);
+% Subtract one (First class )
+idxScoresMax = idxScoresMax - 1;
+idxCorrect = idxCorrect - 1;
+errorCount = 0;
+
+% Compare scores with target
+for idx=1:testBatchSize    
+    if idxScoresMax(idx) ~= idxCorrect(idx)
+        errorCount = errorCount + 1;
+        %fprintf('Predicted %d and should be %d\n',idxScoresMax(idx),idxCorrect(idx));
+        % Uncomment if you want to pause on each error
+        %img = batchValidation.X;
+        %imshow(img(:,:,:,idx));
+        %pause;
+    end    
+end
+errorPercentage = (errorCount*100) / testBatchSize;
+fprintf('Validation Accuracy is %d percent \n',round((100-errorPercentage)));

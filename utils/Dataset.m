@@ -133,9 +133,18 @@ classdef (Sealed) Dataset < handle
         end
         
         function batch = GetValidationBatch(obj,batchSize)
+            % Select the whole dataset if batchSize is negative
+            if (batchSize <= 0)
+                batchSize = obj.m_ValidationSize;
+            end
             selIndex = obj.m_shuffledIndexVal(1:batchSize);
             batch.X = obj.m_X_Val_Tensor(:,:,:,selIndex);
             batch.Y = obj.m_Y_val_one_hot(selIndex,:);
+            
+            % Do Normalization if needed
+            if obj.m_doMeanImageNorm || obj.m_doMeanPixelNorm
+                batch.X = obj.NormalizeImage(batch.X);
+            end
         end
         
         function X = GetOriginalInput(obj)
