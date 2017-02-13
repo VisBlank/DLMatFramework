@@ -1,5 +1,5 @@
 classdef (Sealed) Dataset < handle
-    %DATASET Utility function to handle datasets.
+    %DATASET Utility class to handle datasets.
     % Ex:
     % clear all; clc; load mnist_oficial;
     % data = Dataset(input_train, output_train_labels,1,784,1,1);
@@ -15,6 +15,12 @@ classdef (Sealed) Dataset < handle
         m_inputAreImages;
         m_ValidationSize;
         m_shuffledIndex;m_shuffledIndexVal;
+        m_doAugmentation = false;
+        m_doMeanPixelNorm = false;
+        m_doMeanImageNorm = false;
+        m_meanPixVals;
+        m_meanImage;
+        m_augmenter;
     end
     
     methods(Access = private)
@@ -29,12 +35,21 @@ classdef (Sealed) Dataset < handle
                 oneHotLabels(:,i) = (labels == valueLabels(i));
             end
         end
+        
+        function batchOut = NormalizeImage(obj, batchIn)
+            if obj.m_doMeanPixelNorm
+                batchOut(:,:,1,:) = batchIn(:,:,1,:) - obj.m_meanPixVals{1};
+                batchOut(:,:,2,:) = batchIn(:,:,2,:) - obj.m_meanPixVals{2};
+                batchOut(:,:,3,:) = batchIn(:,:,3,:) - obj.m_meanPixVals{3};
+            end
+        end
     end
     
     methods(Access = public)
         function obj = Dataset(X,Y,rows, cols, channels,dimNumSamples, doOneHot)
             obj.m_X = X;
             obj.m_Y = Y;
+            obj.m_augmenter = AugmentBatch();
             if doOneHot
                 obj.m_Y_one_hot = obj.oneHot(Y);
             else
@@ -80,6 +95,20 @@ classdef (Sealed) Dataset < handle
             %end
         end
         
+        function enableAugmentation(obj, flag)
+            obj.m_doAugmentation = flag;
+        end
+        
+        function enableMeanPixelNormalization(obj, flag, pixVals)
+            obj.m_doMeanPixelNorm = flag;
+            obj.m_meanPixVals = pixVals;
+        end
+        
+        function enableMeanImageNormalization(obj, flag, pixVals)
+            obj.m_doMeanImageNorm = flag;
+            obj.m_meanImage = pixVals;
+        end
+        
         function batch = GetBatch(obj,batchSize)
             % Select the whole dataset if batchSize is negative
             if (batchSize <= 0)
@@ -91,6 +120,16 @@ classdef (Sealed) Dataset < handle
             selIndex = selIndex(1:batchSize);
             batch.X = obj.m_X_Tensor(:,:,:,selIndex);
             batch.Y = obj.m_Y_one_hot(selIndex,:);
+            
+            % Do augmentation if needed
+            if obj.m_doAugmentation
+                batch.X = obj.m_augmenter.Augment(batch.X);
+            end
+            
+            % Do Normalization if needed
+            if obj.m_doMeanImageNorm || obj.m_doMeanPixelNorm
+                batch.X = obj.NormalizeImage(batch.X);
+            end
         end
         
         function batch = GetValidationBatch(obj,batchSize)
