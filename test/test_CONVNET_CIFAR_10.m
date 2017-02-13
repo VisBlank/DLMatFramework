@@ -21,6 +21,31 @@ data.enableAugmentation(true);
 % Enable Mean pixel normalization
 data.enableMeanPixelNormalization(true,pixelMean);
 
-batch = data.GetBatch(10);
+%% Create network
+layers = LayerContainer();    
+layers <= struct('name','ImageIn','type','input','rows',32,'cols',32,'depth',3, 'batchsize',1);
+layers <= struct('name','CONV1','type','conv', 'kh',5,'kw',5,'stride',1,'pad',2,'num_output', 32); 
+layers <= struct('name','SBN_1','type','sp_batchnorm','eps',1e-5, 'momentum', 0.9);
+layers <= struct('name','Relu_1','type','relu');
+layers <= struct('name','MP1','type','maxpool', 'kh',2, 'kw',2, 'stride',2); 
+layers <= struct('name','CONV2','type','conv', 'kh',5,'kw',5,'stride',1,'pad',2,'num_output', 64); 
+layers <= struct('name','SBN_2','type','sp_batchnorm','eps',1e-5, 'momentum', 0.9);
+layers <= struct('name','Relu_2','type','relu');
+layers <= struct('name','MP2','type','maxpool', 'kh',2, 'kw',2, 'stride',2); 
+layers <= struct('name','FC_3','type','fc', 'num_output',1024);
+layers <= struct('name','BN_3','type','batchnorm','eps',1e-5, 'momentum', 0.9);
+layers <= struct('name','Relu_3','type','relu');
+layers <= struct('name','DRP_1','type','dropout','prob',0.5);
+layers <= struct('name','FC_4','type','fc','num_output',data.GetNumClasses());
+layers <= struct('name','Softmax','type','softmax');
+
+% Create DeepLearningModel instance
+net = DeepLearningModel(layers, LossFactory.GetLoss('multi_class_cross_entropy'));
 
 
+%% Create solver and train
+solver = Solver(net, data, 'sgd',containers.Map({'learning_rate', 'L2_reg'}, {0.1, 0}));
+solver.SetBatchSize(1000);
+solver.SetEpochs(10);
+solver.PrintEvery(10);
+solver.Train();
