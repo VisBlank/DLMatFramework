@@ -114,6 +114,7 @@ classdef Solver < handle
             num_train = obj.m_data.GetTrainSize();
             iterations_per_epoch = max(num_train / obj.m_batch_size, 1);
             num_iterations = obj.m_num_epochs * iterations_per_epoch;
+            fprintf('Iterations/epoch: %d\n',round(iterations_per_epoch));
             
             for t=1:num_iterations
                 tic;
