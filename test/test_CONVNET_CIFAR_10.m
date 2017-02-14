@@ -45,8 +45,8 @@ net = DeepLearningModel(layers, LossFactory.GetLoss('multi_class_cross_entropy')
 
 %% Create solver and train
 solver = Solver(net, data, 'sgd',containers.Map({'learning_rate', 'L2_reg'}, {0.1, 0}));
-solver.SetBatchSize(1000);
-solver.SetEpochs(10);
+solver.SetBatchSize(5000);
+solver.SetEpochs(250);
 solver.PrintEvery(10);
 solver.Train();
 
@@ -76,3 +76,7 @@ for idx=1:testBatchSize
 end
 errorPercentage = (errorCount*100) / testBatchSize;
 fprintf('Validation Accuracy is %d percent \n',round((100-errorPercentage)));
+
+%% Plot loss history
+figure;
+plot(solver.GetLossHistory)
