@@ -128,6 +128,7 @@ classdef Solver < handle
                 % learning rate
                 epoch_end = mod((t + 1), iterations_per_epoch) == 0;
                 if epoch_end                    
+                    fprintf('Finished epoch %d/%d\n',obj.m_currEpoch,obj.m_num_epochs);
                     obj.m_currEpoch = obj.m_currEpoch+1;
                     % Do Step weight decay
                     currLearningRate = obj.m_optimizer.GetLearningRate();
