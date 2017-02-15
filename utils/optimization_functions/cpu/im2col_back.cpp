@@ -43,27 +43,26 @@ void im2col_back(T *dout, int dout_H, int dout_W, int stride, int HH, int WW, in
   
   //select patch
   for (int patchNum = 0; patchNum < (dout_H * dout_W); patchNum++){
+	  
+	  int h_start = floor(((patchNum)/dout_W) * stride);
+	  int w_start = ( patchNum % dout_W ) * stride;
+		  
 	  //go over patch
-	  for (int patchElement = 0; patchElement < HH * WW * CC; patchElement++){ 
-		    
-		  double h_start = floor(((patchNum)/dout_W) * stride);
-		  int w_start = ( patchNum % dout_W ) * stride;
+	  int patchElement = 0;
+	  for (int channel = 0; channel < CC; channel++){
 		  
-		  //go over the output
-		  for (int kernel_height_counter = h_start; kernel_height_counter < h_start + HH;kernel_height_counter++ ){
+		  for (int row = 0; row < HH; row++){
 			  
-			  for(int kernel_width_counter = w_start; kernel_width_counter < w_start + WW; kernel_width_counter++){
-				img_grad[kernel_height_counter+kernel_width_counter] = img_grad[kernel_height_counter+kernel_width_counter] + dout[patchNum*(HH * WW * CC)+ patchElement];
-			  }
-		  
+			  for (int col = 0; col < WW; col++){
+			      
+				  img_grad[(w_start*H) + (h_start + row) + (col * W) + (channel * H * W)] = img_grad[(w_start*H) + (h_start + row) + (col * W) + (channel * H * W)] + dout[patchNum + (patchElement*dout_H*dout_W)];  
+                  patchElement++;
+              } 
 		  }
-		  
-	  }
-	  
-	  
-	  
-	  
+	  } 	  
   } 
+  
+  
   
     /*toc*/
   /*clock_gettime(CLOCK_REALTIME, &now);

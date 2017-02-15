@@ -60,9 +60,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   int inStride;
   int nRowKer;
   int nColKer;
-  int nChanKer;
-  
-  
+
   /* read input data */
   inDout_H = mxGetScalar(prhs[1]);
   inDout_W = mxGetScalar(prhs[2]);
@@ -91,12 +89,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     /* creat ouput matrix as float(single)*/
     plhs[0] = mxCreateNumericArray(chan_out,shape_out_mex,mxSINGLE_CLASS,mxREAL);
     float *outMatrix = (float *)mxGetPr(plhs[0]);
-    im2col_back<float>((float *)mxGetPr(prhs[0]), inDout_H, inDout_W, inStride, nRowKer, nColKer, nChanKer , outMatrix, executionTime, transferTime);
+    im2col_back<float>((float *)mxGetPr(prhs[0]), inDout_H, inDout_W, inStride, nRowKer, nColKer, chan_out , outMatrix, executionTime, transferTime);
   } else {
     /* creat ouput matrix as float(double)*/
     plhs[0] = mxCreateNumericArray(chan_out,shape_out_mex,mxDOUBLE_CLASS,mxREAL);
     double *outMatrix = (double *)mxGetPr(plhs[0]);
-    im2col_back<double>((double *)mxGetPr(prhs[0]), inDout_H, inDout_W, inStride, nRowKer, nColKer, nChanKer , outMatrix, executionTime, transferTime);
+    im2col_back<double>((double *)mxGetPr(prhs[0]), inDout_H, inDout_W, inStride, nRowKer, nColKer, chan_out , outMatrix, executionTime, transferTime);
   }
 
 }
