@@ -135,7 +135,7 @@ classdef ConvolutionLayer < BaseLayer
                 grad_before_im2col = (dout_i_reshaped' * filter_col_T);                
                 % Now we need to backpropagate im2col (im2col_back),
                 % results will padded by one always
-                dx_padded = im2col_back_ref(grad_before_im2col,H_prime, W_prime, obj.m_stride, HH, WW, C);                
+                dx_padded = im2col_back_custom(grad_before_im2col,H_prime, W_prime, obj.m_stride, HH, WW, C);                
                 % Now we need to take out the pading                
                 dx(:,:,:,idxBatch) = dx_padded(obj.m_padding+1:obj.m_padding+H, obj.m_padding+1:obj.m_padding+H,:);                
             end
