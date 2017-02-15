@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
-
+#include <cmath>
 /*
 Define macros to help addressing 1d arrays with 2d coordinates
 both on row-major(C) or col-major(matlab)
@@ -30,15 +30,15 @@ void im2col_back(T *dout, int dout_H, int dout_W, int stride, int HH, int WW, in
   
   /*calculate spatial dimensions of img_grad */
   
-  int H = (dout_H - 1) * S + HH;
-  int W = (dout_W - 1) * S + WW;
+  int H = (dout_H - 1) * stride + HH;
+  int W = (dout_W - 1) * stride + WW;
   
-  int row,col,channel
+  int row,col,channel;
   
   /* Measure elapsed wall time */
-  struct timespec now, tmstart;
+  //struct timespec now, tmstart;
   /*tic*/
-  clock_gettime(CLOCK_REALTIME, &tmstart);
+  //clock_gettime(CLOCK_REALTIME, &tmstart);
 
   
   //select patch
@@ -46,14 +46,14 @@ void im2col_back(T *dout, int dout_H, int dout_W, int stride, int HH, int WW, in
 	  //go over patch
 	  for (int patchElement = 0; patchElement < HH * WW * CC; patchElement++){ 
 		    
-		  h_start = floor(((patchNum)/dout_W) * S);
-		  w_start = ( patchNum % dout_W ) * S;
+		  double h_start = floor(((patchNum)/dout_W) * stride);
+		  int w_start = ( patchNum % dout_W ) * stride;
 		  
 		  //go over the output
 		  for (int kernel_height_counter = h_start; kernel_height_counter < h_start + HH;kernel_height_counter++ ){
 			  
 			  for(int kernel_width_counter = w_start; kernel_width_counter < w_start + WW; kernel_width_counter++){
-				img_grad[kernel_height_counter+kernel_width_counter] = img_grad[kernel_height_counter+kernel_width_counter] + dout[patchnum*(HH * WW * CC)+ patchElement];
+				img_grad[kernel_height_counter+kernel_width_counter] = img_grad[kernel_height_counter+kernel_width_counter] + dout[patchNum*(HH * WW * CC)+ patchElement];
 			  }
 		  
 		  }
@@ -66,11 +66,15 @@ void im2col_back(T *dout, int dout_H, int dout_W, int stride, int HH, int WW, in
   } 
   
     /*toc*/
-  clock_gettime(CLOCK_REALTIME, &now);
+  /*clock_gettime(CLOCK_REALTIME, &now);
   double wall_time_sec =
   (double)((now.tv_sec + now.tv_nsec * 1e-9) -
   (double)(tmstart.tv_sec + tmstart.tv_nsec * 1e-9));
   *execTime = wall_time_sec;
   *trfTime = 0.0;
-
+*/
 }
+
+// Explicit declare available versions to avoid linker error.
+template void im2col_back<double>(double *dout, int dout_H, int dout_W, int stride, int HH, int WW, int CC, double *img_grad, double *execTime, double *trfTime);
+template void im2col_back<float>(float *dout, int dout_H, int dout_W, int stride, int HH, int WW, int CC, float *img_grad, double *execTime, double *trfTime);
