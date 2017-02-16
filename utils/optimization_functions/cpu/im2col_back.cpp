@@ -44,26 +44,27 @@ void im2col_back(T *dout, int dout_H, int dout_W, int stride, int HH, int WW, in
   //select patch
   for (int patchNum = 0; patchNum < (dout_H * dout_W); patchNum++){
 	  
+	  //starting upper left spatial coordinate for this patch
 	  int h_start = floor(((patchNum)/dout_W) * stride);
 	  int w_start = ( patchNum % dout_W ) * stride;
 		  
-	  //go over patch
-	  int patchElement = 0;
+	  //go over all the elements in selected patch placing/adding them into the output matrix
+	  int patchElement = 0; //counter for our current patch
 	  for (int channel = 0; channel < CC; channel++){
 		  
 		  for (int row = 0; row < HH; row++){
 			  
 			  for (int col = 0; col < WW; col++){
 			      
-				  img_grad[(w_start*H) + (h_start + row) + (col * W) + (channel * H * W)] = img_grad[(w_start*H) + (h_start + row) + (col * W) + (channel * H * W)] + dout[patchNum + (patchElement*dout_H*dout_W)];  
+				  // starting at (w_start * H) go across the output, channel by channel (channel * H * W) , row by row (h_start + row) and column by column (col * W) 
+				  img_grad[(w_start * H) + (h_start + row) + (col * W) + (channel * H * W)] = img_grad[(w_start * H) + (h_start + row) + (col * W) + (channel * H * W)] + dout[patchNum + (patchElement * dout_H * dout_W)];  
                   patchElement++;
               } 
 		  }
 	  } 	  
   } 
   
-  
-  
+ 
     /*toc*/
   /*clock_gettime(CLOCK_REALTIME, &now);
   double wall_time_sec =

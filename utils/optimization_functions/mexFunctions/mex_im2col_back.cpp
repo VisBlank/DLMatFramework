@@ -50,7 +50,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   /* variable declarations here */
   double *executionTime;
   double *transferTime;
-
   int inDout_H;
   int inDout_W;
   int height_out;
@@ -82,17 +81,17 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   plhs[2] = mxCreateNumericMatrix(1,1,mxDOUBLE_CLASS,mxREAL);
   transferTime = (double *)mxGetPr(plhs[2]);
 
-  
+  // Define shape of output
   mwSize shape_out_mex[] = {height_out,width_out,chan_out};
   
   if (isFloat){
     /* creat ouput matrix as float(single)*/
-    plhs[0] = mxCreateNumericArray(chan_out,shape_out_mex,mxSINGLE_CLASS,mxREAL);
+    plhs[0] = mxCreateNumericArray(3,shape_out_mex,mxSINGLE_CLASS,mxREAL); //number 3 is temporary for now, should probably be replaced by a variable of dimensions!!
     float *outMatrix = (float *)mxGetPr(plhs[0]);
     im2col_back<float>((float *)mxGetPr(prhs[0]), inDout_H, inDout_W, inStride, nRowKer, nColKer, chan_out , outMatrix, executionTime, transferTime);
   } else {
     /* creat ouput matrix as float(double)*/
-    plhs[0] = mxCreateNumericArray(chan_out,shape_out_mex,mxDOUBLE_CLASS,mxREAL);
+    plhs[0] = mxCreateNumericArray(3,shape_out_mex,mxDOUBLE_CLASS,mxREAL); //number 3 is temporary for now, should probably be replaced by a variable of dimensions!!
     double *outMatrix = (double *)mxGetPr(plhs[0]);
     im2col_back<double>((double *)mxGetPr(prhs[0]), inDout_H, inDout_W, inStride, nRowKer, nColKer, chan_out , outMatrix, executionTime, transferTime);
   }
