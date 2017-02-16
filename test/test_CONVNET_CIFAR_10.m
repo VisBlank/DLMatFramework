@@ -32,6 +32,12 @@ layers <= struct('name','CONV2','type','conv', 'kh',5,'kw',5,'stride',1,'pad',2,
 layers <= struct('name','SBN_2','type','sp_batchnorm','eps',1e-5, 'momentum', 0.9);
 layers <= struct('name','Relu_2','type','relu');
 layers <= struct('name','MP2','type','maxpool', 'kh',2, 'kw',2, 'stride',2); 
+
+layers <= struct('name','CONV3','type','conv', 'kh',3,'kw',3,'stride',1,'pad',1,'num_output', 128); 
+layers <= struct('name','SBN_3','type','sp_batchnorm','eps',1e-5, 'momentum', 0.9);
+layers <= struct('name','Relu_C_3','type','relu');
+layers <= struct('name','MP3','type','maxpool', 'kh',2, 'kw',2, 'stride',2); 
+
 layers <= struct('name','FC_3','type','fc', 'num_output',1024);
 layers <= struct('name','BN_3','type','batchnorm','eps',1e-5, 'momentum', 0.9);
 layers <= struct('name','Relu_3','type','relu');
