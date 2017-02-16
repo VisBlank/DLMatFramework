@@ -42,6 +42,7 @@ void im2col_back(T *dout, int dout_H, int dout_W, int stride, int HH, int WW, in
 
   
   //select patch
+  #pragma omp parallel for
   for (int patchNum = 0; patchNum < (dout_H * dout_W); patchNum++){
 	  
 	  //starting upper left spatial coordinate for this patch
@@ -56,6 +57,7 @@ void im2col_back(T *dout, int dout_H, int dout_W, int stride, int HH, int WW, in
 			  
 			  for (int col = 0; col < WW; col++){
 			      
+				  // Place patch on output, but increment values where patches overlap
 				  // starting at col = (w_start * H) row = (h_start + row) go across the output, channel by channel (channel * H * W) and column by column (col * W) 
 				  img_grad[(w_start * H) + (h_start + row) + (col * W) + (channel * H * W)] = img_grad[(w_start * H) + (h_start + row) + (col * W) + (channel * H * W)] + dout[patchNum + (patchElement * dout_H * dout_W)];  
                   patchElement++;
