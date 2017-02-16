@@ -56,7 +56,7 @@ void im2col_back(T *dout, int dout_H, int dout_W, int stride, int HH, int WW, in
 			  
 			  for (int col = 0; col < WW; col++){
 			      
-				  // starting at (w_start * H) go across the output, channel by channel (channel * H * W) , row by row (h_start + row) and column by column (col * W) 
+				  // starting at col = (w_start * H) row = (h_start + row) go across the output, channel by channel (channel * H * W) and column by column (col * W) 
 				  img_grad[(w_start * H) + (h_start + row) + (col * W) + (channel * H * W)] = img_grad[(w_start * H) + (h_start + row) + (col * W) + (channel * H * W)] + dout[patchNum + (patchElement * dout_H * dout_W)];  
                   patchElement++;
               } 
