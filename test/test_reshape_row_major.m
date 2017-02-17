@@ -101,3 +101,6 @@ else
     error('Reshape row-major test 4d failed (CPU)');
 end
 
+%% Exercise crash
+load mnist_oficial;
+data = Dataset(single(input_train), single(output_train_labels),28,28,1,1,true);
