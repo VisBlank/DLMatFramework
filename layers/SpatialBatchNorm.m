@@ -57,13 +57,13 @@ classdef SpatialBatchNorm < BaseLayer
             inputTransposed = permute(input,[2,3,1,4]);                                    
             
             % Flat the input (On python the reshape is row-major)           
-            inputFlat = reshape_row_major(inputTransposed,[(numel(inputTransposed) / C),C]);
+            inputFlat = reshape_row_major_custom(inputTransposed,[(numel(inputTransposed) / C),C]);
             
             % Call the forward propagation of normal batchnorm
             activations = obj.normalBatchNorm.ForwardPropagation(inputFlat, weights, bias);
             
             % Reshape/transpose back the signal, on python was (N,H,W,C)
-            activations_reshape = reshape_row_major(activations, [W,C,H,N]);
+            activations_reshape = reshape_row_major_custom(activations, [W,C,H,N]);
             % On python was transpose(0,3,1,2)
             activations = permute(activations_reshape,[3 1 2 4]);
             
@@ -82,14 +82,14 @@ classdef SpatialBatchNorm < BaseLayer
             dout_transp = permute(dout,[2,3,1,4]);
             
             % Flat the input            
-            dout_flat = reshape_row_major(dout_transp,[(numel(dout_transp) / C),C]);
+            dout_flat = reshape_row_major_custom(dout_transp,[(numel(dout_transp) / C),C]);
             
             % Call the backward propagation of normal batchnorm
             gradDout.input = dout_flat;
             gradient = obj.normalBatchNorm.BackwardPropagation(gradDout);
             
             % Reshape/transpose back the signal, on python was (N,H,W,C)
-            gradient.input = reshape_row_major(gradient.input, [W,C,H,N]);
+            gradient.input = reshape_row_major_custom(gradient.input, [W,C,H,N]);
             % On python was transpose(0,3,1,2)
             gradient.input = permute(gradient.input,[3 1 2 4]);
             

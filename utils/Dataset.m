@@ -4,7 +4,7 @@ classdef (Sealed) Dataset < handle
     % clear all; clc; load mnist_oficial;
     % data = Dataset(input_train, output_train_labels,1,784,1,1);
     % batch = data.GetBatch(10);
-    % display_MNIST_Data(reshape_row_major(batch.X,[10,784]))
+    % display_MNIST_Data(reshape_row_major_custom(batch.X,[10,784]))
     
     properties(Access = private)
         m_X;m_X_val;
@@ -62,7 +62,7 @@ classdef (Sealed) Dataset < handle
             
             % The expected tensor for data is
             % [rows, cols, depth, batch]
-            obj.m_X_Tensor = reshape_row_major(X,[rows,cols,channels,obj.m_trainingSize]);
+            obj.m_X_Tensor = reshape_row_major_custom(X,[rows,cols,channels,obj.m_trainingSize]);
             
             % Detect if we're dealing with images 
             if (rows > 1 && cols > 1)
@@ -87,7 +87,7 @@ classdef (Sealed) Dataset < handle
             
             % The expected tensor for data is
             % [rows, cols, depth, batch]
-            obj.m_X_Val_Tensor = reshape_row_major(X,[rows,cols,channels,obj.m_ValidationSize]);
+            obj.m_X_Val_Tensor = reshape_row_major_custom(X,[rows,cols,channels,obj.m_ValidationSize]);
             
             % Transpose rows,cols if image
             %if (rows > 1 && cols > 1)

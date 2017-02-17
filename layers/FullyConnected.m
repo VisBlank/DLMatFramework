@@ -39,7 +39,7 @@ classdef FullyConnected < BaseLayer
             
             % Reshape input to have N rows and as much cols needed
             D = floor(numel(input) / N);
-            input_reshape = reshape_row_major(input,[N,D]);
+            input_reshape = reshape_row_major_custom(input,[N,D]);
             activations = input_reshape*weights + repmat(bias,N,1);
             
             % Cache results for backpropagation
@@ -60,7 +60,7 @@ classdef FullyConnected < BaseLayer
             end
             
             D = floor(numel(obj.previousInput) / N);
-            input_reshape = reshape_row_major(obj.previousInput,[N,D]);
+            input_reshape = reshape_row_major_custom(obj.previousInput,[N,D]);
             
             % The bias gradient should have the same shape as the original
             % bias
@@ -68,7 +68,7 @@ classdef FullyConnected < BaseLayer
             
             gradient.weight = input_reshape' * dout;
             dx = (dout * obj.weights');
-            dx = reshape_row_major(dx,size(obj.previousInput));
+            dx = reshape_row_major_custom(dx,size(obj.previousInput));
             gradient.input = dx;
             
             if obj.doGradientCheck

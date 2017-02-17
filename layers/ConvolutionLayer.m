@@ -85,7 +85,7 @@ classdef ConvolutionLayer < BaseLayer
                 im = input(:,:,:,idxBatch);    
                 im_col = im2col_custom(im,HH,WW,obj.m_stride,obj.m_padding);                
                 mul = (filter_col_T * im_col) + bias_m;
-                activations(:,:,:,idxBatch) =  reshape_row_major(mul,[H_prime W_prime size(mul,1)]);                                                
+                activations(:,:,:,idxBatch) =  reshape_row_major_custom(mul,[H_prime W_prime size(mul,1)]);                                                
             end
             
             
@@ -106,7 +106,7 @@ classdef ConvolutionLayer < BaseLayer
             W_prime = (W+2*obj.m_padding-WW)/obj.m_stride +1;
             
             % Preparing filter weights            
-            filter_col_T = reshape_row_major(obj.weights,[F HH*WW*C]);                                                
+            filter_col_T = reshape_row_major_custom(obj.weights,[F HH*WW*C]);                                                
             
             % Initialize gradients
             dw = zeros(size(obj.weights));
@@ -119,7 +119,7 @@ classdef ConvolutionLayer < BaseLayer
             for idxBatch = 1:N
                 % Reshape dout
                 dout_i = dout(:,:,:,idxBatch);                                                
-                dout_i_reshaped = reshape_row_major(dout_i,[F, H*W]);                
+                dout_i_reshaped = reshape_row_major_custom(dout_i,[F, H*W]);                
                 
                 % Calculate im2col (Could be cached....)
                 im = obj.previousInput(:,:,:,idxBatch);    
