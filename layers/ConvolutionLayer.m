@@ -63,7 +63,7 @@ classdef ConvolutionLayer < BaseLayer
             W_prime = (W+2*obj.m_padding-WW)/obj.m_stride +1;
             
             % Alocate memory for output
-            activations = zeros([H_prime,W_prime,F,N]);
+            activations = zeros([H_prime,W_prime,F,N],'like',input);
             
             % Preparing filter weights
             filter_col = reshape(weights,[HH*WW*C F]);
