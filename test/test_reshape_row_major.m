@@ -101,6 +101,24 @@ else
     error('Reshape row-major test 4d failed (CPU)');
 end
 
-%% Exercise crash
-load mnist_oficial;
-data = Dataset(single(input_train), single(output_train_labels),28,28,1,1,true);
+%% 4d Matrix Test (CPU)
+A = [1 2; 3 4];
+A(:,:,2,1) = [5 6; 7 8];
+A(:,:,3,1) = [9 10; 11 12];
+A(:,:,1,2) = [13 14; 15 16];
+A(:,:,2,2) = [17 18; 19 20];
+A(:,:,3,2) = [21 22; 23 24];
+A = single(A);
+desired_shape = [2 6 1 2];
+A_reshaped_ref = reshape_row_major(A, desired_shape);
+[A_reshaped,execTime,trfTime] = mex_reshape_row_major(A,desired_shape);
+
+% Compare results
+diff = sum(abs(A_reshaped_ref(:) - A_reshaped(:)));
+if (diff < 0.001)
+    disp('Reshape row-major test 4d worked (CPU)');
+    fprintf('Processing time (trf+exec): %f\n',execTime+trfTime);
+else
+    disp(A_reshaped);
+    error('Reshape row-major test 4d failed (CPU)');
+end
