@@ -21,6 +21,7 @@ classdef (Sealed) Dataset < handle
         m_meanPixVals;
         m_meanImage;
         m_augmenter;
+        hasValidation = false;
     end
     
     methods(Access = private)
@@ -49,6 +50,7 @@ classdef (Sealed) Dataset < handle
         function obj = Dataset(X,Y,rows, cols, channels,dimNumSamples, doOneHot)
             obj.m_X = X;
             obj.m_Y = Y;
+            obj.hasValidation = false;
             obj.m_augmenter = AugmentBatch();
             if doOneHot
                 obj.m_Y_one_hot = obj.oneHot(Y);
@@ -75,6 +77,7 @@ classdef (Sealed) Dataset < handle
         function AddValidation(obj,X,Y,rows, cols, channels,dimNumSamples, doOneHot)
             obj.m_X_val = X;
             obj.m_Y_val = Y;
+            obj.hasValidation = true;
             if doOneHot
                 obj.m_Y_val_one_hot = obj.oneHot(Y);
             else
@@ -165,6 +168,10 @@ classdef (Sealed) Dataset < handle
         
         function dataSize = GetTrainSize(obj)
             dataSize = obj.m_trainingSize;
+        end
+        
+        function flag = HasValidation(obj)
+           flag = obj.hasValidation; 
         end
         
         function pushToGPU(obj)

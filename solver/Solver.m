@@ -22,6 +22,7 @@ classdef Solver < handle
         m_loss_history = [];
         m_l2_reg = 0;
         m_currEpoch = 0;
+        m_bestAccuracy = 0;
     end
     
     methods(Access = protected)
@@ -122,57 +123,41 @@ classdef Solver < handle
                 elapsedTime = toc;
                 % Print something once and while
                 if (obj.m_verbose) && (mod(t,obj.m_print_every) == 0)
-                    fprintf ('(Iteration %d / %d) loss: %d stepTime: %.3f\n',(t), num_iterations, obj.m_loss_history(end), elapsedTime );                    
+                    fprintf ('(Iteration %d / %d) loss: %d stepTime: %.3f\n',(t), num_iterations, obj.m_loss_history(end), elapsedTime );
                 end
                 
                 % At the end of the epoch increment counter and decay
                 % learning rate
                 epoch_end = mod((t + 1), iterations_per_epoch) == 0;
-                if epoch_end                    
+                if epoch_end
                     fprintf('Finished epoch %d/%d\n',obj.m_currEpoch,obj.m_num_epochs);
                     obj.m_currEpoch = obj.m_currEpoch+1;
                     % Do Step weight decay
                     currLearningRate = obj.m_optimizer.GetLearningRate();
                     currLearningRate = currLearningRate*obj.m_lr_decay;
                     obj.m_optimizer.SetLearningRate(currLearningRate);
+                    
+                    % Do prediction on test set if available
+                    if obj.m_data.HasValidation()
+                        % Get whole validation set
+                        batchValidation = obj.m_data.GetValidationBatch(-1);
+                        scores = obj.m_model.Predict(batchValidation.X);
+                        [~, idxScoresMax] = max(scores,[],2);
+                        [~, idxCorrect] = max(batchValidation.Y,[],2);
+                        accuracy = mean(idxScoresMax == idxCorrect);
+                        fprintf('Current Accuracy %3.3d\n',accuracy);
+                        if (obj.m_bestAccuracy < accuracy)
+                            obj.m_bestAccuracy = accuracy;
+                            currModel = obj.m_model;
+                            %save('best_model.mat', 'currModel','-v7.3');
+                        end                                                
+                    end
                 end
             end
             
             % Indicate to model that training phase is over
             obj.m_model.IsTraining(false);
-        end
-        
-        % Check accuracy of model with some given dataset
-        function [accuracy] = CheckAccuracy(obj, X, Y, num_samples, batchSize)
-            % Get 4-d tensor batch size
-            N = size(X,4);
-            
-            % Subsample the data (also shuffle)
-            if (~isempty(num_samples)) && (num_samples>N)
-                mask = randperm(N);
-                selIndex = mask(1:num_samples);
-                X = X(:,:,:,selIndex);
-                Y = Y(selIndex,:);
-                N = num_samples;
-            end
-            
-            % Compute predictions in batches
-            num_batches = N / batchSize;
-            if mod(N,batchSize) ~= 0
-                num_batches = num_batches+1;
-            end
-            y_pred = [];
-            for i=1:num_batches
-                start_idx = i * batchSize;
-                end_idx = (i+1) * batchSize;
-                scores = obj.m_model.Predict(X(:,:,:,start_idx:end_idx));
-                [~,y_pred(end+1)] = max(scores);
-            end
-            
-            accuracy = mean(y_pred == Y);
-        end
-        
-    end
-    
+        end                        
+    end    
 end
 
