@@ -1,5 +1,5 @@
-classdef MaxPoolLayer < BaseLayer
-    %MaxPoolLayer Summary of this class goes here
+classdef AvgPoolLayer < BaseLayer
+    %AvgPoolLayer Summary of this class goes here
     % Reference:
     % https://github.com/leonardoaraujosantos/DLMatFramework/blob/master/learn/cs231n/assignment2/cs231n/layers.py
     % https://leonardoaraujosantos.gitbooks.io/artificial-inteligence/content/convolution_layer.html
@@ -22,7 +22,7 @@ classdef MaxPoolLayer < BaseLayer
         inputLayer
         numOutput
         
-        % Some data used for maxpool
+        % Some data used for avgpool
         m_kernelHeight
         m_kernelWidth
         m_stride
@@ -33,7 +33,7 @@ classdef MaxPoolLayer < BaseLayer
     end
     
     methods (Access = 'public')
-        function [obj] = MaxPoolLayer(name, kH, kW, stride, index, inLayer)
+        function [obj] = AvgPoolLayer(name, kH, kW, stride, index, inLayer)
             obj.name = name;
             obj.index = index;
             %obj.numOutput = numOutput;
@@ -70,34 +70,34 @@ classdef MaxPoolLayer < BaseLayer
             same_kernel_size = (obj.m_kernelHeight == obj.m_kernelWidth);
             tile = (mod(H,obj.m_kernelHeight) == 0) && (mod(H,obj.m_kernelWidth) == 0);
             
-            if same_kernel_size && tile
-                % Can do the fast mode (vectorized max)
-                obj.m_canDoFast = true;
-                
-                % Create a 6d tensor with the spatial dimensions divided,
-                % for example if input is [4x4x3x2] the output of this
-                % reshape will be [2x2x2x2x3x2]
-                x_reshaped = reshape(input,[obj.m_kernelHeight, W/obj.m_kernelHeight, obj.m_kernelWidth,H/obj.m_kernelWidth,C,N]);
-                
-                % Get the biggest element along the row dimension of
-                % x_reshaped then the biggest element along the third
-                % dimension of this result, resulting on a 6d tensor
-                maxpool_out = max(max(x_reshaped,[],1),[],3);
-                
-                % Reshape back again to the desired output activation shape
-                activations = reshape(maxpool_out,[H_prime W_prime, C, N]);
-                
-                % Cache reshaped input
-                obj.m_reshapedInputForFast = x_reshaped;
-            else
+%             if same_kernel_size && tile
+%                 % Can do the fast mode (vectorized max)
+%                 obj.m_canDoFast = true;
+%                 
+%                 % Create a 6d tensor with the spatial dimensions divided,
+%                 % for example if input is [4x4x3x2] the output of this
+%                 % reshape will be [2x2x2x2x3x2]
+%                 x_reshaped = reshape(input,[obj.m_kernelHeight, W/obj.m_kernelHeight, obj.m_kernelWidth,H/obj.m_kernelWidth,C,N]);
+%                 
+%                 % Get the biggest element along the row dimension of
+%                 % x_reshaped then the biggest element along the third
+%                 % dimension of this result, resulting on a 6d tensor
+%                 avgpool_out = mean(mean(x_reshaped,[],1),[],3);
+%                 
+%                 % Reshape back again to the desired output activation shape
+%                 activations = reshape(avgpool_out,[H_prime W_prime, C, N]);
+%                 
+%                 % Cache reshaped input
+%                 obj.m_reshapedInputForFast = x_reshaped;
+%             else
                 % Fall back to slower (naive version), note that on caffe
                 % this version is default (but written in C++)
                 for n=1:N
                     input_batch = input(:,:,:,n);
-                    resPool = max_pooling_forward(input_batch,obj.m_kernelHeight, obj.m_kernelWidth,obj.m_stride);
+                    resPool = avg_pooling_forward(input_batch,obj.m_kernelHeight, obj.m_kernelWidth,obj.m_stride);
                     activations(:,:,:,n) = resPool;
                 end                
-            end
+%             end
             
             % Cache results for backpropagation
             obj.activations = activations;
@@ -139,12 +139,12 @@ classdef MaxPoolLayer < BaseLayer
                 
                 dx_reshaped(mask) = dout_new_axis(mask);
                 
-                % Reshape back the the input shape
+                % Reshape back to the input shape
                 dx = reshape(dx_reshaped, size(obj.previousInput));
             else
-                % Backpropagation on the case that we fall back to the
+                % Backpropagation in the case that we fall back to the
                 % naive implementation
-                dx = max_pooling_backward(dout, obj.previousInput, obj.m_kernelHeight,obj.m_kernelWidth,obj.m_stride);                                
+                dx = avg_pooling_backward(dout, obj.previousInput, obj.m_kernelHeight,obj.m_kernelWidth,obj.m_stride);                                
             end
             
             %% Output gradients
