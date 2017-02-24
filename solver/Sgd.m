@@ -14,10 +14,12 @@ classdef Sgd < Optimizer
             obj.m_base_lr = obj.m_config('learning_rate');
         end
         
-        function [weights] = Optimize(obj, w, dw)
+        function [weights, newState] = Optimize(obj, w, dw, state)
             % Gradient descent approach (Simplest optimizer)
             w = w - (obj.m_base_lr * dw);
             weights = w;
+            
+            newState = [];
         end
     end
     

@@ -11,7 +11,7 @@ classdef (Abstract) Optimizer < handle
     
     % All derived classes must have those methods implemented
     methods(Abstract, Access = public)
-        [weights] = Optimize(obj, w, dw);
+        [weights, newState] = Optimize(obj, w, dw, state);
     end
     
     methods (Access = public)

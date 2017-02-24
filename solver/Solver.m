@@ -16,6 +16,7 @@ classdef Solver < handle
         m_num_epochs = 10;
         m_batch_size = 100;
         m_lr_decay = 1;
+        m_mu = 0.9;
         m_print_every = 1000;
         m_verbose = true;
         m_data = [];
@@ -23,6 +24,10 @@ classdef Solver < handle
         m_l2_reg = 0;
         m_currEpoch = 0;
         m_bestAccuracy = 0;
+        % Hold velocity state for each parameter on the model (Key will be
+        % the layer name)
+        weightsVelocityMap = containers.Map('KeyType','char','ValueType','any');
+        biasVelocityMap = containers.Map('KeyType','char','ValueType','any');
     end
     
     methods(Access = protected)
@@ -53,12 +58,19 @@ classdef Solver < handle
                 if ~isempty(weight)
                     bias = biasMap(keys{idx});
                     
+                    weightVelocity = obj.weightsVelocityMap(keys{idx});
+                    biasVelocity = obj.biasVelocityMap(keys{idx});
+                    
                     % Add regularization gradient contribution
                     grad.weights(keys{idx}) = grad.weights(keys{idx}) + (obj.m_l2_reg * weight);
                     
                     % Use optimizer to calculate new weights
-                    next_w = obj.m_optimizer.Optimize(weight,grad.weights(keys{idx}));
-                    next_b = obj.m_optimizer.Optimize(bias,grad.bias(keys{idx}));
+                    [next_w,weightVelocity] = obj.m_optimizer.Optimize(weight,grad.weights(keys{idx}), weightVelocity);
+                    [next_b,biasVelocity] = obj.m_optimizer.Optimize(bias,grad.bias(keys{idx}), biasVelocity);
+                    
+                    % Store state
+                    obj.weightsVelocityMap(keys{idx}) = weightVelocity;
+                    obj.biasVelocityMap(keys{idx}) = biasVelocity;
                     
                     % Update weights on model
                     weightsMap(keys{idx}) = next_w;
@@ -103,9 +115,39 @@ classdef Solver < handle
                 obj.m_lr_decay = 1.0;
             end
             
+            % Get mu parameter (Damping effect on SGD with momentum)
+            if isKey(config, 'mu')
+                obj.m_mu = config('mu');
+            else
+                obj.m_mu = 0.9;
+            end
+            
             % Both solver and model needs reguarization information
             obj.m_l2_reg = config('L2_reg');
             obj.m_model.L2Regularization(obj.m_l2_reg);
+            
+            % On solvers like SGD with momentum, ADAM, RMSProp we need to
+            % store a state of the previous iteration (ex: Velocity) so we
+            % need to create those before usage.
+            weightsMap = obj.m_model.getWeights();
+            keys = weightsMap.keys;
+            biasMap = obj.m_model.getBias();
+            numParameters = numel(keys);
+            for idx = 1:numParameters
+                weight = weightsMap(keys{idx});
+                if ~isempty(weight)
+                    bias = biasMap(keys{idx});
+                    if (strcmp(optimizerType,'sgd_momentum'))
+                        biasVelocity = zeros(size(bias), 'like',bias);
+                        weightsVelocity = zeros(size(weight), 'like',weight);
+                        obj.weightsVelocityMap(keys{idx}) = weightsVelocity;
+                        obj.biasVelocityMap(keys{idx}) = biasVelocity;
+                    else
+                        obj.weightsVelocityMap(keys{idx}) = [];
+                        obj.biasVelocityMap(keys{idx}) = [];
+                    end
+                end
+            end
         end
         
         function Train(obj)
@@ -150,14 +192,14 @@ classdef Solver < handle
                             obj.m_bestAccuracy = accuracy;
                             currModel = obj.m_model;
                             %save('best_model.mat', 'currModel','-v7.3');
-                        end                                                
+                        end
                     end
                 end
             end
             
             % Indicate to model that training phase is over
             obj.m_model.IsTraining(false);
-        end                        
-    end    
+        end
+    end
 end
 

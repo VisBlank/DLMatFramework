@@ -5,8 +5,7 @@ classdef SgdMomentum < Optimizer
     properties(Access = protected)
         m_config = containers.Map();
         m_base_lr = 0;
-        m_momentum = 0.9;
-        m_velocity = [];
+        m_momentum = 0.9;        
     end
     
     methods(Access = public)
@@ -20,16 +19,15 @@ classdef SgdMomentum < Optimizer
             end
         end
         
-        function [weights] = Optimize(obj, w, dw)
-            if isempty(obj.m_velocity)
-                obj.m_velocity = zeros(size(w));
-            end
+        function [weights, newState] = Optimize(obj, w, dw, state)
+            velocity = state;
             next_w = w;
             % Velocity will be a moving average of the gradients.
-            obj.m_velocity = obj.m_momentum * obj.m_velocity - obj.m_base_lr*dw;
+            velocity = obj.m_momentum * velocity - obj.m_base_lr*dw;
             % Update weights
-            next_w = next_w + obj.m_velocity;
+            next_w = next_w + velocity;
             weights = next_w;
+            newState = velocity;
         end
     end
     
