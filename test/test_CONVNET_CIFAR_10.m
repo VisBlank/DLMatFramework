@@ -30,17 +30,17 @@ layers <= struct('name','SBN_1','type','sp_batchnorm','eps',1e-5, 'momentum', 0.
 layers <= struct('name','Relu_1','type','relu');
 layers <= struct('name','MP1','type','maxpool', 'kh',2, 'kw',2, 'stride',2); 
 
-layers <= struct('name','CONV2','type','conv', 'kh',3,'kw',3,'stride',1,'pad',1,'num_output', 32); 
+layers <= struct('name','CONV2','type','conv', 'kh',3,'kw',3,'stride',1,'pad',1,'num_output', 64); 
 layers <= struct('name','SBN_2','type','sp_batchnorm','eps',1e-5, 'momentum', 0.9);
 layers <= struct('name','Relu_2','type','relu');
 layers <= struct('name','MP2','type','maxpool', 'kh',2, 'kw',2, 'stride',2); 
 
-layers <= struct('name','CONV3','type','conv', 'kh',3,'kw',3,'stride',1,'pad',1,'num_output', 64); 
+layers <= struct('name','CONV3','type','conv', 'kh',3,'kw',3,'stride',1,'pad',1,'num_output', 128); 
 layers <= struct('name','SBN_3','type','sp_batchnorm','eps',1e-5, 'momentum', 0.9);
 layers <= struct('name','Relu_C_3','type','relu');
 layers <= struct('name','MP3','type','maxpool', 'kh',2, 'kw',2, 'stride',2); 
 
-layers <= struct('name','CONV4','type','conv', 'kh',3,'kw',3,'stride',1,'pad',1,'num_output', 128); 
+layers <= struct('name','CONV4','type','conv', 'kh',3,'kw',3,'stride',1,'pad',1,'num_output', 256); 
 layers <= struct('name','SBN_4','type','sp_batchnorm','eps',1e-5, 'momentum', 0.9);
 layers <= struct('name','Relu_C_4','type','relu');
 layers <= struct('name','MP4','type','maxpool', 'kh',2, 'kw',2, 'stride',2); 
@@ -57,7 +57,7 @@ net = DeepLearningModel(layers, LossFactory.GetLoss('multi_class_cross_entropy')
 
 
 %% Create solver and train
-solver = Solver(net, data, 'sgd',containers.Map({'learning_rate', 'L2_reg', 'lr_decay'}, {0.5, 0, 0.99}));
+solver = Solver(net, data, 'sgd_momentum',containers.Map({'learning_rate', 'L2_reg', 'lr_decay'}, {0.5, 0, 0.99}));
 solver.SetBatchSize(4000);
 solver.SetEpochs(250);
 solver.PrintEvery(10);
@@ -92,4 +92,6 @@ fprintf('Validation Accuracy is %d percent \n',round((100-errorPercentage)));
 
 %% Plot loss history
 figure;
-plot(solver.GetLossHistory)
+loss = solver.GetLossHistory;
+acc = solver.GetAccuracyHistory;
+plot(loss);

@@ -21,6 +21,7 @@ classdef Solver < handle
         m_verbose = true;
         m_data = [];
         m_loss_history = [];
+        m_acc_history = [];
         m_l2_reg = 0;
         m_currEpoch = 0;
         m_bestAccuracy = 0;
@@ -84,6 +85,11 @@ classdef Solver < handle
         function lossHistory = GetLossHistory(obj)
             lossHistory = obj.m_loss_history;
         end
+        
+        function accHistory = GetAccuracyHistory(obj)
+            accHistory = obj.m_acc_history;
+        end
+        
         function SetBatchSize(obj,batchSize)
             obj.m_batch_size = batchSize;
         end
@@ -188,6 +194,7 @@ classdef Solver < handle
                         [~, idxCorrect] = max(batchValidation.Y,[],2);
                         accuracy = mean(idxScoresMax == idxCorrect);
                         fprintf('Current Accuracy %3.3d\n',accuracy);
+                        obj.m_acc_history(end+1) = accuracy;
                         if (obj.m_bestAccuracy < accuracy)
                             obj.m_bestAccuracy = accuracy;
                             currModel = obj.m_model;
