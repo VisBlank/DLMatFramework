@@ -1,0 +1,5 @@
+*.asv
+*.*~
+*.autosave
+*.pyc
+*.mexa64
