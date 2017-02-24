@@ -2,13 +2,8 @@ classdef AvgPoolLayer < BaseLayer
     %AvgPoolLayer Summary of this class goes here
     % Reference:
     % https://github.com/leonardoaraujosantos/DLMatFramework/blob/master/learn/cs231n/assignment2/cs231n/layers.py
-    % https://leonardoaraujosantos.gitbooks.io/artificial-inteligence/content/convolution_layer.html
-    % https://github.com/leonardoaraujosantos/DLMatFramework/blob/master/learn/cs231n/assignment3/cs231n/fast_layers.py#L13
-    % https://github.com/leonardoaraujosantos/DLMatFramework/blob/master/learn/cs231n/assignment3/cs231n/fast_layers.py#L106
-    % http://sunshineatnoon.github.io/Using.Computation.Graph.to.Understand.and.Implement.Backpropagation/
-    % https://uk.mathworks.com/matlabcentral/newsreader/view_thread/279051
-    % Mastering matrix indexing in matlab
-    % https://uk.mathworks.com/company/newsletters/articles/matrix-indexing-in-matlab.html
+    % Average pooling backpropagation
+    % https://youtu.be/cDdpwAIsuD8?list=PL6Xpj9I5qXYEcOhn7TqghAJ6NAPrNmUBH&t=646
     
     properties (Access = 'protected')
         weights
