@@ -6,13 +6,16 @@ classdef AugmentBatch < handle
     end
     
     methods(Access = public)
-        function batchOut = Augment(obj,batchIn)
+        function batchOut = Augment(obj,batchIn, cropDims)
             % The augmentation will not change the number of elements on
             % the batch, it will only apply few transformations on it
             % Flip coin
             prob = rand();
             
-            % Do random crop disregarding the probability (TODO)
+            % Do random crop disregarding the probability
+            if ~isempty(cropDims)
+                batchIn = obj.randomCropSize(batchIn, cropDims, true);            
+            end
             
             % Choose between one of the augmentations
             if prob >= 0.75
@@ -35,7 +38,7 @@ classdef AugmentBatch < handle
         end
     end
     
-    methods (Access = protected)
+    methods (Access = public)
         function [batchOut] = convertToGrayscale(obj,batchIn)
             % Select channels
             R = batchIn(:,:,1,:);
@@ -72,13 +75,13 @@ classdef AugmentBatch < handle
                         batchOut(:,:,:,idx) = imadjust(uint8(img),[0 0 0; 1 1 randVal],[]);
                     case 4
                         batchOut(:,:,:,idx) = imadjust(uint8(img),[0 0 0; randVal_R randVal_G randVal_B],[]);
-                end                                
+                end
             end
             if isa(batchIn,'single')
                 batchOut = single(batchOut);
             else
                 batchOut = double(batchOut);
-            end            
+            end
         end
         
         function [batchOut] = sepiaFilter(obj, batchIn)
@@ -126,42 +129,26 @@ classdef AugmentBatch < handle
             chImg = lab2rgb(lab_image);
         end
         
-        function [cropImg] = randomCrop(obj, imageIn)
-            [nrows,ncols, ~] = size(imageIn);
+        function [cropBatch] = randomCropSize(obj, batchIn, cropSize, isTraining)
+            [nrows,ncols, channels, batchSize] = size(batchIn);
+            displacement = [nrows, ncols] - cropSize;
             
-            % Standard (Alexnet-paper) ratio for crop
-            cropSizeRows = nrows * 0.875;
-            cropSizeCols = ncols * 0.875;
+            % Pre-allocate to save dynamic allocation
+            cropBatch = zeros([cropSize(1) cropSize(2) channels batchSize], 'like',batchIn);
             
-            centerCropRow = (nrows-cropSizeRows)/2;
-            centerCropCol = (ncols - cropSizeCols)/2;
-            
-            % We're going to use imcrop which parameter is a rect with
-            % format: [xmin ymin width height], here width=cropSizeCols adn
-            % height=cropSizeRows.
-            % Return the center crop + (random numCrops-1)
-            centerImage = imcrop(imageIn, [centerCropCol centerCropRow cropSizeCols-1 cropSizeRows-1]);
-            
-            cropImg = zeros([cropSizeRows,cropSizeCols,3,11]);
-            cropImg(:,:,:,1) = centerImage;
-            
-            % Get 10 random crops excluding the center crop
-            nImages = 1;
-            while nImages < 10
-                randX = randi(ncols - cropSizeCols);
-                randY = randi(nrows - cropSizeRows);
-                
-                if (randX == centerCropCol) &&  (randY == centerCropCol)
-                    continue;
-                else
-                    nImages = nImages + 1;
-                    img = imcrop(imageIn, [randX randY cropSizeCols-1 cropSizeRows-1]);
-                    cropImg(:,:,:,nImages) = img;
+            if isTraining
+                % Do random crop (Training)
+                for idxBatch=1:batchSize
+                    randX = randi(displacement(1));
+                    randY = randi(displacement(2));
+                    cropBatch(:,:,:,idxBatch) = batchIn(randX:randX+cropSize(1)-1, randY:randY+cropSize(2)-1,:,idxBatch);
                 end
+            else
+                % Crop from center (Test)
+                displacement = displacement / 2;
+                cropBatch = batchIn(displacement(1):displacement(1)+cropSize(1)-1, displacement(2):displacement(2)+cropSize(2)-1,:,:);
             end
-        end
-        
-    end
-    
+        end                        
+    end    
 end
 

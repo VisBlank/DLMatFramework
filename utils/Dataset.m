@@ -16,6 +16,7 @@ classdef (Sealed) Dataset < handle
         m_ValidationSize;
         m_shuffledIndex;m_shuffledIndexVal;
         m_doAugmentation = false;
+        m_cropDims = [];
         m_doMeanPixelNorm = false;
         m_doMeanImageNorm = false;
         m_meanPixVals;
@@ -102,6 +103,10 @@ classdef (Sealed) Dataset < handle
             obj.m_doAugmentation = flag;
         end
         
+        function doCrop(obj, cropDims)
+           obj.m_cropDims = cropDims;
+        end
+        
         function enableMeanPixelNormalization(obj, flag, pixVals)
             obj.m_doMeanPixelNorm = flag;
             obj.m_meanPixVals = pixVals;
@@ -126,7 +131,7 @@ classdef (Sealed) Dataset < handle
             
             % Do augmentation if needed
             if obj.m_doAugmentation
-                batch.X = obj.m_augmenter.Augment(batch.X);
+                batch.X = obj.m_augmenter.Augment(batch.X, obj.m_cropDims);
             end
             
             % Do Normalization if needed
@@ -147,6 +152,11 @@ classdef (Sealed) Dataset < handle
             % Do Normalization if needed
             if obj.m_doMeanImageNorm || obj.m_doMeanPixelNorm
                 batch.X = obj.NormalizeImage(batch.X);
+            end
+            
+            % Get Crop (Central crop if needed)
+            if ~isempty(obj.m_cropDims)
+                batch.X = obj.m_augmenter.randomCropSize(batch.X, obj.m_cropDims, false);
             end
         end
         
