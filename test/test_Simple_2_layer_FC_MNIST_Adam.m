@@ -33,7 +33,7 @@ net = DeepLearningModel(layers, LossFactory.GetLoss('multi_class_cross_entropy')
 
 
 %% Create solver and train
-solver = Solver(net, data, 'sgd',containers.Map({'learning_rate', 'L2_reg'}, {0.01, 0}));
+solver = Solver(net, data, 'adam',containers.Map({'learning_rate', 'L2_reg'}, {0.01, 0}));
 solver.SetBatchSize(200);
 solver.SetEpochs(60);
 solver.Train();
