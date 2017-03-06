@@ -38,6 +38,8 @@ classdef LayerContainer < handle
                     layerInst = ConvolutionLayer(metaDataLayer.name, metaDataLayer.kh, metaDataLayer.kw, metaDataLayer.stride, metaDataLayer.pad, metaDataLayer.num_output, obj.numLayers+1, previousLayer);                
                 case 'maxpool'                    
                     layerInst = MaxPoolLayer(metaDataLayer.name, metaDataLayer.kh, metaDataLayer.kw, metaDataLayer.stride, obj.numLayers+1, previousLayer);
+                case 'avgpool'                    
+                    layerInst = AvgPoolLayer(metaDataLayer.name, metaDataLayer.kh, metaDataLayer.kw, metaDataLayer.stride, obj.numLayers+1, previousLayer);
                 case 'relu'
                     layerInst = Relu(metaDataLayer.name, obj.numLayers+1, previousLayer);                                                
                 case 'dropout'
