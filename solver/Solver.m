@@ -27,8 +27,8 @@ classdef Solver < handle
         m_bestAccuracy = 0;
         % Hold velocity state for each parameter on the model (Key will be
         % the layer name)
-        weightsVelocityMap = containers.Map('KeyType','char','ValueType','any');
-        biasVelocityMap = containers.Map('KeyType','char','ValueType','any');
+        m_statesWeightOptim = containers.Map('KeyType','char','ValueType','any');
+        m_statesBiasOptim = containers.Map('KeyType','char','ValueType','any');
     end
     
     methods(Access = protected)
@@ -59,19 +59,16 @@ classdef Solver < handle
                 if ~isempty(weight)
                     bias = biasMap(keys{idx});
                     
-                    weightVelocity = obj.weightsVelocityMap(keys{idx});
-                    biasVelocity = obj.biasVelocityMap(keys{idx});
-                    
                     % Add regularization gradient contribution
                     grad.weights(keys{idx}) = grad.weights(keys{idx}) + (obj.m_l2_reg * weight);
                     
                     % Use optimizer to calculate new weights
-                    [next_w,weightVelocity] = obj.m_optimizer.Optimize(weight,grad.weights(keys{idx}), weightVelocity);
-                    [next_b,biasVelocity] = obj.m_optimizer.Optimize(bias,grad.bias(keys{idx}), biasVelocity);
+                    [next_w, newStateW] = obj.m_optimizer.Optimize(weight,grad.weights(keys{idx}), obj.m_statesWeightOptim(keys{idx}));
+                    [next_b, newStateB] = obj.m_optimizer.Optimize(bias,grad.bias(keys{idx}), obj.m_statesBiasOptim(keys{idx}));
                     
-                    % Store state
-                    obj.weightsVelocityMap(keys{idx}) = weightVelocity;
-                    obj.biasVelocityMap(keys{idx}) = biasVelocity;
+                    % Store state info
+                    obj.m_statesWeightOptim(keys{idx}) = newStateW;
+                    obj.m_statesBiasOptim(keys{idx}) = newStateB;
                     
                     % Update weights on model
                     weightsMap(keys{idx}) = next_w;
@@ -145,15 +142,28 @@ classdef Solver < handle
                 weight = weightsMap(keys{idx});
                 if ~isempty(weight)
                     bias = biasMap(keys{idx});
-                    if (strcmp(optimizerType,'sgd_momentum'))
-                        biasVelocity = zeros(size(bias), 'like',bias);
-                        weightsVelocity = zeros(size(weight), 'like',weight);
-                        obj.weightsVelocityMap(keys{idx}) = weightsVelocity;
-                        obj.biasVelocityMap(keys{idx}) = biasVelocity;
-                    else
-                        obj.weightsVelocityMap(keys{idx}) = [];
-                        obj.biasVelocityMap(keys{idx}) = [];
-                    end
+                    switch optimizerType                        
+                        case 'sgd_momentum'
+                            % Initialize states for SGD with momentum
+                            bias_vel = zeros(size(bias), 'like',bias);
+                            weight_vel = zeros(size(weight), 'like',weight);
+                            obj.m_statesWeightOptim(keys{idx}) = struct('velocity',weight_vel);
+                            obj.m_statesBiasOptim(keys{idx}) = struct('velocity',bias_vel);
+                        case 'adam'
+                            % Initialize states for Adam
+                            bias_m = zeros(size(bias), 'like',bias);
+                            bias_v = zeros(size(bias), 'like',bias);
+                            bias_t = 0;
+                            weight_t = 0;
+                            weight_m = zeros(size(weight), 'like',weight);                            
+                            weight_v = zeros(size(weight), 'like',weight);                            
+                            obj.m_statesWeightOptim(keys{idx}) = struct('m',weight_m,'v',weight_v,'t',weight_t);
+                            obj.m_statesBiasOptim(keys{idx}) = struct('m',bias_m,'v',bias_v,'t',bias_t);
+                        otherwise
+                            % All other stateless optimizers
+                            obj.m_statesWeightOptim(keys{idx}) = [];
+                            obj.m_statesBiasOptim(keys{idx}) = [];
+                    end                    
                 end
             end
         end

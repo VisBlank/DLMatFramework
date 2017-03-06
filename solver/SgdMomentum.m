@@ -19,15 +19,17 @@ classdef SgdMomentum < Optimizer
             end
         end
         
-        function [weights, newState] = Optimize(obj, w, dw, state)
-            velocity = state;
+        function [weights, newState] = Optimize(obj, w, dw, state)            
             next_w = w;
             % Velocity will be a moving average of the gradients.
-            velocity = obj.m_momentum * velocity - obj.m_base_lr*dw;
+            state.velocity = obj.m_momentum * state.velocity - obj.m_base_lr*dw;
+            
             % Update weights
-            next_w = next_w + velocity;
-            weights = next_w;
-            newState = velocity;
+            next_w = next_w + state.velocity;
+            weights = next_w;  
+            
+            % Update state
+            newState = state;
         end
     end
     

@@ -31,9 +31,18 @@ classdef Adam < Optimizer
         end
         
         function [weights, newState] = Optimize(obj, w, dw, state)
-            weights = 0;
-            newState = 0;
+            state.t = state.t + 1;
+            state.m = (obj.m_beta1 .* state.m) + (1-obj.m_beta1) .* dw;
+            state.v = (obj.m_beta2 .* state.v) + (1-obj.m_beta2) .* (dw.^2);
             
+            mb = state.m ./ (1-obj.m_beta1 .^ state.t);
+            vb = state.v ./ (1-obj.m_beta2 .^ state.t);
+            
+            % Update weights
+            weights = w - obj.m_base_lr .* (mb ./ (sqrt(vb) + obj.m_epsilon));
+            
+            % Update state
+            newState = state;
         end
     end
     
