@@ -110,6 +110,8 @@ classdef Solver < handle
                     obj.m_optimizer = Sgd(config);
                 case 'sgd_momentum'
                     obj.m_optimizer = SgdMomentum(config);
+                case 'adam'
+                    obj.m_optimizer = Adam(config);
                 otherwise
                     fprintf('Optimizer not implemented\n');
             end
