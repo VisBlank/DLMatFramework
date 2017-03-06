@@ -1,5 +1,6 @@
 *.asv
 *.*~
+*.m~
 *.autosave
 *.pyc
 *.mexa64
