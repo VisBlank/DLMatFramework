@@ -32,7 +32,7 @@ classdef DeepLearningModel < handle
                     shapeInput = inputLayer{1}.getActivationShape();
                 else
                     shapeInput = inputLayer.getActivationShape();
-                end                
+                end
                 layerName = currLayer.getName();
                 if isa(currLayer,'FullyConnected') || isa(currLayer,'ConvolutionLayer')
                     if isa(currLayer,'FullyConnected')
@@ -90,6 +90,15 @@ classdef DeepLearningModel < handle
                 layerName = currLayer.getName();
                 if isa(currLayer,'Dropout') || isa(currLayer,'BatchNorm') || isa(currLayer,'SpatialBatchNorm')
                     currLayer.IsTraining(obj.isTraining);
+                end
+                % Check if the layer needs for more inputs (ex add layer)
+                if (currLayer.GetNumInputs) > 1
+                    % Get the activation of each layer that this layer
+                    % depends
+                    currInput = cell(1,currLayer.GetNumInputs);
+                    for idxDepLayer=1:currLayer.GetNumInputs
+                        currInput{idxDepLayer} = currLayer.getInputLayer{idxDepLayer}.getActivations;
+                    end                    
                 end
                 currInput = currLayer.ForwardPropagation(currInput,obj.weightsMap(layerName),obj.BiasMap(layerName));
             end
