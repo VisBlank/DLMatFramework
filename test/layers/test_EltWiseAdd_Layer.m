@@ -4,7 +4,7 @@ dout_vals = x1 * 0.01;
 
 eal = EltWiseAdd('EW_1',[],[]);
 
-activations = eal.ForwardPropagation(x1,x2);
+activations = eal.ForwardPropagation({x1,x2},[],[]);
 
 actual = x1 + x2;
 

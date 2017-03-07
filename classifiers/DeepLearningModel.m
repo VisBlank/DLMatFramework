@@ -27,7 +27,12 @@ classdef DeepLearningModel < handle
         function initWeights(obj)
             for idxLayer=2:obj.layersContainer.getNumLayers()
                 currLayer = obj.layersContainer.getLayerFromIndex(idxLayer);
-                shapeInput = currLayer.getInputLayer().getActivationShape();
+                inputLayer = currLayer.getInputLayer();
+                if currLayer.GetNumInputs() > 1
+                    shapeInput = inputLayer{1}.getActivationShape();
+                else
+                    shapeInput = inputLayer.getActivationShape();
+                end                
                 layerName = currLayer.getName();
                 if isa(currLayer,'FullyConnected') || isa(currLayer,'ConvolutionLayer')
                     if isa(currLayer,'FullyConnected')
