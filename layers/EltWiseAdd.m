@@ -26,7 +26,7 @@ classdef EltWiseAdd < BaseLayer
             % EltWiseAdd does not change the shape of it's output, and it's
             % input shapes are also the same
             if ~isempty(inLayer)
-                obj.activationShape = obj.inputLayer.getActivationShape();
+                obj.activationShape = obj.inputLayer{1}.getActivationShape();
             end
         end
         
