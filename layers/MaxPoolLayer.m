@@ -129,13 +129,13 @@ classdef MaxPoolLayer < BaseLayer
                 % Get the mask
                 % Do a repmat (lack of broadcast on matlab2016a) on
                 % active_new_axis to match the dimensions of x_reshaped
-                % Basically we want to repeat 2 the first and third
+                % Basically we want to repeat stride times the first and third
                 % dimensions
-                activ_new_axis = repmat(activ_new_axis,[2,1,2,1,1,1]);
+                activ_new_axis = repmat(activ_new_axis,[obj.m_stride,1,obj.m_stride,1,1,1]);
                 mask = (obj.m_reshapedInputForFast == activ_new_axis);
                 
                 dout_new_axis = reshape(dout,[1 H_prime 1 W_prime C N]);
-                dout_new_axis = repmat(dout_new_axis,[2,1,2,1,1,1]);
+                dout_new_axis = repmat(dout_new_axis,[obj.m_stride,1,obj.m_stride,1,1,1]);
                 
                 dx_reshaped(mask) = dout_new_axis(mask);
                 
