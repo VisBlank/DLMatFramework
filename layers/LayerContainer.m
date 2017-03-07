@@ -14,9 +14,10 @@ classdef LayerContainer < handle
         layersContainer = containers.Map('KeyType','char','ValueType','any');
         layersCellContainer = {};
         numLayers = 0;
+        m_adjacencyList = [];
     end
     
-    methods (Access = 'protected')
+    methods (Access = 'protected')        
         function pushLayer(obj,metaDataLayer)            
             % Unless pre-defined the previous layer will be the input of
             % the current layer.
@@ -69,6 +70,27 @@ classdef LayerContainer < handle
     methods (Access = 'public')
         function obj = LayerContainer()            
             obj.numLayers = 0;
+        end
+        
+        function buildGraph(obj)
+            nodes = obj.layersContainer.keys;
+            numNodes = numel(nodes);
+            m_adjacencyList = cell(numNodes,1);
+            
+            % Build adjacency list (Array of lists)
+            for idxNode=1:numNodes
+                node = obj.getLayerFromIndex(idxNode);
+                cellConnectetion = {};
+                % Check to whom node is connected to
+                for idxNode2=1:numNodes
+                    node2 = obj.getLayerFromIndex(idxNode2);
+                    currNode = node2.getInputLayer();
+                    if isequal(currNode,node)
+                        cellConnectetion{end+1} = currNode;
+                    end
+                end
+                m_adjacencyList{idxNode} = node.getInputLayer();
+            end
         end
         
         % Override the "<=" operator (used to push a new layer)

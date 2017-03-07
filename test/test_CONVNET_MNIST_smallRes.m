@@ -48,6 +48,9 @@ layers <= struct('name','Relu_5','type','relu');
 layers <= struct('name','FC_2','type','fc','num_output',data.GetNumClasses());
 layers <= struct('name','Softmax','type','softmax');
 
+% Build graph
+layers.buildGraph();
+
 % Print structure
 layers.ShowStructure();
 
