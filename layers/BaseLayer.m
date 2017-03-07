@@ -66,6 +66,10 @@ classdef (Abstract) BaseLayer < handle
        function EnableGradientCheck(obj, flag)
            obj.doGradientCheck = flag;
        end
+       
+       function numInputs = GetNumInputs(obj)
+           numInputs = numel(obj.inputLayer);
+       end
               
     end
     

@@ -40,6 +40,9 @@ classdef LayerContainer < handle
                     layerInst = MaxPoolLayer(metaDataLayer.name, metaDataLayer.kh, metaDataLayer.kw, metaDataLayer.stride, obj.numLayers+1, previousLayer);
                 case 'avgpool'                    
                     layerInst = AvgPoolLayer(metaDataLayer.name, metaDataLayer.kh, metaDataLayer.kw, metaDataLayer.stride, obj.numLayers+1, previousLayer);
+                case 'add'     
+                    previousLayers = obj.getLayersFromName(metaDataLayer.inputs);
+                    layerInst = EltWiseAdd(metaDataLayer.name, obj.numLayers+1, previousLayers);
                 case 'relu'
                     layerInst = Relu(metaDataLayer.name, obj.numLayers+1, previousLayer);                                                
                 case 'dropout'
@@ -83,6 +86,14 @@ classdef LayerContainer < handle
             layer = obj.layersContainer(name);
         end
         
+        function layers = getLayersFromName(obj, name)
+           % On this case name comes from a cell array
+           layers = cell(1,numel(name));
+           for idxLayer=1:numel(layers)
+                layers{idxLayer} = obj.getLayerFromName(name{idxLayer});
+           end
+        end
+        
         function layer = getLayerFromIndex(obj,index)            
             layer = obj.layersCellContainer(index);
             layer = layer{1};
@@ -105,7 +116,18 @@ classdef LayerContainer < handle
             for idxLayer=1:obj.layersContainer.Count
                 layerInstance = obj.layersCellContainer{idxLayer};
                 txtDesc = layerInstance.getName();
-                fprintf('LAYER(%d)--> %s\n',layerInstance.getIndex(),txtDesc);
+                fprintf('LAYER(%d)--> %s num_inputs:%d [',layerInstance.getIndex(),txtDesc, layerInstance.GetNumInputs());                
+                inLayer = layerInstance.getInputLayer();
+                if layerInstance.GetNumInputs() < 2                    
+                    if ~isempty(inLayer)
+                        fprintf(' %s,',inLayer.getName());
+                    end
+                else
+                    for idxIn=1:layerInstance.GetNumInputs()                       
+                        fprintf(' %s,',inLayer{idxIn}.getName());
+                    end
+                end                
+                fprintf(']\n');
             end
         end
         
