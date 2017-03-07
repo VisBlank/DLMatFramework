@@ -133,14 +133,13 @@ classdef LayerContainer < handle
         
         function dotGraph = generateDotGraph(obj)
             
-            dotGraph = cell(1,obj.layersContainer.Count);
+            dotGraph = {sprintf('digraph CNN {\n')};
             
             for idxLayer=1:obj.layersContainer.Count
                 layerInstance = obj.layersCellContainer{idxLayer};
-                dotGraph{idxLayer} = sprintf('%s\n',layerInstance.getName());
+                dotGraph{end+1} = sprintf('%s\n',layerInstance.getName());
             end
             
-            dotGraphEdges = {};
             for idxLayer=1:obj.layersContainer.Count
                 
                 layerInstance = obj.layersCellContainer{idxLayer};
@@ -148,17 +147,38 @@ classdef LayerContainer < handle
                 if layerInstance.GetNumInputs() < 2                    
                     if ~isempty(inLayers)
                         thisEdge = sprintf('%s->%s\n', inLayers.getName(), layerInstance.getName());
-                        dotGraphEdges{end+1} = thisEdge;
+                        dotGraph{end+1} = thisEdge;
                     end
                 else
                     for idxIn=1:layerInstance.GetNumInputs()
                         thisEdge = sprintf('%s->%s\n',inLayers{idxIn}.getName(), layerInstance.getName());
-                        dotGraphEdges{end+1} = thisEdge;
+                        dotGraph{end+1} = thisEdge;
                     end
                 end
             end
-            dotGraph  = cat(2,dotGraph{:},dotGraphEdges{:}) ;
+            dotGraph{end+1} = sprintf('}');
+            dotGraph  = cat(2,dotGraph{:});
+            dotFileName = 'graph.dot';
             
+            f = fopen(dotFileName, 'w') ; fwrite(f, dotGraph) ; fclose(f) ;
+            
+            pdfFileName = 'graph.pdf';
+            if (exist('dot'))
+                cmd = sprintf('dot -Tpdf %s -o %s', dotFileName, pdfFileName) ;
+                system(cmd);
+
+                
+                switch computer
+                    case {'PCWIN64', 'PCWIN'}
+                        system(sprintf('start "" "%s"', pdfFileName)) ;
+                    case 'MACI64'
+                        system(sprintf('open "%s"', pdfFileName)) ;
+                    case 'GLNXA64'
+                        system(sprintf('display "%s"', pdfFileName)) ;
+                    otherwise
+                        fprintf('The figure saved at "%s"\n', pdfFileName) ;
+                end
+            end
         end
     end
 end
