@@ -4,7 +4,7 @@ classdef LayerContainer < handle
     % https://uk.mathworks.com/matlabcentral/fileexchange/25024-data-structure--a-cell-array-list-container
     
     % Ex:
-    % cont = LayerContainer();    
+    % cont = LayerContainer();
     % cont <= struct('name','ImageIn','type','input','rows',1,'cols',2,'depth',1, 'batchsize',1);
     % cont <= struct('name','FC_1','type','fc');
     % cont.getNumLayers()
@@ -17,8 +17,8 @@ classdef LayerContainer < handle
         m_adjacencyList = [];
     end
     
-    methods (Access = 'protected')        
-        function pushLayer(obj,metaDataLayer)            
+    methods (Access = 'protected')
+        function pushLayer(obj,metaDataLayer)
             % Unless pre-defined the previous layer will be the input of
             % the current layer.
             if isfield(metaDataLayer, 'inputLayer')
@@ -30,26 +30,26 @@ classdef LayerContainer < handle
                     previousLayer = obj.layersCellContainer{obj.numLayers};
                 end
             end
-            switch metaDataLayer.type                
-                case 'input'                    
+            switch metaDataLayer.type
+                case 'input'
                     layerInst = InputLayer(metaDataLayer.name, metaDataLayer.rows,metaDataLayer.cols,metaDataLayer.depth, metaDataLayer.batchsize, obj.numLayers+1);
-                case 'fc'                    
-                    layerInst = FullyConnected(metaDataLayer.name, metaDataLayer.num_output, obj.numLayers+1, previousLayer);                
-                case 'conv'                    
-                    layerInst = ConvolutionLayer(metaDataLayer.name, metaDataLayer.kh, metaDataLayer.kw, metaDataLayer.stride, metaDataLayer.pad, metaDataLayer.num_output, obj.numLayers+1, previousLayer);                
-                case 'maxpool'                    
+                case 'fc'
+                    layerInst = FullyConnected(metaDataLayer.name, metaDataLayer.num_output, obj.numLayers+1, previousLayer);
+                case 'conv'
+                    layerInst = ConvolutionLayer(metaDataLayer.name, metaDataLayer.kh, metaDataLayer.kw, metaDataLayer.stride, metaDataLayer.pad, metaDataLayer.num_output, obj.numLayers+1, previousLayer);
+                case 'maxpool'
                     layerInst = MaxPoolLayer(metaDataLayer.name, metaDataLayer.kh, metaDataLayer.kw, metaDataLayer.stride, obj.numLayers+1, previousLayer);
-                case 'avgpool'                    
+                case 'avgpool'
                     layerInst = AvgPoolLayer(metaDataLayer.name, metaDataLayer.kh, metaDataLayer.kw, metaDataLayer.stride, obj.numLayers+1, previousLayer);
-                case 'add'     
+                case 'add'
                     previousLayers = obj.getLayersFromName(metaDataLayer.inputs);
                     layerInst = EltWiseAdd(metaDataLayer.name, obj.numLayers+1, previousLayers);
                 case 'relu'
-                    layerInst = Relu(metaDataLayer.name, obj.numLayers+1, previousLayer);                                                
+                    layerInst = Relu(metaDataLayer.name, obj.numLayers+1, previousLayer);
                 case 'dropout'
-                    layerInst = Dropout(metaDataLayer.name, metaDataLayer.prob, obj.numLayers+1, previousLayer);                                                
+                    layerInst = Dropout(metaDataLayer.name, metaDataLayer.prob, obj.numLayers+1, previousLayer);
                 case 'batchnorm'
-                    layerInst = BatchNorm(metaDataLayer.name, metaDataLayer.eps, metaDataLayer.momentum, obj.numLayers+1, previousLayer);                                                
+                    layerInst = BatchNorm(metaDataLayer.name, metaDataLayer.eps, metaDataLayer.momentum, obj.numLayers+1, previousLayer);
                 case 'sp_batchnorm'
                     layerInst = SpatialBatchNorm(metaDataLayer.name, metaDataLayer.eps, metaDataLayer.momentum, obj.numLayers+1, previousLayer);
                 case 'sigmoid'
@@ -68,7 +68,7 @@ classdef LayerContainer < handle
     end
     
     methods (Access = 'public')
-        function obj = LayerContainer()            
+        function obj = LayerContainer()
             obj.numLayers = 0;
         end
         
@@ -81,16 +81,25 @@ classdef LayerContainer < handle
             for idxNode=1:numNodes
                 node = obj.getLayerFromIndex(idxNode);
                 cellConnectetion = {};
-                % Check to whom node is connected to
+                % Build list to all edges from this node
                 for idxNode2=1:numNodes
                     node2 = obj.getLayerFromIndex(idxNode2);
                     currNode = node2.getInputLayer();
-                    if isequal(currNode,node)
-                        cellConnectetion{end+1} = currNode;
+                    if (node2.GetNumInputs > 1)
+                        for idx=1:numel(currNode)
+                            if isequal(currNode{idx},node)
+                                cellConnectetion{end+1} = currNode;
+                            end
+                        end                        
+                    else
+                        if isequal(currNode,node)
+                            cellConnectetion{end+1} = currNode;
+                        end
                     end
                 end
-                m_adjacencyList{idxNode} = node.getInputLayer();
+                m_adjacencyList{idxNode} = cellConnectetion;
             end
+            1+1;
         end
         
         % Override the "<=" operator (used to push a new layer)
@@ -104,19 +113,19 @@ classdef LayerContainer < handle
             remove(obj.layersContainer,name);
         end
         
-        function layer = getLayerFromName(obj,name)            
+        function layer = getLayerFromName(obj,name)
             layer = obj.layersContainer(name);
         end
         
         function layers = getLayersFromName(obj, name)
-           % On this case name comes from a cell array
-           layers = cell(1,numel(name));
-           for idxLayer=1:numel(layers)
+            % On this case name comes from a cell array
+            layers = cell(1,numel(name));
+            for idxLayer=1:numel(layers)
                 layers{idxLayer} = obj.getLayerFromName(name{idxLayer});
-           end
+            end
         end
         
-        function layer = getLayerFromIndex(obj,index)            
+        function layer = getLayerFromIndex(obj,index)
             layer = obj.layersCellContainer(index);
             layer = layer{1};
         end
@@ -131,24 +140,24 @@ classdef LayerContainer < handle
         
         function layerCont = getLayerMap(obj)
             layerCont = obj.layersContainer;
-        end                
+        end
         
         function ShowStructure(obj)
-            % Iterate on all layers            
+            % Iterate on all layers
             for idxLayer=1:obj.layersContainer.Count
                 layerInstance = obj.layersCellContainer{idxLayer};
                 txtDesc = layerInstance.getName();
-                fprintf('LAYER(%d)--> %s num_inputs:%d [',layerInstance.getIndex(),txtDesc, layerInstance.GetNumInputs());                
+                fprintf('LAYER(%d)--> %s num_inputs:%d [',layerInstance.getIndex(),txtDesc, layerInstance.GetNumInputs());
                 inLayer = layerInstance.getInputLayer();
-                if layerInstance.GetNumInputs() < 2                    
+                if layerInstance.GetNumInputs() < 2
                     if ~isempty(inLayer)
                         fprintf(' %s,',inLayer.getName());
                     end
                 else
-                    for idxIn=1:layerInstance.GetNumInputs()                       
+                    for idxIn=1:layerInstance.GetNumInputs()
                         fprintf(' %s,',inLayer{idxIn}.getName());
                     end
-                end                
+                end
                 fprintf(']\n');
             end
         end
@@ -168,7 +177,7 @@ classdef LayerContainer < handle
                 
                 layerInstance = obj.layersCellContainer{idxLayer};
                 inLayers = layerInstance.getInputLayer();
-                if layerInstance.GetNumInputs() < 2                    
+                if layerInstance.GetNumInputs() < 2
                     if ~isempty(inLayers)
                         thisEdge = sprintf('%s->%s\n', inLayers.getName(), layerInstance.getName());
                         dotGraph{end+1} = thisEdge;
@@ -190,7 +199,7 @@ classdef LayerContainer < handle
             if (exist('dot'))
                 cmd = sprintf('dot -Tpdf %s -o %s', dotFileName, pdfFileName) ;
                 system(cmd);
-
+                
                 
                 switch computer
                     case {'PCWIN64', 'PCWIN'}
