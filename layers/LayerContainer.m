@@ -137,7 +137,9 @@ classdef LayerContainer < handle
             
             for idxLayer=1:obj.layersContainer.Count
                 layerInstance = obj.layersCellContainer{idxLayer};
-                dotGraph{end+1} = sprintf('%s\n',layerInstance.getName());
+                weightString = obj.makeDimString(layerInstance.getWeights());
+                biasString = obj.makeDimString(layerInstance.getBias());
+                dotGraph{end+1} = sprintf('%s [label="%s | {w: %s|b: %s}" shape=record style="solid,rounded"] \n',layerInstance.getName(), layerInstance.getName(), weightString, biasString);
             end
             
             for idxLayer=1:obj.layersContainer.Count
@@ -178,6 +180,16 @@ classdef LayerContainer < handle
                     otherwise
                         fprintf('The figure saved at "%s"\n', pdfFileName) ;
                 end
+            end
+        end
+    end
+    methods (Access = 'private', Static = true)
+        function str = makeDimString(arr)
+            
+            sizes = size(arr);
+            str = num2str(sizes(1));
+            for i = 2:length(sizes)
+                str = [str 'x' num2str(sizes(i))];
             end
         end
     end
