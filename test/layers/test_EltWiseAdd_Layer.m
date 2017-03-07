@@ -1,5 +1,6 @@
-x1 = rand([100 50 25]);
-x2 = rand([100 50 25]);
+x1 = rand([10 5 2]);
+x2 = rand([10 5 2]);
+dout_vals = x1 * 0.01;
 
 eal = EltWiseAdd('EW_1',[],[]);
 
@@ -13,3 +14,8 @@ if diff > 1e-6
 else
     fprintf('EltWiseAdd forward pass passed\n');    
 end
+
+%% Check backprop (gradient check only for now)
+dout.input = dout_vals;
+eal.EnableGradientCheck(true);
+eal.BackwardPropagation(dout);

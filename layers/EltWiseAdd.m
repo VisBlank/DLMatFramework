@@ -14,6 +14,7 @@ classdef EltWiseAdd < BaseLayer
         index
         activationShape
         inputLayer
+        numInputs
         additionResult
     end
     
@@ -21,8 +22,9 @@ classdef EltWiseAdd < BaseLayer
         function [obj] = EltWiseAdd(name, index, inLayer)
             obj.name = name;
             obj.index = index;
-            obj.inputLayer = inLayer;
-            % EltWiseAdd does not change the shape of it's output
+            obj.inputLayer = inLayer;            
+            % EltWiseAdd does not change the shape of it's output, and it's
+            % input shapes are also the same
             if ~isempty(inLayer)
                 obj.activationShape = obj.inputLayer.getActivationShape();
             end
@@ -37,10 +39,9 @@ classdef EltWiseAdd < BaseLayer
         end
         
         function [gradient] = BackwardPropagation(obj, dout)
-            dout = dout.input;
-            dx = dout ;
-            gradient.input1 = dx;
-            gradient.input2 = dx;
+            dout = dout.input;            
+            gradient.input1 = dout;
+            gradient.input2 = dout;
             
             if obj.doGradientCheck
                 evalGrad = obj.EvalBackpropNumerically(dout);
@@ -59,8 +60,8 @@ classdef EltWiseAdd < BaseLayer
         
         function gradient = EvalBackpropNumerically(obj, dout)
             % Eltwise connected layers has 2 inputs so we have 2 gradients
-            eltwiseadd_x1 = @(x) obj.ForwardPropagation(x, obj.previousInput1, obj.previousInput2 );            
-            eltwiseadd_x2 = @(x) obj.ForwardPropagation(x, obj.previousInput1, obj.previousInput2 );
+            eltwiseadd_x1 = @(x) obj.ForwardPropagation(x, obj.previousInput2 );            
+            eltwiseadd_x2 = @(x) obj.ForwardPropagation(obj.previousInput1, x );
             
             % Evaluate
             gradient.input1 = GradientCheck.Eval(eltwiseadd_x1,obj.previousInput1, dout);
