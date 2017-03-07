@@ -131,7 +131,33 @@ classdef LayerContainer < handle
             end
         end
         
-        function generateGraphVizStruct(obj)
+        function dotGraph = generateDotGraph(obj)
+            
+            dotGraph = cell(1,obj.layersContainer.Count);
+            
+            for idxLayer=1:obj.layersContainer.Count
+                layerInstance = obj.layersCellContainer{idxLayer};
+                dotGraph{idxLayer} = sprintf('%s\n',layerInstance.getName());
+            end
+            
+            dotGraphEdges = {};
+            for idxLayer=1:obj.layersContainer.Count
+                
+                layerInstance = obj.layersCellContainer{idxLayer};
+                inLayers = layerInstance.getInputLayer();
+                if layerInstance.GetNumInputs() < 2                    
+                    if ~isempty(inLayers)
+                        thisEdge = sprintf('%s->%s\n', inLayers.getName(), layerInstance.getName());
+                        dotGraphEdges{end+1} = thisEdge;
+                    end
+                else
+                    for idxIn=1:layerInstance.GetNumInputs()
+                        thisEdge = sprintf('%s->%s\n',inLayers{idxIn}.getName(), layerInstance.getName());
+                        dotGraphEdges{end+1} = thisEdge;
+                    end
+                end
+            end
+            dotGraph  = cat(2,dotGraph{:},dotGraphEdges{:}) ;
             
         end
     end

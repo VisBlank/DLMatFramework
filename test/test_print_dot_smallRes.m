@@ -16,9 +16,9 @@ layers <= struct('name','Add_1','type','add','inputs',{{'Relu_3','MP1'}});
 layers <= struct('name','MP2','type','maxpool', 'kh',14, 'kw',14, 'stride',1); 
 layers <= struct('name','FC','type','fc', 'num_output',1024);
 layers <= struct('name','Relu_5','type','relu');
-layers <= struct('name','FC_2','type','fc','num_output',data.GetNumClasses());
+layers <= struct('name','FC_2','type','fc','num_output', 10);
 layers <= struct('name','Softmax','type','softmax');
 
 % Print structure
 layers.ShowStructure();
-
+dotGraph = layers.generateDotGraph();
