@@ -28,7 +28,7 @@ myCacheFolder = fullfile(projectRoot, 'work');
 if ~exist(myCacheFolder, 'dir')
     mkdir(myCacheFolder)
 end
-Simulink.fileGenControl('set', 'CacheFolder', myCacheFolder, ...
-   'CodeGenFolder', myCacheFolder);
+% Simulink.fileGenControl('set', 'CacheFolder', myCacheFolder, ...
+%    'CodeGenFolder', myCacheFolder);
 
 end
