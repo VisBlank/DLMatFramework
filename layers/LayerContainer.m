@@ -72,34 +72,42 @@ classdef LayerContainer < handle
             obj.numLayers = 0;
         end
         
+        function adjacencyList = getGraph(obj)
+            adjacencyList = obj.m_adjacencyList;
+        end
+        
+        % Infer a graph from the layers structure
         function buildGraph(obj)
             nodes = obj.layersContainer.keys;
             numNodes = numel(nodes);
-            m_adjacencyList = cell(numNodes,1);
-            
+                        
             % Build adjacency list (Array of lists)
             for idxNode=1:numNodes
                 node = obj.getLayerFromIndex(idxNode);
+                obj.m_adjacencyList(idxNode).name = node.getName();
+                obj.m_adjacencyList(idxNode).objRef = node;
+                obj.m_adjacencyList(idxNode).inputs = node.getInputLayer();                
+                
                 cellConnectetion = {};
-                % Build list to all edges from this node
+                                
+                % Build list to all output edges from this node
                 for idxNode2=1:numNodes
                     node2 = obj.getLayerFromIndex(idxNode2);
-                    currNode = node2.getInputLayer();
+                    inputNode2 = node2.getInputLayer();
                     if (node2.GetNumInputs > 1)
-                        for idx=1:numel(currNode)
-                            if isequal(currNode{idx},node)
-                                cellConnectetion{end+1} = currNode;
+                        for idx=1:numel(inputNode2)
+                            if isequal(inputNode2{idx},node)
+                                cellConnectetion{end+1} = node2;
                             end
                         end                        
                     else
-                        if isequal(currNode,node)
-                            cellConnectetion{end+1} = currNode;
+                        if isequal(inputNode2,node)
+                            cellConnectetion{end+1} = node2;
                         end
                     end
-                end
-                m_adjacencyList{idxNode} = cellConnectetion;
-            end
-            1+1;
+                end                
+                obj.m_adjacencyList(idxNode).outputs = cellConnectetion;
+            end                        
         end
         
         % Override the "<=" operator (used to push a new layer)

@@ -74,7 +74,9 @@ classdef DeepLearningModel < handle
     methods (Access = 'public')
         function obj = DeepLearningModel(layerCont, lossType)
             obj.layersContainer = layerCont;
-            obj.lossFunction = LossFactory.GetLoss(lossType);
+            obj.lossFunction = LossFactory.GetLoss(lossType);            
+            % Use layer container to build a graph
+            layerCont.buildGraph();            
             %% Initialize weights and biases
             obj.initWeights();
         end
@@ -172,6 +174,10 @@ classdef DeepLearningModel < handle
         
         function layers = getLayers(obj)
             layers = obj.layersContainer.getLayerMap();
+        end
+        
+        function layerContainer = getLayerContainer(obj)
+            layerContainer = obj.layersContainer;
         end
         
         function L2Regularization(obj,regVal)
