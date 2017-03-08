@@ -133,6 +133,17 @@ classdef LayerContainer < handle
             end
         end
         
+        function index = getIndexFromName(obj,name)
+           index = -1;
+           for idxLayer=1:obj.layersContainer.Count
+               layerInstance = obj.layersCellContainer{idxLayer};
+               if (strcmp(layerInstance.getName(),name))
+                  index =  idxLayer;
+                  return;
+               end
+           end
+        end
+        
         function layer = getLayerFromIndex(obj,index)
             layer = obj.layersCellContainer(index);
             layer = layer{1};

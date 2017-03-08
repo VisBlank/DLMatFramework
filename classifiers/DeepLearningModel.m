@@ -74,9 +74,9 @@ classdef DeepLearningModel < handle
     methods (Access = 'public')
         function obj = DeepLearningModel(layerCont, lossType)
             obj.layersContainer = layerCont;
-            obj.lossFunction = LossFactory.GetLoss(lossType);            
+            obj.lossFunction = LossFactory.GetLoss(lossType);
             % Use layer container to build a graph
-            layerCont.buildGraph();            
+            layerCont.buildGraph();
             %% Initialize weights and biases
             obj.initWeights();
         end
@@ -100,7 +100,7 @@ classdef DeepLearningModel < handle
                     currInput = cell(1,currLayer.GetNumInputs);
                     for idxDepLayer=1:currLayer.GetNumInputs
                         currInput{idxDepLayer} = currLayer.getInputLayer{idxDepLayer}.getActivations;
-                    end                    
+                    end
                 end
                 currInput = currLayer.ForwardPropagation(currInput,obj.weightsMap(layerName),obj.BiasMap(layerName));
             end
@@ -120,6 +120,14 @@ classdef DeepLearningModel < handle
             % to be used on the regularization
             squared_W_reg = [];
             currDout.input = grad_loss;
+            
+            % Get the graph
+            grfModel = obj.layersContainer.getGraph();
+            
+            % Create a list to hold the gradients in case
+            % they are needed on a graph model
+            gradientList = cell(obj.layersContainer.getNumLayers(),1);
+            
             % Start by the last layer before Softmax
             for idxLayer=obj.layersContainer.getNumLayers()-1:-1:1
                 currLayer = obj.layersContainer.getLayerFromIndex(idxLayer);
@@ -128,7 +136,38 @@ classdef DeepLearningModel < handle
                     continue;
                 end
                 layerName = currLayer.getName();
+                
+                % If the current layer has multiple outputs we need to
+                % accumulate their gradient
+                if numel(grfModel(idxLayer).outputs) > 1  
+                    gradInput = {};
+                    for idxOut = 1:numel(grfModel(idxLayer).outputs)                        
+                        layerIdx = obj.layersContainer.getIndexFromName(grfModel(idxLayer).outputs{idxOut}.getName());                        
+                        if isfield(gradientList{layerIdx},'input2')
+                            gradInput{end+1} = gradientList{layerIdx}.input1;
+                        else
+                            gradInput{end+1} = gradientList{layerIdx}.input;
+                        end
+                    end
+                    currDout.input = zeros(size(gradInput{1}),'like',gradInput{1});
+                    for idxElGrad=1:numel(grfModel(idxLayer).outputs)
+                        currDout.input = currDout.input + gradInput{idxElGrad};
+                    end
+                else
+                    % If the previous node had more than one input we
+                    % should select wich gradient to use, on case of
+                    % element-wise addition it will not matter, but other
+                    % nodes like multiplication will mather
+                    if isfield(currDout,'input2')
+                        currDout.input = currDout.input1;
+                    end
+                end
+                
                 currDout = currLayer.BackwardPropagation(currDout);
+                
+                % Cache gradient
+                gradientList{idxLayer} = currDout;
+                
                 % Save gradients on parametrizes layers
                 if isa(currLayer,'FullyConnected') || isa(currLayer,'BatchNorm') || isa(currLayer,'ConvolutionLayer') || isa(currLayer,'SpatialBatchNorm')
                     obj.gradWeightsMap(layerName) = currDout.weight;
