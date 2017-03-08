@@ -177,7 +177,8 @@ classdef LayerContainer < handle
             for idxLayer=1:obj.layersContainer.Count
                 layerInstance = obj.layersCellContainer{idxLayer};
                 asString = obj.makeDimString(layerInstance.getActivationShape());
-                dotGraph{end+1} = sprintf('%s [label="%s | AS: %s" shape=record style="solid,rounded"] \n',layerInstance.getName(), layerInstance.getName(), asString);
+                wString = obj.makeDimString(layerInstance.getWeightShape());
+                dotGraph{end+1} = sprintf('%s [label="%s | {AS: %s | WS: %s}" shape=record style="solid,rounded"] \n',layerInstance.getName(), layerInstance.getName(), asString, wString);
             end
             
             for idxLayer=1:obj.layersContainer.Count
@@ -214,7 +215,7 @@ classdef LayerContainer < handle
                     case 'MACI64'
                         system(sprintf('open "%s"', pdfFileName)) ;
                     case 'GLNXA64'
-                        system(sprintf('display "%s"', pdfFileName)) ;
+                        system(sprintf('display "%s" &', pdfFileName)) ;
                     otherwise
                         fprintf('The figure saved at "%s"\n', pdfFileName) ;
                 end

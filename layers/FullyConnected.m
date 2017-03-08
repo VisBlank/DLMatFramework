@@ -22,11 +22,13 @@ classdef FullyConnected < BaseLayer
             obj.index = index;
             obj.numOutput = numOutput;
             obj.inputLayer = inLayer;
-            obj.activationShape = [1 numOutput];
             
             % Calculate the weight shape
             if ~isempty(inLayer)                
-                obj.weightShape = [ abs(prod(inLayer.getActivationShape)) obj.numOutput];                        
+                inLayerAS = inLayer.getActivationShape();
+                
+                obj.activationShape = [1 numOutput inLayerAS(end)];
+                obj.weightShape = [ abs(prod(inLayerAS(1:(end-1)))) obj.numOutput];                        
             end
         end
         
