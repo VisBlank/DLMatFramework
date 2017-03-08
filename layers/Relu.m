@@ -12,6 +12,7 @@ classdef Relu < BaseLayer
         index
         activationShape
         inputLayer
+        weightShape
     end
     
     methods (Access = 'public')
@@ -23,6 +24,7 @@ classdef Relu < BaseLayer
             if ~isempty(inLayer)
                 obj.activationShape = obj.inputLayer.getActivationShape();
             end
+            obj.weightShape = [];
         end
         
         function [activations] = ForwardPropagation(obj, input, weights, bias)

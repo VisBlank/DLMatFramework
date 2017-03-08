@@ -12,6 +12,7 @@ classdef Softmax < BaseLayer
         index
         activationShape
         inputLayer
+        weightShape
     end
     
     methods (Access = 'public')
@@ -19,6 +20,7 @@ classdef Softmax < BaseLayer
             obj.name = name;
             obj.index = index;
             obj.inputLayer = inLayer;
+            obj.weightShape = [];
         end
         
         function [activations] = ForwardPropagation(obj, scores, weights, bias)

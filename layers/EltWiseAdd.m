@@ -13,6 +13,7 @@ classdef EltWiseAdd < BaseLayer
         name
         index
         activationShape
+        weightShape
         inputLayer
         numInputs        
     end
@@ -27,6 +28,7 @@ classdef EltWiseAdd < BaseLayer
             if ~isempty(inLayer)
                 obj.activationShape = obj.inputLayer{1}.getActivationShape();
             end
+            obj.weightShape = [];
         end
         
         function [additionResult] = ForwardPropagation(obj, input, weights, bias)                        

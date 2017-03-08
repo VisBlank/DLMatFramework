@@ -13,6 +13,7 @@ classdef FullyConnected < BaseLayer
         activationShape
         inputLayer
         numOutput
+        weightShape
     end
     
     methods (Access = 'public')
@@ -22,6 +23,11 @@ classdef FullyConnected < BaseLayer
             obj.numOutput = numOutput;
             obj.inputLayer = inLayer;
             obj.activationShape = [1 numOutput];
+            
+            % Calculate the weight shape
+            if ~isempty(inLayer)                
+                obj.weightShape = [ abs(prod(inLayer.getActivationShape)) obj.numOutput];                        
+            end
         end
         
         function [activations] = ForwardPropagation(obj, input, weights, bias)

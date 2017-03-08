@@ -24,6 +24,7 @@ classdef SpatialBatchNorm < BaseLayer
         sqrtvar
         var
         normalBatchNorm
+        weightShape
     end
     
     methods (Access = 'public')
@@ -38,6 +39,9 @@ classdef SpatialBatchNorm < BaseLayer
             % Relu does not change the shape of it's output
             if ~isempty(inLayer)
                 obj.activationShape = obj.inputLayer.getActivationShape();
+                shapeInput = inLayer.getActivationShape();
+                C = shapeInput(3);
+                obj.weightShape = [1 C];
             end
         end
         

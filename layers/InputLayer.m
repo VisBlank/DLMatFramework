@@ -17,6 +17,7 @@ classdef InputLayer < BaseLayer
         numChannels
         batchSize
         activationShape
+        weightShape
     end
     
     methods (Access = 'public')
@@ -28,6 +29,7 @@ classdef InputLayer < BaseLayer
             obj.batchSize = batchSize;
             obj.index = index;
             obj.activationShape = [numRows numCols numChannels batchSize];
+            obj.weightShape = [];
         end
         
         function [activations] = ForwardPropagation(obj, scores, weights, bias)

@@ -16,9 +16,10 @@ classdef ConvolutionLayer < BaseLayer
         previousInput
         name
         index
-        activationShape
+        activationShape        
         inputLayer
         numOutput
+        weightShape
         
         % Some data used for convolution
         m_kernelHeight
@@ -51,6 +52,9 @@ classdef ConvolutionLayer < BaseLayer
                 W_prime = (W+2*pad-kW)/stride +1;
                 obj.activationShape = [H_prime W_prime numOutF -1];
             end
+            
+            % Calculate the weight shape
+            obj.weightShape = [kH kW numOutF];
         end
         
         function [activations] = ForwardPropagation(obj, input, weights, bias)

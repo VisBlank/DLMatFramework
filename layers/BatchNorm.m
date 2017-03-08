@@ -11,6 +11,7 @@ classdef BatchNorm < BaseLayer
         name
         index
         activationShape
+        weightShape
         inputLayer        
         isTraining
         eps
@@ -35,6 +36,7 @@ classdef BatchNorm < BaseLayer
             % Relu does not change the shape of it's output
             if ~isempty(inLayer)
                 obj.activationShape = obj.inputLayer.getActivationShape();
+                obj.weightShape = [1 abs(prod(inLayer.getActivationShape()))];
             end
         end
         

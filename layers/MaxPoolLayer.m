@@ -21,6 +21,7 @@ classdef MaxPoolLayer < BaseLayer
         activationShape
         inputLayer
         numOutput
+        weightShape
         
         % Some data used for maxpool
         m_kernelHeight
@@ -42,6 +43,7 @@ classdef MaxPoolLayer < BaseLayer
             obj.m_kernelHeight = kH;
             obj.m_kernelWidth = kW;
             obj.m_stride = stride;
+            obj.weightShape = [];
             
             % Calculate the activation shape to be used to correctly
             % initialize the parameters of the next layers

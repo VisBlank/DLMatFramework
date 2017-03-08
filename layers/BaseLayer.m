@@ -14,12 +14,13 @@ classdef (Abstract) BaseLayer < handle
         previousInput
         name
         index
-        activationShape
-        inputLayer        
+        activationShape        
+        inputLayer  
+        weightShape
     end
     
     properties (Access = 'public')
-       doGradientCheck = false; 
+       doGradientCheck = false;        
     end
     
     methods(Abstract, Access = 'public')
@@ -49,6 +50,10 @@ classdef (Abstract) BaseLayer < handle
        
        function [actShape] = getActivationShape(obj)
            actShape = obj.activationShape;
+       end
+       
+       function [weightShape] = getWeightShape(obj)
+           weightShape = obj.weightShape;
        end
        
        function [layer] = getInputLayer(obj)

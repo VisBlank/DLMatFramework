@@ -14,6 +14,7 @@ classdef AvgPoolLayer < BaseLayer
         name
         index
         activationShape
+        weightShape
         inputLayer
         numOutput
         
@@ -37,6 +38,7 @@ classdef AvgPoolLayer < BaseLayer
             obj.m_kernelHeight = kH;
             obj.m_kernelWidth = kW;
             obj.m_stride = stride;
+            obj.weightShape = [];
             
             % Calculate the activation shape to be used to correctly
             % initialize the parameters of the next layers

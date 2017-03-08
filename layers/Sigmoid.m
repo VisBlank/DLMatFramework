@@ -12,6 +12,7 @@ classdef Sigmoid < BaseLayer
         index
         activationShape
         inputLayer
+        weightShape
     end
     
     methods (Access = 'public')
@@ -21,6 +22,7 @@ classdef Sigmoid < BaseLayer
             obj.inputLayer = inLayer;
             % Relu does not change the shape of it's output
             obj.activationShape = obj.inputLayer.getActivationShape();
+            obj.weightShape = [];
         end
         
         function [activations] = ForwardPropagation(obj, input, weights, bias)

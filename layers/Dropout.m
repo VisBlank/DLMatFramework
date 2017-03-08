@@ -13,6 +13,7 @@ classdef Dropout < BaseLayer
         name
         index
         activationShape
+        weightShape
         inputLayer
         dropoutMask
         dropoutProb
@@ -29,6 +30,7 @@ classdef Dropout < BaseLayer
             if ~isempty(inLayer)
                 obj.activationShape = obj.inputLayer.getActivationShape();
             end
+            obj.weightShape = [];
         end
         
         function [activations] = ForwardPropagation(obj, input, weights, bias)
