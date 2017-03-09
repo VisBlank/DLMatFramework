@@ -17,7 +17,7 @@ b = b';
 % Get sizes
 [k_rows,k_cols,C,F] = size(w);
 
-% Create FC layer
+% Create conv layer
 conv = ConvolutionLayer('CONV_1',k_rows, k_cols, 2, 1,[],[],[]);
 
 % Do forward pass
@@ -53,7 +53,7 @@ gradDout.input = dout;
 % Get sizes
 [k_rows,k_cols,C,F] = size(w);
 
-% Create FC layer
+% Create conv layer
 conv = ConvolutionLayer('CONV_1',k_rows, k_cols, 1, 1,[],[],[]);
 
 % Do forward pass
@@ -74,3 +74,50 @@ else
     fprintf('CONV backward pass passed\n');    
 end
 
+
+%% test CONV 1x1 forward
+x_test = rand(25,25,3,2);
+w_test = rand(1,1,3,4);
+b_test = rand(4,1);
+
+% Get sizes
+[k_rows,k_cols,C,F] = size(w_test);
+
+% Create conv layer
+conv_1_1 = ConvolutionLayer('CONV_1',k_rows, k_cols, 1, 0,[],[],[]);
+out_conv_1_1 = conv_1_1.ForwardPropagation(x_test,w_test,b_test);
+
+% % % true result 
+% % true_out_conv_1_1 = ;
+% % 
+% % diff = sum(abs(out_conv_1_1(:) - true_out_conv_1_1(:)));
+% % if diff > 1e-9
+% %     error('CONV 1x1 forward pass failed');
+% % else
+% %     fprintf('CONV forward pass passed\n');    
+% % end
+
+%% test CONV 1x1 backward
+
+gradDout.input = rand(25,25,4,2);
+
+conv_1_1.EnableGradientCheck(true);
+gradients = conv_1_1.BackwardPropagation(gradDout);
+
+%% test CONV 1x1 forward (1 filter)
+x_test = rand(25,25,3,2);
+w_test = rand(1,1,3,1);
+b_test = rand(1,1);
+
+[k_rows,k_cols,C,F] = size(w_test);
+
+% Create conv layer
+conv_1_1 = ConvolutionLayer('CONV_1',k_rows, k_cols, 1, 0,[],[],[]);
+out_conv_1_1 = conv_1_1.ForwardPropagation(x_test,w_test,b_test);
+
+%% test CONV 1x1 backward (1 filter)
+
+gradDout.input = rand(25,25,1,2);
+
+conv_1_1.EnableGradientCheck(true);
+gradients = conv_1_1.BackwardPropagation(gradDout);
