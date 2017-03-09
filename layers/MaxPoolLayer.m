@@ -53,7 +53,7 @@ classdef MaxPoolLayer < BaseLayer
                 H = inShape(1); W = inShape(2); C = inShape(3);
                 H_prime = (H-kH)/stride +1;
                 W_prime = (W-kW)/stride +1;
-                obj.activationShape = [H_prime W_prime C inShape(4)];
+                obj.activationShape = [H_prime W_prime C -1];
             end
         end
         

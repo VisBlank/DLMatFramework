@@ -45,18 +45,16 @@ classdef ConvolutionLayer < BaseLayer
             % Calculate the activation shape to be used to correctly
             % initialize the parameters of the next layers
             % Calculate output sizes
-            inputSize = NaN;
             if ~isempty(inLayer)
                 inShape = inLayer.getActivationShape();
                 H = inShape(1); W = inShape(2); C = inShape(3);
                 H_prime = (H+2*pad-kH)/stride +1;
                 W_prime = (W+2*pad-kW)/stride +1;
-                inputSize = inShape(3);
-                obj.activationShape = [H_prime W_prime numOutF inShape(4)];
+                obj.activationShape = [H_prime W_prime numOutF -1];
             end
             
             % Calculate the weight shape
-            obj.weightShape = [kH kW inputSize numOutF];
+            obj.weightShape = [kH kW numOutF];
         end
         
         function [activations] = ForwardPropagation(obj, input, weights, bias)
