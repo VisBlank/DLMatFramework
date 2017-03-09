@@ -6,6 +6,7 @@ classdef Sigmoid < BaseLayer
         weights
         biases
         activations
+        gradients
         config
         previousInput
         name
@@ -37,6 +38,9 @@ classdef Sigmoid < BaseLayer
             d_sigm  = (t .* (1 - t));
             dx = dout .* d_sigm;
             gradient.input = dx;
+            
+            % Cache gradients
+            obj.gradients = gradient;
             
             if obj.doGradientCheck
                 evalGrad = obj.EvalBackpropNumerically(dout);

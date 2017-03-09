@@ -6,6 +6,7 @@ classdef EltWiseAdd < BaseLayer
         weights
         biases
         activations
+        gradients
         config
         previousInput
         previousInput1
@@ -44,6 +45,9 @@ classdef EltWiseAdd < BaseLayer
             dout = dout.input;            
             gradient.input1 = dout;
             gradient.input2 = dout;
+            
+            % Cache gradients
+            obj.gradients = gradient;
             
             if obj.doGradientCheck
                 evalGrad = obj.EvalBackpropNumerically(dout);

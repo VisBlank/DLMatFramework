@@ -8,6 +8,7 @@ classdef Dropout < BaseLayer
         weights
         biases
         activations
+        gradients
         config
         previousInput
         name
@@ -71,6 +72,9 @@ classdef Dropout < BaseLayer
             dx = dout .* obj.dropoutMask;
             
             gradient.input = dx;
+            
+            % Cache gradients
+            obj.gradients = gradient;
             
             if obj.doGradientCheck
                 evalGrad = obj.EvalBackpropNumerically(dout);

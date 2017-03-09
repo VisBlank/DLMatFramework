@@ -7,6 +7,7 @@ classdef SpatialBatchNorm < BaseLayer
         weights
         biases
         activations
+        gradients
         config
         previousInput
         name
@@ -96,6 +97,9 @@ classdef SpatialBatchNorm < BaseLayer
             gradient.input = reshape_row_major_custom(gradient.input, [W,C,H,N]);
             % On python was transpose(0,3,1,2)
             gradient.input = permute(gradient.input,[3 1 2 4]);
+            
+            % Cache gradients
+            obj.gradients = gradient;
             
             % Evalulate numerically if needed
             if obj.doGradientCheck     

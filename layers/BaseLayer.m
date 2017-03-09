@@ -10,6 +10,7 @@ classdef (Abstract) BaseLayer < handle
         weights
         biases
         activations
+        gradients
         config
         previousInput
         name
@@ -34,6 +35,10 @@ classdef (Abstract) BaseLayer < handle
     methods(Access = 'public')
        function [activations] = getActivations(obj)
             activations = obj.activations;
+       end
+       
+       function [gradients] = getGradients(obj)
+            gradients = obj.gradients;
        end 
        
        function [config] = getConfig(obj)

@@ -9,6 +9,7 @@ classdef AvgPoolLayer < BaseLayer
         weights
         biases
         activations
+        gradients
         config
         previousInput
         name
@@ -148,6 +149,9 @@ classdef AvgPoolLayer < BaseLayer
             gradient.bias = [];
             gradient.input = dx;
             gradient.weight = [];
+            
+            % Cache gradients
+            obj.gradients = gradient;
             
             if obj.doGradientCheck
                 evalGrad = obj.EvalBackpropNumerically(dout);

@@ -6,6 +6,7 @@ classdef InputLayer < BaseLayer
         weights
         biases
         activations
+        gradients
         config
         previousInput
         name
@@ -39,6 +40,9 @@ classdef InputLayer < BaseLayer
         % We don't do backpropagation on the input layer
         function [gradient] = BackwardPropagation(obj, dout)
             gradient = [];
+            
+            % Cache gradients
+            obj.gradients = gradient;
         end
         
         function setActivations(obj, pData)

@@ -12,6 +12,7 @@ classdef ConvolutionLayer < BaseLayer
         weights
         biases
         activations
+        gradients
         config
         previousInput
         name
@@ -148,6 +149,9 @@ classdef ConvolutionLayer < BaseLayer
             gradient.bias = db;
             gradient.input = dx;  
             gradient.weight = dw;
+            
+            % Cache gradients
+            obj.gradients = gradient;
             
             if obj.doGradientCheck
                 evalGrad = obj.EvalBackpropNumerically(dout);
