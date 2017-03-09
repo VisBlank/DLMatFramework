@@ -90,6 +90,7 @@ classdef DeepLearningModel < handle
             for idxLayer=2:obj.layersContainer.getNumLayers()
                 currLayer = obj.layersContainer.getLayerFromIndex(idxLayer);
                 layerName = currLayer.getName();
+                % Mark training flag if necessary
                 if isa(currLayer,'Dropout') || isa(currLayer,'BatchNorm') || isa(currLayer,'SpatialBatchNorm')
                     currLayer.IsTraining(obj.isTraining);
                 end
@@ -139,16 +140,19 @@ classdef DeepLearningModel < handle
                 
                 % If the current layer has multiple outputs we need to
                 % accumulate their gradient
-                if numel(grfModel(idxLayer).outputs) > 1  
-                    gradInput = {};
+                if numel(grfModel(idxLayer).outputs) > 1                      
+                    gradInput = cell(numel(grfModel(idxLayer).outputs),1);                    
+                    % Iterate on each output
                     for idxOut = 1:numel(grfModel(idxLayer).outputs)                        
-                        layerIdx = obj.layersContainer.getIndexFromName(grfModel(idxLayer).outputs{idxOut}.getName());                        
+                        % Get the layers connected to this outputs
+                        layerIdx = obj.layersContainer.getIndexFromName(grfModel(idxLayer).outputs{idxOut}.getName());                                                
                         if isfield(gradientList{layerIdx},'input2')
-                            gradInput{end+1} = gradientList{layerIdx}.input1;
+                            gradInput{idxOut} = gradientList{layerIdx}.input2;
                         else
-                            gradInput{end+1} = gradientList{layerIdx}.input;
+                            gradInput{idxOut} = gradientList{layerIdx}.input;
                         end
                     end
+                    % Accumulate gradients
                     currDout.input = zeros(size(gradInput{1}),'like',gradInput{1});
                     for idxElGrad=1:numel(grfModel(idxLayer).outputs)
                         currDout.input = currDout.input + gradInput{idxElGrad};
