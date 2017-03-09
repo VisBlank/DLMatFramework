@@ -28,7 +28,15 @@ myCacheFolder = fullfile(projectRoot, 'work');
 if ~exist(myCacheFolder, 'dir')
     mkdir(myCacheFolder)
 end
-% Simulink.fileGenControl('set', 'CacheFolder', myCacheFolder, ...
-%    'CodeGenFolder', myCacheFolder);
+
+%% Call only if simulink is available
+if license('test','Simulink')
+    disp('Simulink available');
+   Simulink.fileGenControl('set', 'CacheFolder', myCacheFolder, 'CodeGenFolder', myCacheFolder); 
+else
+    disp('Simulink not available');
+    % At least add work into the path
+    addpath(genpath(fullfile(curdir, 'work')));
+end
 
 end
