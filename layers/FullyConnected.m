@@ -6,6 +6,7 @@ classdef FullyConnected < BaseLayer
         weights
         biases
         activations
+        gradients
         config
         previousInput
         name
@@ -76,6 +77,9 @@ classdef FullyConnected < BaseLayer
             dx = (dout * obj.weights');
             dx = reshape_row_major_custom(dx,size(obj.previousInput));
             gradient.input = dx;
+            
+            % Cache gradients
+            obj.gradients = gradient;
             
             if obj.doGradientCheck
                 evalGrad = obj.EvalBackpropNumerically(dout);

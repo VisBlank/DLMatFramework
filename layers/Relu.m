@@ -6,6 +6,7 @@ classdef Relu < BaseLayer
         weights
         biases
         activations
+        gradients
         config
         previousInput
         name
@@ -37,6 +38,9 @@ classdef Relu < BaseLayer
             dout = dout.input;
             dx = dout .* (obj.previousInput >= 0);
             gradient.input = dx;
+            
+            % Cache gradients
+            obj.gradients = gradient;
             
             if obj.doGradientCheck
                 evalGrad = obj.EvalBackpropNumerically(dout);

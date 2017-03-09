@@ -140,23 +140,19 @@ classdef DeepLearningModel < handle
                 
                 % If the current layer has multiple outputs we need to
                 % accumulate their gradient
-                if numel(grfModel(idxLayer).outputs) > 1                      
-                    gradInput = cell(numel(grfModel(idxLayer).outputs),1);                    
+                if numel(grfModel(idxLayer).outputs) > 1                                          
+                    accInputGradient = grfModel(idxLayer).outputs{1}.getGradients.input;
                     % Iterate on each output
-                    for idxOut = 1:numel(grfModel(idxLayer).outputs)                        
-                        % Get the layers connected to this outputs
-                        layerIdx = obj.layersContainer.getIndexFromName(grfModel(idxLayer).outputs{idxOut}.getName());                                                
-                        if isfield(gradientList{layerIdx},'input2')
-                            gradInput{idxOut} = gradientList{layerIdx}.input2;
+                    for idxOut = 2:numel(grfModel(idxLayer).outputs) 
+                        otherGradients = grfModel(idxLayer).outputs{idxOut}.getGradients;                        
+                        if isfield(otherGradients,'input2')
+                            accInputGradient = accInputGradient + otherGradients.input2;
                         else
-                            gradInput{idxOut} = gradientList{layerIdx}.input;
+                            accInputGradient = accInputGradient + otherGradients.input;                            
                         end
                     end
                     % Accumulate gradients
-                    currDout.input = zeros(size(gradInput{1}),'like',gradInput{1});
-                    for idxElGrad=1:numel(grfModel(idxLayer).outputs)
-                        currDout.input = currDout.input + gradInput{idxElGrad};
-                    end
+                    currDout.input = accInputGradient;                    
                 else
                     % If the previous node had more than one input we
                     % should select wich gradient to use, on case of

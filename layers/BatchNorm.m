@@ -6,6 +6,7 @@ classdef BatchNorm < BaseLayer
         weights
         biases
         activations
+        gradients
         config
         previousInput
         name
@@ -150,6 +151,9 @@ classdef BatchNorm < BaseLayer
             gradient.input = dx1+dx2;
             gradient.weight = dgamma;
             gradient.bias = dbeta;
+            
+            % Cache gradients
+            obj.gradients = gradient;
             
             % Evalulate numerically if needed
             if obj.doGradientCheck     

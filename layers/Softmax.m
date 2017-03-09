@@ -6,6 +6,7 @@ classdef Softmax < BaseLayer
         weights
         biases
         activations
+        gradients
         config
         previousInput
         name
@@ -43,6 +44,9 @@ classdef Softmax < BaseLayer
         function [gradient] = BackwardPropagation(obj, dout)
             % TODO
             gradient = [];
+            
+            % Cache gradients
+            obj.gradients = gradient;
         end
         
         function gradient = EvalBackpropNumerically(obj, dout)
