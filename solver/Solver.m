@@ -173,8 +173,8 @@ classdef Solver < handle
             obj.m_model.IsTraining(true);
             
             num_train = obj.m_data.GetTrainSize();
-            iterations_per_epoch = max(num_train / obj.m_batch_size, 1);
-            num_iterations = obj.m_num_epochs * iterations_per_epoch;
+            iterations_per_epoch = ceil(max(num_train / obj.m_batch_size, 1));
+            num_iterations = ceil(obj.m_num_epochs * iterations_per_epoch);
             fprintf('Iterations/epoch: %d\n',round(iterations_per_epoch));
             
             for t=1:num_iterations
@@ -190,7 +190,7 @@ classdef Solver < handle
                 % learning rate
                 epoch_end = mod((t + 1), iterations_per_epoch) == 0;
                 if epoch_end
-                    fprintf('Finished epoch %d/%d\n',obj.m_currEpoch,obj.m_num_epochs);
+                    fprintf('Finished epoch %d/%d\n',obj.m_currEpoch+1,obj.m_num_epochs);
                     obj.m_currEpoch = obj.m_currEpoch+1;
                     % Do Step weight decay
                     currLearningRate = obj.m_optimizer.GetLearningRate();
