@@ -23,6 +23,8 @@ classdef (Sealed) Dataset < handle
         m_meanImage;
         m_augmenter;
         hasValidation = false;
+        iterationCounter = 1;
+        shuffleTime = 10;
     end
     
     methods(Access = private)
@@ -182,6 +184,10 @@ classdef (Sealed) Dataset < handle
         
         function flag = HasValidation(obj)
            flag = obj.hasValidation; 
+        end
+        
+        function shuffleEveryNIterations(obj, numIterations)
+            obj.shuffleTime = numIterations;
         end
         
         function pushToGPU(obj)

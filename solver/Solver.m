@@ -177,6 +177,10 @@ classdef Solver < handle
             num_iterations = ceil(obj.m_num_epochs * iterations_per_epoch);
             fprintf('Iterations/epoch: %d\n',round(iterations_per_epoch));
             
+            % Indicate the dataset class that we want to auto-shuffle every
+            % iterations_per_epoch iterations
+            obj.m_data.shuffleEveryNIterations(iterations_per_epoch);
+            
             for t=1:num_iterations
                 tic;
                 obj.Step();
