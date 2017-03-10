@@ -32,6 +32,7 @@ classdef FullyConnected < BaseLayer
         end
         
         function [activations] = ForwardPropagation(obj, input, weights, bias)
+            tic;
             obj.previousInput = input;
             
             % Tensor format (rows,cols,channels, batch) on matlab
@@ -54,6 +55,9 @@ classdef FullyConnected < BaseLayer
             obj.weights = weights;
             obj.biases = bias;
             obj.previousInput = input;
+            
+            % Get execution time
+            obj.executionTime = toc;
         end
         
         function [gradient] = BackwardPropagation(obj, dout)

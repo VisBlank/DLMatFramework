@@ -33,12 +33,16 @@ classdef EltWiseAdd < BaseLayer
         end
         
         function [additionResult] = ForwardPropagation(obj, input, weights, bias)                        
+            tic;
             additionResult = input{1} + input{2};            
             
             % Cache results for backpropagation
             obj.activations = additionResult;
             obj.previousInput1 = input{1};
             obj.previousInput2 = input{2};
+            
+            % Get execution time
+            obj.executionTime = toc;
         end
         
         function [gradient] = BackwardPropagation(obj, dout)

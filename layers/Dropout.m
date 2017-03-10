@@ -35,6 +35,7 @@ classdef Dropout < BaseLayer
         end
         
         function [activations] = ForwardPropagation(obj, input, weights, bias)
+            tic;
             obj.previousInput = input;
             
             if (obj.isTraining)
@@ -62,6 +63,9 @@ classdef Dropout < BaseLayer
             end
             
             obj.activations = activations;
+            
+            % Get execution time
+            obj.executionTime = toc;
         end
         
         function [gradient] = BackwardPropagation(obj, dout)

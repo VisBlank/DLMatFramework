@@ -25,6 +25,8 @@ classdef Softmax < BaseLayer
         end
         
         function [activations] = ForwardPropagation(obj, scores, weights, bias)
+            tic;
+            
             % Fix numerical error
             scoresFix = scores - repmat(max(scores,[],2),1,size(scores,2));
             
@@ -35,7 +37,10 @@ classdef Softmax < BaseLayer
             sumProb = repmat(sumProb,1,size(scores,2));
             
             % Calculate probabilities
-            activations = exp(scoresFix) ./ sumProb;            
+            activations = exp(scoresFix) ./ sumProb; 
+            
+            % Get execution time
+            obj.executionTime = toc;
         end
         
         % The softmax activation has only one input (scores) so we just

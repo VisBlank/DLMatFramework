@@ -59,6 +59,7 @@ classdef ConvolutionLayer < BaseLayer
         end
         
         function [activations] = ForwardPropagation(obj, input, weights, bias)
+            tic;
             % Tensor format (rows,cols,channels, batch) on matlab
             [H,W,~,N] = size(input);
             [HH,WW,C,F] = size(weights);
@@ -98,7 +99,10 @@ classdef ConvolutionLayer < BaseLayer
             obj.activations = activations;
             obj.weights = weights;
             obj.biases = bias;
-            obj.previousInput = input;            
+            obj.previousInput = input;     
+            
+            % Get execution time
+            obj.executionTime = toc;
         end
         
         function [gradient] = BackwardPropagation(obj, dout)

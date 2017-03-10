@@ -42,6 +42,7 @@ classdef BatchNorm < BaseLayer
         end
         
         function [activations] = ForwardPropagation(obj, input, weights, bias)
+            tic;
             obj.previousInput = input;
             % Tensor format (rows,cols,channels, batch) on matlab
             % Get batch size            
@@ -105,6 +106,9 @@ classdef BatchNorm < BaseLayer
             obj.activations = activations;
             obj.weights = weights;
             obj.biases = bias;
+            
+            % Get execution time
+            obj.executionTime = toc;
         end
         
         function [gradient] = BackwardPropagation(obj, dout)

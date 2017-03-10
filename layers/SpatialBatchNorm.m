@@ -30,6 +30,8 @@ classdef SpatialBatchNorm < BaseLayer
     
     methods (Access = 'public')
         function [obj] = SpatialBatchNorm(name, eps, momentum, index, inLayer)
+            tic;
+            
             obj.name = name;
             obj.index = index;            
             obj.inputLayer = inLayer;
@@ -44,6 +46,9 @@ classdef SpatialBatchNorm < BaseLayer
                 C = shapeInput(3);
                 obj.weightShape = [1 C];
             end
+            
+            % Get execution time
+            obj.executionTime = toc;
         end
         
         % It's just a call to the normal batchnorm but with some

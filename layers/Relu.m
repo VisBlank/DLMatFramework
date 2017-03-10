@@ -29,9 +29,14 @@ classdef Relu < BaseLayer
         end
         
         function [activations] = ForwardPropagation(obj, input, weights, bias)
+            tic;
+            
             obj.previousInput = input;
             activations = max(0,input);
             obj.activations = activations;
+            
+            % Get execution time
+            obj.executionTime = toc;
         end
         
         function [gradient] = BackwardPropagation(obj, dout)

@@ -59,6 +59,7 @@ classdef MaxPoolLayer < BaseLayer
         end
         
         function [activations] = ForwardPropagation(obj, input, weights, bias)
+            tic;
             % Tensor format (rows,cols,channels, batch) on matlab
             [H,W,C,N] = size(input);
             
@@ -107,6 +108,9 @@ classdef MaxPoolLayer < BaseLayer
             obj.weights = [];
             obj.biases = [];
             obj.previousInput = input;
+            
+            % Get execution time
+            obj.executionTime = toc;
         end
         
         function [gradient] = BackwardPropagation(obj, dout)
