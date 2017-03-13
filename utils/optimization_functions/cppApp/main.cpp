@@ -13,6 +13,16 @@
 
 using namespace std;
 
+#ifdef USE_ROW_MAJOR
+#define MAT_2D(i, j, width) (((i) * (width)) + (j))
+#define MAT_3D(i, j, k, height, width) (((i) * (width)) + (j) + ((k) * (height) * (width)))
+#define MAT_4D(i, j, k, l, height, width, depth) (((i) * (width)) + (j) + ((k) * (height) * (width)) + ((l) * (height) * (width) * (depth)))
+#else
+#define MAT_2D(i, j, height) (((j) * (height)) + (i))
+#define MAT_3D(i, j, k, height, width) (((j) * (height)) + (i) + ((k) * (height) * (width)))
+#define MAT_4D(i, j, k, l, height, width, depth) (((j) * (height)) + (i) + ((k) * (height) * (width)) + ((l) * (height) * (width) * (depth)))
+#endif
+
 template <typename T>
 class Tensor {
 private:
@@ -33,9 +43,17 @@ public:
     m_numElements = prodDims;
   }
 
-  void print() {
+  /*void print() {
 
   }
+
+  T& operator()(int row, int col){
+
+  }
+
+  const T& operator()(int row, int col) const{
+
+  }*/
 
 };
 
