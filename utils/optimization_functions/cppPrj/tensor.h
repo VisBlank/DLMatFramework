@@ -30,10 +30,21 @@ private:
     vector<T> m_buffer;
     int m_num_dims;
     int m_numElements;
-    vector<int> m_dims;
+    vector<int> m_dims;    
 public:
     // Delete default Constructor
-    Tensor() = delete;
+    //Tensor() = delete;
+    Tensor(){}
+
+    void SetDims(const vector<int> &dims){
+        m_num_dims = dims.size();
+        // Do a "prod" of all elements on vector
+        int prodDims = 1;
+        for_each(dims.begin(), dims.end(), [&] (int m){prodDims *= m;});
+        // Initialize vector with prodDims size and fill with zeros
+        m_buffer = vector<T>(prodDims,0);
+        m_numElements = prodDims;
+    }
 
     Tensor (const vector<int> &dims):m_dims(dims){
         m_num_dims = dims.size();
@@ -55,7 +66,7 @@ public:
     // Return a reference of our buffer (Will break thread safeness)
     vector<T> &GetBufferRef() {return ref(m_buffer);}
 
-    // The cont here means that this method will not change the class members
+    // The cont here means that this method will not change the class members    
     void print() const{
         auto start = m_buffer.begin();
         auto ncols = m_dims[1];

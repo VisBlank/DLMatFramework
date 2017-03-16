@@ -7,7 +7,6 @@ QMAKE_CXXFLAGS += -fopenmp
 
 SOURCES += main.cpp \
     tensor.cpp \
-    baselayer.cpp \
     layercontainer.cpp \
     baseloss.cpp \
     solver.cpp \
@@ -19,7 +18,8 @@ SOURCES += main.cpp \
     multiclasscrossentropy.cpp \
     meansquarederror.cpp \
     crossentropy.cpp \
-    lossfactory.cpp
+    lossfactory.cpp \
+    relu.cpp
 
 HEADERS += \
     tensor.h \
@@ -35,4 +35,5 @@ HEADERS += \
     multiclasscrossentropy.h \
     meansquarederror.h \
     crossentropy.h \
-    lossfactory.h
+    lossfactory.h \
+    relu.h
