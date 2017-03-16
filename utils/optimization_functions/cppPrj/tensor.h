@@ -101,18 +101,20 @@ public:
         return result;
     }
 
-    Tensor<T> operator*(T b){
+    Tensor<T> operator*(T b) const{
         // Create result tensor with same dimensions
         Tensor<T> result(vector<int>({m_dims}));
+
+        // Get a reference to the result tensor buffer
         vector<T> &resVec = result.GetBufferRef();
 
         // For each element of m_buffer multiply by b and store the result on resVec
-        transform(m_buffer.begin(), m_buffer.end(), resVec.begin(),std::bind1st(std::multiplies<T>(),b));
+        transform(m_buffer.begin(), m_buffer.end(), resVec.begin(),std::bind1st(std::multiplies<T>(),b));        
 
         return result;
     }
 
-    Tensor<T> operator+(Tensor &b){
+    Tensor<T> operator+(Tensor &b) const {
         // Create result tensor with same dimensions
         Tensor<T> result(vector<int>({m_dims}));
         vector<int> bDims = b.GetDims();
@@ -129,7 +131,20 @@ public:
         return result;
     }
 
-    Tensor<T> operator-(Tensor &b){
+    Tensor<T> operator+(T b) const {
+        // Create result tensor with same dimensions
+        Tensor<T> result(vector<int>({m_dims}));
+
+        // Get a reference to the result tensor buffer
+        vector<T> &resVec = result.GetBufferRef();
+
+        // For each element of m_buffer multiply by b and store the result on resVec
+        transform(m_buffer.begin(), m_buffer.end(), resVec.begin(),std::bind1st(std::plus<T>(),b));
+
+        return result;
+    }
+
+    Tensor<T> operator-(Tensor &b) const {
         // Create result tensor with same dimensions
         Tensor<T> result(vector<int>({m_dims}));
         vector<int> bDims = b.GetDims();
@@ -146,7 +161,7 @@ public:
         return result;
     }
 
-    Tensor<T> operator=(Tensor &other){
+    Tensor<T> operator=(const Tensor &other){
         // Create result tensor with same dimensions
         Tensor<T> result(vector<int>({m_dims}));
         vector<T> &otherVec = other.GetBufferRef();

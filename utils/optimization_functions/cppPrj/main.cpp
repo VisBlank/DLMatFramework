@@ -29,7 +29,7 @@ int main() {
     cout << "Matrix B:" << endl;
     B.print();
 
-    Tensor<float>C = A*B;
+    Tensor<float>C = A*B; // C.assign(A.mult(B));
     cout << "A*B" << endl;
     C.print();
 
@@ -48,6 +48,10 @@ int main() {
     Tensor<float>G = A*(float)2.5;
     cout << "G=A*2.5" << endl;
     G.print();
+
+    Tensor<float>H = A+(float)1.1;
+    cout << "H=A*1.1" << endl;
+    H.print();
 
     return 0;
 }
