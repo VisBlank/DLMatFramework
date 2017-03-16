@@ -101,7 +101,7 @@ public:
         return result;
     }
 
-    Tensor<T> operator*(T b) const{
+    Tensor<T> operator*(const T b) const{
         // Create result tensor with same dimensions
         Tensor<T> result(vector<int>({m_dims}));
 
@@ -131,7 +131,7 @@ public:
         return result;
     }
 
-    Tensor<T> operator+(T b) const {
+    Tensor<T> operator+(const T b) const {
         // Create result tensor with same dimensions
         Tensor<T> result(vector<int>({m_dims}));
 
