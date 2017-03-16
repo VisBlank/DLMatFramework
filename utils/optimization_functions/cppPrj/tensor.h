@@ -63,7 +63,7 @@ public:
             // Get a slice from the vector
             vector<T> rowSlice(start, start + m_dims[1]);
             cout << "| ";
-            for_each(rowSlice.begin(), rowSlice.end(), [](int m){cout << m << " ";});
+            for_each(rowSlice.begin(), rowSlice.end(), [](T m){cout << m << " ";});
             start += ncols;
             cout << "|" << endl;
         }
@@ -101,6 +101,17 @@ public:
         return result;
     }
 
+    Tensor<T> operator*(T b){
+        // Create result tensor with same dimensions
+        Tensor<T> result(vector<int>({m_dims}));
+        vector<T> &resVec = result.GetBufferRef();
+
+        // For each element of m_buffer multiply by b and store the result on resVec
+        transform(m_buffer.begin(), m_buffer.end(), resVec.begin(),std::bind1st(std::multiplies<T>(),b));
+
+        return result;
+    }
+
     Tensor<T> operator+(Tensor &b){
         // Create result tensor with same dimensions
         Tensor<T> result(vector<int>({m_dims}));
@@ -114,6 +125,23 @@ public:
 
         // Add contents of A and B and store results on resVec
         transform(m_buffer.begin(), m_buffer.end(), bVec.begin(),resVec.begin(), plus<T>());
+
+        return result;
+    }
+
+    Tensor<T> operator-(Tensor &b){
+        // Create result tensor with same dimensions
+        Tensor<T> result(vector<int>({m_dims}));
+        vector<int> bDims = b.GetDims();
+        if (bDims != m_dims){
+            throw invalid_argument("Dimensions must match.");
+        }
+        // Get vector reference from b and result
+        vector<T> &bVec = b.GetBufferRef();
+        vector<T> &resVec = result.GetBufferRef();
+
+        // Add contents of A and B and store results on resVec
+        transform(m_buffer.begin(), m_buffer.end(), bVec.begin(),resVec.begin(), minus<T>());
 
         return result;
     }

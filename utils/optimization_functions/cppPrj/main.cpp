@@ -37,9 +37,17 @@ int main() {
     cout << "A+B" << endl;
     D.print();
 
-    Tensor<float>E = B;
-    cout << "E=B" << endl;
+    Tensor<float>E = A-B;
+    cout << "A-B" << endl;
     E.print();
+
+    Tensor<float>F = B;
+    cout << "F=B" << endl;
+    F.print();
+
+    Tensor<float>G = A*(float)2.5;
+    cout << "G=A*2.5" << endl;
+    G.print();
 
     return 0;
 }
