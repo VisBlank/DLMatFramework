@@ -33,5 +33,13 @@ int main() {
     cout << "A*B" << endl;
     C.print();
 
+    Tensor<float>D = A+B;
+    cout << "A+B" << endl;
+    D.print();
+
+    Tensor<float>E = B;
+    cout << "E=B" << endl;
+    E.print();
+
     return 0;
 }

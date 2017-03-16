@@ -93,11 +93,37 @@ public:
             for (int k=0; k<num_cols_B; ++k) {
                 T sum = 0;
                 for (int j=0; j<num_cols_A; ++j){
-                    sum += (*this)(j,k) * b(j,k);
+                    sum += (*this)(i,j) * b(j,k);
                 }
                 result(i,k) = sum;
             }
         }
+        return result;
+    }
+
+    Tensor<T> operator+(Tensor &b){
+        // Create result tensor with same dimensions
+        Tensor<T> result(vector<int>({m_dims}));
+        vector<int> bDims = b.GetDims();
+        if (bDims != m_dims){
+            throw invalid_argument("Dimensions must match.");
+        }
+        // Get vector reference from b and result
+        vector<T> &bVec = b.GetBufferRef();
+        vector<T> &resVec = result.GetBufferRef();
+
+        // Add contents of A and B and store results on resVec
+        transform(m_buffer.begin(), m_buffer.end(), bVec.begin(),resVec.begin(), plus<T>());
+
+        return result;
+    }
+
+    Tensor<T> operator=(Tensor &other){
+        // Create result tensor with same dimensions
+        Tensor<T> result(vector<int>({m_dims}));
+        vector<T> &otherVec = other.GetBufferRef();
+        vector<T> &resVec = result.GetBufferRef();
+        copy(otherVec.begin(), otherVec.end(), resVec.begin());
         return result;
     }
 
