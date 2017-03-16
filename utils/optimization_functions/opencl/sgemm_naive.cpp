@@ -15,7 +15,7 @@
 /*#define KERNEL_FILENAME "./optimization_functions/opencl/matrix_mul_coarsening.cl"*/
 /*#define KERNEL_FILENAME "./optimization_functions/opencl/matrix_mul_data_reuse.cl"*/
 /*#define KERNEL_FILENAME "./optimization_functions/opencl/matrix_mul_data_local.cl"*/
-#define KERNEL_FILENAME "./optimization_functions/opencl/matrix_mul_naive.cl"
+#define KERNEL_FILENAME "./utils/optimization_functions/opencl/sgemm_naive.cl"
 
 cl_platform_id cpPlatform;     /* OpenCL platform */
 cl_device_id device_id;        /* device ID */
