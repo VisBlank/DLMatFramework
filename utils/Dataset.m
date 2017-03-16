@@ -23,8 +23,10 @@ classdef (Sealed) Dataset < handle
         m_meanImage;
         m_augmenter;
         hasValidation = false;
-        iterationCounter = 1;
-        shuffleTime = 10;
+        batchPosition = 1;
+        iterationCounter = 0;
+        shuffleTime = 0;
+        indexShuffle;
     end
     
     methods(Access = private)
@@ -124,10 +126,28 @@ classdef (Sealed) Dataset < handle
             if (batchSize <= 0)
                 batchSize = obj.m_trainingSize;
             end
-            selIndex = randperm(obj.m_trainingSize);
-            %% TODO: I don't know if I need to reshufle every new batch
-            %selIndex = [1:1:batchSize];
-            selIndex = selIndex(1:batchSize);
+            
+            % Shuffle dataset on first iteration or if reaching set iter.
+            % Then reset the counter for place in the batch and set iter
+            if (obj.iterationCounter == 0 || obj.iterationCounter == obj.shuffleTime)
+                obj.indexShuffle = randperm(obj.m_trainingSize);
+                obj.batchPosition = 1;
+                obj.iterationCounter = 0;
+            end
+            selIndex = obj.indexShuffle;
+            
+            % Check if batch will take more elements than are left in the
+            % dataset to take
+            if (obj.batchPosition + batchSize -1  > size(selIndex,2))
+                remainingBatchSize = batchSize - length(selIndex(obj.batchPosition:end));
+                selIndex = [selIndex(obj.batchPosition:end) selIndex(1:remainingBatchSize)];
+                obj.batchPosition = 1;
+                warning('Not enough data left for complete batch')
+            else
+                selIndex = selIndex(obj.batchPosition:obj.batchPosition + batchSize - 1);
+                obj.batchPosition = obj.batchPosition + batchSize;
+            end
+            
             batch.X = obj.m_X_Tensor(:,:,:,selIndex);
             batch.Y = obj.m_Y_one_hot(selIndex,:);
             
@@ -140,6 +160,8 @@ classdef (Sealed) Dataset < handle
             if obj.m_doMeanImageNorm || obj.m_doMeanPixelNorm
                 batch.X = obj.NormalizeImage(batch.X);
             end
+            
+            obj.iterationCounter = obj.iterationCounter + 1;
         end
         
         function batch = GetValidationBatch(obj,batchSize)

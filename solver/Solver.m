@@ -192,7 +192,7 @@ classdef Solver < handle
                 
                 % At the end of the epoch increment counter and decay
                 % learning rate
-                epoch_end = mod((t + 1), iterations_per_epoch) == 0;
+                epoch_end = mod((t), iterations_per_epoch) == 0;
                 if epoch_end
                     fprintf('Finished epoch %d/%d\n',obj.m_currEpoch+1,obj.m_num_epochs);
                     obj.m_currEpoch = obj.m_currEpoch+1;
