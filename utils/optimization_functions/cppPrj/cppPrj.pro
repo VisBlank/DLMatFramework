@@ -17,7 +17,6 @@ SOURCES += main.cpp \
     loss/multiclasscrossentropy.cpp \
     solver/baseoptimizer.cpp \
     layers/layercontainer.cpp \
-    layers/relu.cpp \
     classifier/deeplearningmodel.cpp \
     utils/tensor.cpp
 
@@ -36,4 +35,9 @@ HEADERS += \
     layers/layercontainer.h \
     layers/relu.h \
     classifier/deeplearningmodel.h \
-    utils/tensor.h
+    utils/tensor.h \
+    test/catch.hpp \
+    layers/layermetadata.h \
+    layers/fullyconnected.h \
+    layers/softmax.h \
+    layers/inputlayer.h

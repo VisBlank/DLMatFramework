@@ -4,20 +4,19 @@
 #include <memory>
 #include <vector>
 #include <algorithm>
-#include "tensor.h"
+#include "utils/tensor.h"
 
 using namespace std;
 
 class BaseLayer
 {
-public:
-    //BaseLayer(string name, int index): m_name(name), m_index(index){}
-    //BaseLayer();
+public:        
     virtual Tensor<float> ForwardPropagation(const Tensor<float> &input) = 0;
     virtual Tensor<float> BackwardPropagation() = 0;
 
     void SetWeights(shared_ptr<Tensor<float>> weights){m_weights = weights;}
     void SetBias(shared_ptr<Tensor<float>> weights){m_bias = weights;}
+    string GetName() {return m_name;}
 
 protected:
     // Weights and bias are references, we don't need to store them
@@ -31,10 +30,9 @@ protected:
     vector<int> m_activationShape;
 
     string m_name;
-    int m_index;
 
-    // Reference to layers connected to this current layer
-    BaseLayer *m_inputLayer = nullptr;
+    // Reference to layers connected to this current layer    
+    shared_ptr<BaseLayer> m_inputLayer = nullptr;
 };
 
 #endif // BASELAYER_H

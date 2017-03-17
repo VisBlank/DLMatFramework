@@ -10,6 +10,7 @@ http://stackoverflow.com/questions/8384234/return-reference-to-a-vector-member-v
 https://mbevin.wordpress.com/2012/11/20/move-semantics/
 */
 #include "utils/tensor.h"
+#include "layers/layercontainer.h"
 
 
 int main() {    
@@ -52,6 +53,14 @@ int main() {
     Tensor<float>H = A+(float)1.1;
     cout << "H=A*1.1" << endl;
     H.print();
+
+    cout << "Create Model strucutre" << endl;
+    LayerContainer layers;
+    layers <= LayerMetaData{"Input",LayerType::TInput};
+    layers <= LayerMetaData{"FC_1",LayerType::TFullyConnected};
+    layers <= LayerMetaData{"Relu_1",LayerType::TRelu};
+    layers <= LayerMetaData{"FC_2",LayerType::TFullyConnected};
+    layers <= LayerMetaData{"Softmax",LayerType::TSoftMax};
 
     return 0;
 }
