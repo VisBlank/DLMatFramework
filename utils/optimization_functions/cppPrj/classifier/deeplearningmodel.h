@@ -14,7 +14,9 @@ public:
 
     DeepLearningModel(const LayerContainer &lc, shared_ptr<BaseLoss> bl):m_layers(lc){
         m_loss = bl;
-        auto loss = m_loss->GetLossAndGradients(Tensor<float>(),Tensor<float>());
+        Tensor<float> A(vector<int>({4,1}),{0,1,1,0});
+        Tensor<float> B(vector<int>({4,1}),{0,1,1,0});
+        auto loss = m_loss->GetLossAndGradients(A,B);
     }
 };
 

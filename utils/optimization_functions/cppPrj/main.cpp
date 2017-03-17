@@ -13,6 +13,7 @@ https://mbevin.wordpress.com/2012/11/20/move-semantics/
 #include "layers/layercontainer.h"
 #include "loss/lossfactory.h"
 #include "classifier/deeplearningmodel.h"
+#include "utils/mathhelper.h"
 
 
 int main() {    
@@ -55,6 +56,14 @@ int main() {
     Tensor<float>H = A+(float)1.1;
     cout << "H=A*1.1" << endl;
     H.print();
+
+    cout << "Test SumVec and ProdVec" << endl;
+    Tensor<float> someVec(vector<int>({1,4}),{1,2,3,4});
+    someVec.print();
+    float testSum = MathHelper<float>::SumVec(someVec);
+    float testProd = MathHelper<float>::ProdVec(someVec);
+    cout << "Sum vector someVec=" << testSum << endl;
+    cout << "Prod vector someVec=" << testProd << endl;
 
     /*
         Xor problem

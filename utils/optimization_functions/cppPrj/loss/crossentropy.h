@@ -1,3 +1,8 @@
+/*
+    Cross Entropy: Use for binary class classification
+    References:
+    https://visualstudiomagazine.com/articles/2014/04/01/neural-network-cross-entropy-error.aspx
+*/
 #ifndef CROSSENTROPY_H
 #define CROSSENTROPY_H
 #include "baseloss.h"

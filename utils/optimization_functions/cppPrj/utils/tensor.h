@@ -81,7 +81,7 @@ public:
 
     // Return a copy of our buffer (safer)
     vector<T> GetBufferCopy() const {return m_buffer;}
-    // Return a reference of our buffer (Will break thread safeness)
+    // Return a reference of our buffer (Will break thread safeness, and encapsulation)
     vector<T> &GetBufferRef() {return ref(m_buffer);}
 
     // The cont here means that this method will not change the class members    
@@ -144,7 +144,7 @@ public:
         return result;
     }
 
-    Tensor<T> operator+(Tensor &b) const {
+    Tensor<T> operator+(const Tensor &b) const {
         // Create result tensor with same dimensions
         Tensor<T> result(vector<int>({m_dims}));
         vector<int> bDims = b.GetDims();
@@ -152,7 +152,7 @@ public:
             throw invalid_argument("Dimensions must match.");
         }
         // Get vector reference from b and result
-        vector<T> &bVec = b.GetBufferRef();
+        vector<T> bVec = b.GetBufferCopy();
         vector<T> &resVec = result.GetBufferRef();
 
         // Add contents of A and B and store results on resVec
@@ -174,15 +174,15 @@ public:
         return result;
     }
 
-    Tensor<T> operator-(Tensor &b) const {
+    Tensor<T> operator-(const Tensor &b) const {
         // Create result tensor with same dimensions
         Tensor<T> result(vector<int>({m_dims}));
         vector<int> bDims = b.GetDims();
         if (bDims != m_dims){
             throw invalid_argument("Dimensions must match.");
         }
-        // Get vector reference from b and result
-        vector<T> &bVec = b.GetBufferRef();
+        // Get vector copy from b and reference to result
+        vector<T> bVec = b.GetBufferCopy();
         vector<T> &resVec = result.GetBufferRef();
 
         // Add contents of A and B and store results on resVec

@@ -17,7 +17,8 @@ SOURCES += main.cpp \
     solver/baseoptimizer.cpp \
     layers/layercontainer.cpp \
     classifier/deeplearningmodel.cpp \
-    utils/tensor.cpp
+    utils/tensor.cpp \
+    utils/mathhelper.cpp
 
 HEADERS += \    
     loss/lossfactory.h \
@@ -39,4 +40,5 @@ HEADERS += \
     layers/layermetadata.h \
     layers/fullyconnected.h \
     layers/softmax.h \
-    layers/inputlayer.h
+    layers/inputlayer.h \
+    utils/mathhelper.h
