@@ -6,7 +6,6 @@ LIBS += -fopenmp
 QMAKE_CXXFLAGS += -fopenmp
 
 SOURCES += main.cpp \    
-    loss/lossfactory.cpp \
     solver/adam.cpp \
     solver/sgd.cpp \
     solver/sgdmomentum.cpp \

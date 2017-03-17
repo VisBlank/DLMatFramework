@@ -11,6 +11,8 @@ https://mbevin.wordpress.com/2012/11/20/move-semantics/
 */
 #include "utils/tensor.h"
 #include "layers/layercontainer.h"
+#include "loss/lossfactory.h"
+#include "classifier/deeplearningmodel.h"
 
 
 int main() {    
@@ -54,13 +56,26 @@ int main() {
     cout << "H=A*1.1" << endl;
     H.print();
 
-    cout << "Create Model strucutre" << endl;
+    /*
+        Xor problem
+    */
+    cout << "XOR Problem" << endl;
+    // Define input/label matrices(2d tensor)
+    Tensor<float> X(vector<int>({4,2}),{0,0,0,1,1,0,1,1});
+    Tensor<float> Y(vector<int>({4,1}),{0,1,1,0});
+
+    cout << "Xor input" << endl;X.print();
+    cout << "Xor output" << endl;Y.print();
+
+    // Define model structure
     LayerContainer layers;
     layers <= LayerMetaData{"Input",LayerType::TInput};
     layers <= LayerMetaData{"FC_1",LayerType::TFullyConnected};
     layers <= LayerMetaData{"Relu_1",LayerType::TRelu};
     layers <= LayerMetaData{"FC_2",LayerType::TFullyConnected};
     layers <= LayerMetaData{"Softmax",LayerType::TSoftMax};
+
+    DeepLearningModel net(layers,LossFactory<CrossEntropy>::GetLoss());
 
     return 0;
 }

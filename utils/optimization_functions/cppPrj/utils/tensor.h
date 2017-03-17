@@ -1,3 +1,10 @@
+/*
+Tensor type
+References:
+http://www.learncpp.com/cpp-tutorial/99-overloading-the-parenthesis-operator/
+https://leonardoaraujosantos.gitbooks.io/opencl/content/bigger_matrix_multiply_problem.html
+http://stackoverflow.com/questions/27873719/c-get-initializer-list-for-constructor-with-other-parameters
+*/
 #ifndef TENSOR_H
 #define TENSOR_H
 
@@ -9,6 +16,7 @@
 #include <algorithm>
 #include <array>
 #include <stdexcept>
+#include <initializer_list>
 
 using namespace std;
 
@@ -28,21 +36,29 @@ class Tensor {
 private:
     //unique_ptr<T[]> m_buffer;
     vector<T> m_buffer;
+    vector<int> m_dims;
     int m_num_dims;
-    int m_numElements;
-    vector<int> m_dims;    
+    int m_numElements;    
 public:
     // Delete default Constructor
     //Tensor() = delete;
-    Tensor(){}
+    Tensor(){};
+    Tensor(const vector<int> &dims, initializer_list<T> list){
+        m_buffer = vector<T>(list.size(),0);
+        copy(list.begin(), list.end(), m_buffer.begin());
+        SetDims(dims);
+    }
+    Tensor(initializer_list<T> list){
+        m_buffer = vector<T>(list.size(),0);
+        copy(list.begin(), list.end(), m_buffer.begin());
+    }
 
     void SetDims(const vector<int> &dims){
+        m_dims = dims;
         m_num_dims = dims.size();
         // Do a "prod" of all elements on vector
         int prodDims = 1;
-        for_each(dims.begin(), dims.end(), [&] (int m){prodDims *= m;});
-        // Initialize vector with prodDims size and fill with zeros
-        m_buffer = vector<T>(prodDims,0);
+        for_each(dims.begin(), dims.end(), [&] (int m){prodDims *= m;});        
         m_numElements = prodDims;
     }
 
@@ -60,6 +76,8 @@ public:
     // The expected format will be rows,cols,channel,batch
     int GetNumDims() const{return m_num_dims;}
     vector<int> GetDims() const{return m_dims;}
+    int GetRows() const {return m_dims[0];};
+    int GetCols() const {return m_dims[1];};
 
     // Return a copy of our buffer (safer)
     vector<T> GetBufferCopy() const {return m_buffer;}
@@ -70,7 +88,8 @@ public:
     void print() const{
         auto start = m_buffer.begin();
         auto ncols = m_dims[1];
-        for (int i = 0; i < ncols; ++i){
+        auto nrows = m_dims[0];
+        for (int i = 0; i < nrows; ++i){
             // Get a slice from the vector
             vector<T> rowSlice(start, start + m_dims[1]);
             cout << "| ";
