@@ -19,6 +19,18 @@ T MathHelper<T>::ProdVec(const Tensor<T> &in){
     return res;
 }
 
+template<typename T>
+Tensor<T> MathHelper<T>::Log(const Tensor<T> &in){
+    Tensor<T> result(vector<int>({in.GetDims()}));
+
+    // Get a reference to the result tensor buffer
+    vector<T> &resVec = result.GetBufferRef();
+
+    // For each element of m_buffer multiply by b and store the result on resVec
+    //transform(m_buffer.begin(), m_buffer.end(), resVec.begin(),std::bind1st(std::multiplies<T>(),b));
+    return result;
+}
+
 // Explicit template instantiation
 template class MathHelper<float>;
 template class MathHelper<double>;
