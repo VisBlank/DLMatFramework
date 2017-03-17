@@ -2,6 +2,8 @@
     Layer container
     References:
     http://thispointer.com/unordered_map-usage-tutorial-and-example/
+    http://codereview.stackexchange.com/questions/114304/c-graph-implementation
+    http://blog.coldflake.com/posts/Testing-C++-with-a-new-Catch/
 */
 #ifndef LAYERCONTAINER_H
 #define LAYERCONTAINER_H
@@ -12,6 +14,8 @@
 #include <algorithm>
 #include <utility>
 #include <memory>
+#include <vector>
+#include <list>
 
 #include <layers/inputlayer.h>
 #include <layers/relu.h>
@@ -51,12 +55,25 @@ public:
     }
 
     int GetNumLayers() const { return m_numLayers;}
+    vector<list<shared_ptr<BaseLayer>>> GetGraph() const {return m_adjacency_vector;}
+
+    void BuildGraph(){
+        // Populate the Adjacency vector
+    }
+
 private:
     // Hash map of layers unique pointers (Remember that they should be moved here...)
     unordered_map<string,shared_ptr<BaseLayer>> m_hashMapLayers;
+
     // Number of layers
     int m_numLayers = 0;
+
+    // Used to store the last inserted layer
     shared_ptr<BaseLayer> m_currentLayer = nullptr;
+
+    // Adjacency vector (vector of list of pointers to layers)
+    vector<list<shared_ptr<BaseLayer>>> m_adjacency_vector;
+
 };
 
 #endif // LAYERCONTAINER_H

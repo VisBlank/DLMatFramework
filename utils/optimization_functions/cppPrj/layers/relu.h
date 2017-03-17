@@ -6,6 +6,7 @@ using namespace std;
 class Relu : public BaseLayer
 {
 public:
+    // We don't pass a shared_ptr or unique_ptr as reference
     Relu(const string &name, shared_ptr<BaseLayer> inLayer){
         m_inputLayer = inLayer;
         m_name = name;
