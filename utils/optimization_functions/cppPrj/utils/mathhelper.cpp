@@ -6,29 +6,23 @@
 */
 
 template<typename T>
-T MathHelper<T>::SumVec(const Tensor<T> &in){
-    vector<T> inVec = in.GetBufferCopy();
-    T res = accumulate(inVec.begin(), inVec.end(),0);
+T MathHelper<T>::SumVec(const Tensor<T> &in){    
+    T res = accumulate(in.begin(), in.end(),0);
     return res;
 }
 
 template<typename T>
-T MathHelper<T>::ProdVec(const Tensor<T> &in){
-    vector<T> inVec = in.GetBufferCopy();
-    T res = accumulate(inVec.begin(), inVec.end(),1,multiplies<T>());
+T MathHelper<T>::ProdVec(const Tensor<T> &in){    
+    T res = accumulate(in.begin(), in.end(),1,multiplies<T>());
     return res;
 }
 
 template<typename T>
 Tensor<T> MathHelper<T>::Log(const Tensor<T> &in){
-    Tensor<T> result(vector<int>({in.GetDims()}));
-
-    // Get a reference to the result tensor buffer
-    vector<T> &resVec = result.GetBufferRef();
-    vector<T> inVec = in.GetBufferCopy();
+    Tensor<T> result(vector<int>({in.GetDims()}));    
 
     // For each element of invVec apply log(element) and store the result on resVec
-    transform(inVec.begin(), inVec.end(), resVec.begin(),[](T m) -> T {return log(m);});
+    transform(in.begin(), in.end(), result.begin(),[](T m) -> T {return log(m);});
     return result;
 }
 

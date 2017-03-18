@@ -74,15 +74,13 @@ public:
 
     // A const method does not change it's class members
     // The expected format will be rows,cols,channel,batch
-    int GetNumDims() const{return m_num_dims;}
-    vector<int> GetDims() const{return m_dims;}
+    int GetNumDims() const {return m_num_dims;}
+    vector<int> GetDims() const {return m_dims;}
     int GetRows() const {return m_dims[0];}
     int GetCols() const {return m_dims[1];}
 
     // Return a copy of our buffer (safer)
     vector<T> GetBufferCopy() const {return m_buffer;}
-    // Return a reference of our buffer (Will break thread safeness, and encapsulation)
-    vector<T> &GetBufferRef() {return ref(m_buffer);}     
 
     typename std::vector<T>::iterator begin(){
         return m_buffer.begin();
@@ -146,13 +144,10 @@ public:
 
     Tensor<T> operator*(const T b) const{
         // Create result tensor with same dimensions
-        Tensor<T> result(vector<int>({m_dims}));
-
-        // Get a reference to the result tensor buffer
-        vector<T> &resVec = result.GetBufferRef();
+        Tensor<T> result(vector<int>({m_dims}));       
 
         // For each element of m_buffer multiply by b and store the result on resVec
-        transform(m_buffer.begin(), m_buffer.end(), resVec.begin(),std::bind1st(std::multiplies<T>(),b));        
+        transform(m_buffer.begin(), m_buffer.end(), result.begin(),std::bind1st(std::multiplies<T>(),b));
 
         return result;
     }
@@ -163,13 +158,10 @@ public:
         vector<int> bDims = b.GetDims();
         if (bDims != m_dims){
             throw invalid_argument("Dimensions must match.");
-        }
-        // Get vector reference from b and result
-        vector<T> bVec = b.GetBufferCopy();
-        vector<T> &resVec = result.GetBufferRef();
+        }        
 
         // Add contents of A and B and store results on resVec
-        transform(m_buffer.begin(), m_buffer.end(), bVec.begin(),resVec.begin(), plus<T>());
+        transform(m_buffer.begin(), m_buffer.end(), b.begin(),result.begin(), plus<T>());
 
         return result;
     }
@@ -178,11 +170,8 @@ public:
         // Create result tensor with same dimensions
         Tensor<T> result(vector<int>({m_dims}));
 
-        // Get a reference to the result tensor buffer
-        vector<T> &resVec = result.GetBufferRef();
-
         // For each element of m_buffer multiply by b and store the result on resVec
-        transform(m_buffer.begin(), m_buffer.end(), resVec.begin(),std::bind1st(std::plus<T>(),b));
+        transform(m_buffer.begin(), m_buffer.end(), result.begin(),std::bind1st(std::plus<T>(),b));
 
         return result;
     }
@@ -193,23 +182,18 @@ public:
         vector<int> bDims = b.GetDims();
         if (bDims != m_dims){
             throw invalid_argument("Dimensions must match.");
-        }
-        // Get vector copy from b and reference to result
-        vector<T> bVec = b.GetBufferCopy();
-        vector<T> &resVec = result.GetBufferRef();
+        }        
 
         // Add contents of A and B and store results on resVec
-        transform(m_buffer.begin(), m_buffer.end(), bVec.begin(),resVec.begin(), minus<T>());
+        transform(m_buffer.begin(), m_buffer.end(), b.begin(),result.begin(), minus<T>());
 
         return result;
     }
 
-    Tensor<T> operator=(const Tensor &other){
+    Tensor<T> operator=(const Tensor &b){
         // Create result tensor with same dimensions
-        Tensor<T> result(vector<int>({m_dims}));
-        vector<T> &otherVec = other.GetBufferRef();
-        vector<T> &resVec = result.GetBufferRef();
-        copy(otherVec.begin(), otherVec.end(), resVec.begin());
+        Tensor<T> result(vector<int>({m_dims}));        
+        copy(b.begin(), b.end(), result.begin());
         return result;
     }
 
