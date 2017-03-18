@@ -62,8 +62,10 @@ int main() {
     someVec.print();
     float testSum = MathHelper<float>::SumVec(someVec);
     float testProd = MathHelper<float>::ProdVec(someVec);
+    Tensor<float> testLog = MathHelper<float>::Log(someVec);
     cout << "Sum vector someVec=" << testSum << endl;
     cout << "Prod vector someVec=" << testProd << endl;
+    testLog.print();
 
     /*
         Xor problem

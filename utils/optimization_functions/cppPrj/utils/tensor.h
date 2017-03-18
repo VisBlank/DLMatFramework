@@ -76,13 +76,26 @@ public:
     // The expected format will be rows,cols,channel,batch
     int GetNumDims() const{return m_num_dims;}
     vector<int> GetDims() const{return m_dims;}
-    int GetRows() const {return m_dims[0];};
-    int GetCols() const {return m_dims[1];};
+    int GetRows() const {return m_dims[0];}
+    int GetCols() const {return m_dims[1];}
 
     // Return a copy of our buffer (safer)
     vector<T> GetBufferCopy() const {return m_buffer;}
     // Return a reference of our buffer (Will break thread safeness, and encapsulation)
-    vector<T> &GetBufferRef() {return ref(m_buffer);}
+    vector<T> &GetBufferRef() {return ref(m_buffer);}     
+
+    typename std::vector<T>::iterator begin(){
+        return m_buffer.begin();
+    }
+    typename std::vector<T>::iterator end() {
+        return m_buffer.end();
+    }
+    typename std::vector<T>::const_iterator begin() const {
+        return m_buffer.begin();
+    }
+    typename std::vector<T>::const_iterator end() const {
+        return m_buffer.end();
+    }
 
     // The cont here means that this method will not change the class members    
     void print() const{

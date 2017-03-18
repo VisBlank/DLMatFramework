@@ -25,9 +25,10 @@ Tensor<T> MathHelper<T>::Log(const Tensor<T> &in){
 
     // Get a reference to the result tensor buffer
     vector<T> &resVec = result.GetBufferRef();
+    vector<T> inVec = in.GetBufferCopy();
 
-    // For each element of m_buffer multiply by b and store the result on resVec
-    //transform(m_buffer.begin(), m_buffer.end(), resVec.begin(),std::bind1st(std::multiplies<T>(),b));
+    // For each element of invVec apply log(element) and store the result on resVec
+    transform(inVec.begin(), inVec.end(), resVec.begin(),[](T m) -> T {return log(m);});
     return result;
 }
 
