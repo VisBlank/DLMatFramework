@@ -95,6 +95,15 @@ public:
 
         return result;
     }
+    friend Tensor<T> operator-(const T &left, const Tensor<T> &right){
+        // Create result tensor with same dimensions
+        Tensor<T> result(right.GetDims());
+
+        // For each element of m_buffer multiply by b and store the result on resVec
+        transform(right.begin(), right.end(), result.begin(),std::bind1st(std::plus<T>(),left));
+
+        return result;
+    }
 };
 
 #endif // TENSOR_H
