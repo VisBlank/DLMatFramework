@@ -44,6 +44,48 @@ void Tensor<T>::SetDims(const vector<int> &dims){
 }
 
 template<typename T>
+void Tensor<T>::print() const{
+    auto start = m_buffer.begin();
+    auto ncols = m_dims[1];
+    auto nrows = m_dims[0];
+    for (int i = 0; i < nrows; ++i){
+        // Get a slice from the vector
+        vector<T> rowSlice(start, start + m_dims[1]);
+        cout << "| ";
+        for_each(rowSlice.begin(), rowSlice.end(), [](T m){cout << m << " ";});
+        start += ncols;
+        cout << "|" << endl;
+    }
+}
+
+template<typename T>
+typename vector<T>::iterator Tensor<T>::begin(){
+    return m_buffer.begin();
+}
+
+template<typename T>
+typename vector<T>::iterator Tensor<T>::end() {
+    return m_buffer.end();
+}
+
+template<typename T>
+typename vector<T>::const_iterator Tensor<T>::begin() const {
+    return m_buffer.begin();
+}
+
+template<typename T>
+typename vector<T>::const_iterator Tensor<T>::end() const {
+    return m_buffer.end();
+}
+
+template<typename T>
+T &Tensor<T>::operator()(int row, int col){
+    // Using at is safer because it checks the boundaries of the vector
+    //return m_buffer[MAT_2D(row, col,m_dims[1])];
+    return m_buffer.at(MAT_2D(row, col,m_dims[1]));
+}
+
+template<typename T>
 Tensor<T> Tensor<T>::operator+(const T b) const {
     // Create result tensor with same dimensions
     Tensor<T> result(vector<int>({m_dims}));
@@ -66,25 +108,14 @@ Tensor<T> Tensor<T>::operator*(const T b) const{
 }
 
 template<typename T>
-void Tensor<T>::print() const{
-    auto start = m_buffer.begin();
-    auto ncols = m_dims[1];
-    auto nrows = m_dims[0];
-    for (int i = 0; i < nrows; ++i){
-        // Get a slice from the vector
-        vector<T> rowSlice(start, start + m_dims[1]);
-        cout << "| ";
-        for_each(rowSlice.begin(), rowSlice.end(), [](T m){cout << m << " ";});
-        start += ncols;
-        cout << "|" << endl;
-    }
-}
+Tensor<T> Tensor<T>::operator/(const T b) const{
+    // Create result tensor with same dimensions
+    Tensor<T> result(vector<int>({m_dims}));
 
-template<typename T>
-T &Tensor<T>::operator()(int row, int col){
-    // Using at is safer because it checks the boundaries of the vector
-    //return m_buffer[MAT_2D(row, col,m_dims[1])];
-    return m_buffer.at(MAT_2D(row, col,m_dims[1]));
+    // For each element of m_buffer multiply by b and store the result on resVec
+    transform(m_buffer.begin(), m_buffer.end(), result.begin(),std::bind1st(std::divides<T>(),b));
+
+    return result;
 }
 
 template<typename T>
@@ -146,6 +177,33 @@ Tensor<T> Tensor<T>::operator=(const Tensor &b){
     // Create result tensor with same dimensions
     Tensor<T> result(vector<int>({m_dims}));
     copy(b.begin(), b.end(), result.begin());
+    return result;
+}
+
+template<typename T>
+Tensor<T> Tensor<T>::EltWiseMult(Tensor &b) const{
+    if (GetDims() != b.GetDims()){
+        throw invalid_argument("Both matrices must have same dimension.");
+    }
+    // Create result tensor with same dimensions
+    Tensor<T> result(vector<int>({m_dims}));
+
+    // Add contents of A and B and store results on resVec
+    transform(m_buffer.begin(), m_buffer.end(), b.begin(),result.begin(), multiplies<T>());
+    return result;
+}
+
+template<typename T>
+Tensor<T> Tensor<T>::EltWiseDiv(Tensor &b) const{
+    if (GetDims() != b.GetDims()){
+        throw invalid_argument("Both matrices must have same dimension.");
+    }
+    // Create result tensor with same dimensions
+    Tensor<T> result(vector<int>({m_dims}));
+
+    // Add contents of A and B and store results on resVec
+    transform(m_buffer.begin(), m_buffer.end(), b.begin(),result.begin(), divides<T>());
+
     return result;
 }
 

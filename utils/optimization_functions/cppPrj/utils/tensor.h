@@ -4,6 +4,7 @@ References:
 http://www.learncpp.com/cpp-tutorial/99-overloading-the-parenthesis-operator/
 https://leonardoaraujosantos.gitbooks.io/opencl/content/bigger_matrix_multiply_problem.html
 http://stackoverflow.com/questions/27873719/c-get-initializer-list-for-constructor-with-other-parameters
+http://www.learncpp.com/cpp-tutorial/92-overloading-the-arithmetic-operators-using-friend-functions/
 */
 #ifndef TENSOR_H
 #define TENSOR_H
@@ -38,7 +39,7 @@ private:
     vector<T> m_buffer;
     vector<int> m_dims;
     int m_num_dims;
-    int m_numElements;    
+    int m_numElements;
 public:
     // Delete default Constructor
     //Tensor() = delete;
@@ -47,10 +48,10 @@ public:
     // Allows aggregate initialization
     //http://en.cppreference.com/w/cpp/language/aggregate_initialization
     Tensor(initializer_list<T> list);
-
     Tensor (const vector<int> &dims);
 
     void SetDims(const vector<int> &dims);
+    void print() const;
 
     // The expected format will be rows,cols,channel,batch
     int GetNumDims() const {return m_num_dims;}
@@ -58,23 +59,14 @@ public:
     int GetRows() const {return m_dims[0];}
     int GetCols() const {return m_dims[1];}
 
-    // Return a copy of our buffer (safer)
+    // Return a copy of our buffer (Safe)
     vector<T> GetBufferCopy() const {return m_buffer;}
 
-    typename std::vector<T>::iterator begin(){
-        return m_buffer.begin();
-    }
-    typename std::vector<T>::iterator end() {
-        return m_buffer.end();
-    }
-    typename std::vector<T>::const_iterator begin() const {
-        return m_buffer.begin();
-    }
-    typename std::vector<T>::const_iterator end() const {
-        return m_buffer.end();
-    }
-
-    void print() const;
+    // Iterators to manipulate the vector class member
+    typename std::vector<T>::iterator begin();
+    typename std::vector<T>::iterator end();
+    typename std::vector<T>::const_iterator begin() const;
+    typename std::vector<T>::const_iterator end() const;
 
     /*
         Overload the "()" and "*" operators to make it feel like matlab
@@ -83,11 +75,26 @@ public:
     T& operator()(int row, int col);
     Tensor<T> operator*(Tensor &b);
     Tensor<T> operator*(const T b) const;
+    Tensor<T> operator/(const T b) const;
     Tensor<T> operator+(const Tensor &b) const;
     Tensor<T> operator+(const T b) const;
     Tensor<T> operator-(const Tensor &b) const;
     Tensor<T> operator=(const Tensor &b);
 
+    // Element-wise operations
+    Tensor<T> EltWiseMult(Tensor &b) const;
+    Tensor<T> EltWiseDiv(Tensor &b) const;
+
+    // A friend operator can see the private elements of this class
+    friend Tensor<T> operator+(const T &left, const Tensor<T> &right){
+        // Create result tensor with same dimensions
+        Tensor<T> result(right.GetDims());
+
+        // For each element of m_buffer multiply by b and store the result on resVec
+        transform(right.begin(), right.end(), result.begin(),std::bind1st(std::plus<T>(),left));
+
+        return result;
+    }
 };
 
 #endif // TENSOR_H

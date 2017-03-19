@@ -57,6 +57,18 @@ int main() {
     cout << "H=A*1.1" << endl;
     H.print();
 
+    Tensor<float>I = A.EltWiseMult(A);
+    cout << "I=A.*A" << endl;
+    I.print();
+
+    Tensor<float>J = A.EltWiseDiv(A);
+    cout << "J=A./A" << endl;
+    J.print();
+
+    Tensor<float>L = (float)1.0+A;
+    cout << "L=1+A" << endl;
+    L.print();
+
     cout << "Test SumVec and ProdVec" << endl;
     Tensor<float> someVec(vector<int>({1,4}),{1,2,3,4});
     someVec.print();
