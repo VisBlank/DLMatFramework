@@ -18,6 +18,7 @@ https://mbevin.wordpress.com/2012/11/20/move-semantics/
 #include "solver/sgd.h"
 #include "layers/baselayer.h"
 #include "layers/sigmoid.h"
+#include "loss/crossentropy.h"
 
 
 int main() {    
@@ -87,6 +88,7 @@ int main() {
     cout << "Prod vector someVec=" << testProd << endl;
     testLog.print();
 
+    // Test Sigmoid
     Tensor<float> input(vector<int>({1,2}),{1.5172, -0.0332});
     Sigmoid sigm("Test",nullptr);
     Tensor<float> fpAct = sigm.ForwardPropagation(input);
@@ -94,6 +96,14 @@ int main() {
     Tensor<float> dout(vector<int>({1,2}),{-0.3002, 0.2004});
     LayerGradient<float> bpAct = sigm.BackwardPropagation(dout);
     cout << "Sigmoid Backward propagation: ";bpAct.dx.print();
+
+    // Test Cross entropy
+    Tensor<float> scores(vector<int>({2,1}),{0.3897, 0.4049});
+    Tensor<float> targets(vector<int>({2,1}),{0.0, 0.0});
+    CrossEntropy cross;
+    auto LossGrad = cross.GetLossAndGradients(scores,targets);
+    cout << "Loss: " << get<0>(LossGrad) << endl;
+    get<1>(LossGrad).print();
 
 
     /*

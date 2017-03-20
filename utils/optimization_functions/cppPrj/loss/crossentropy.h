@@ -6,6 +6,7 @@
 #ifndef CROSSENTROPY_H
 #define CROSSENTROPY_H
 #include "baseloss.h"
+#include "utils/mathhelper.h"
 
 class CrossEntropy : public BaseLoss
 {

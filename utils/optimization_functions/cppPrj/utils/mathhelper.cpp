@@ -7,7 +7,7 @@
 
 template<typename T>
 T MathHelper<T>::SumVec(const Tensor<T> &in){    
-    T res = accumulate(in.begin(), in.end(),0);
+    T res = accumulate(in.begin(), in.end(),T(0));
     return res;
 }
 
