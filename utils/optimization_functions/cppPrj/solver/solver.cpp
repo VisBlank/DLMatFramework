@@ -30,8 +30,10 @@ void Solver::SetBatchSize(int batch){
 }
 
 void Solver::Step(){
-    cout << "Solver::Step" << endl;    
-    Tensor<float> A,B,C;
+    cout << "Solver::Step" << endl;        
+    Tensor<float> A(vector<int>({1,2}),{0,0});
+    Tensor<float> B(vector<int>({1,2}),{0,0});
+    Tensor<float> C(vector<int>({1,2}),{0,0});
     m_optimizer->Optimize(A, B, C);
 }
 

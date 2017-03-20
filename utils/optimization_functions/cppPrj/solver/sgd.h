@@ -1,6 +1,7 @@
 #ifndef SGD_H
 #define SGD_H
 #include "baseoptimizer.h"
+using namespace std;
 
 
 template <typename T>
