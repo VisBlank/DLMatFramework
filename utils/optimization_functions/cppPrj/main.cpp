@@ -135,5 +135,15 @@ int main() {
     solver.SetEpochs(1000);
     solver.Train();
 
+    auto score0 = net.Predict(Tensor<float>(vector<int>({1,2}),{0,0}));
+    auto score1 = net.Predict(Tensor<float>(vector<int>({1,2}),{0,1}));
+    auto score2 = net.Predict(Tensor<float>(vector<int>({1,2}),{1,0}));
+    auto score3 = net.Predict(Tensor<float>(vector<int>({1,2}),{1,1}));
+    cout << "0 XOR 0 :" << endl;
+    cout << "0 XOR 1 :" << endl;
+    cout << "1 XOR 0 :" << endl;
+    cout << "1 XOR 1 :" << endl;
+
+
     return 0;
 }
