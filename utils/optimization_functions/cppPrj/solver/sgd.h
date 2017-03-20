@@ -3,10 +3,12 @@
 #include "baseoptimizer.h"
 
 
-class SGD : public BaseOptimizer
+template <typename T>
+class SGD : public BaseOptimizer<T>
 {
 public:
     SGD();
+    tuple<Tensor<T>, Tensor<T>> Optimize(const Tensor<T> &params, const Tensor<T> &grad_params, const Tensor<T> &state) override;
 };
 
 #endif // SGD_H

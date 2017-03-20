@@ -14,6 +14,8 @@ https://mbevin.wordpress.com/2012/11/20/move-semantics/
 #include "loss/lossfactory.h"
 #include "classifier/deeplearningmodel.h"
 #include "utils/mathhelper.h"
+#include "solver/solver.h"
+#include "solver/sgd.h"
 
 
 int main() {    
@@ -86,6 +88,8 @@ int main() {
     // Define input/label matrices(2d tensor)
     Tensor<float> X(vector<int>({4,2}),{0,0,0,1,1,0,1,1});
     Tensor<float> Y(vector<int>({4,1}),{0,1,1,0});
+    Tensor<float> Xt(vector<int>({4,2}),{0,0,0,1,1,0,1,1});
+    Tensor<float> Yt(vector<int>({4,1}),{0,1,1,0});
 
     cout << "Xor input" << endl;X.print();
     cout << "Xor output" << endl;Y.print();
@@ -99,6 +103,12 @@ int main() {
     layers <= LayerMetaData{"Softmax",LayerType::TSoftMax};
 
     DeepLearningModel net(layers,LossFactory<CrossEntropy>::GetLoss());
+
+    // Create solver and train
+    Solver<float> solver(net,OptimizerType::T_SGD, map<string,float>{{"learning_rate",0.1},{"L2_reg",0}});
+    solver.SetBatchSize(1);
+    solver.SetEpochs(1000);
+    solver.Train();
 
     return 0;
 }

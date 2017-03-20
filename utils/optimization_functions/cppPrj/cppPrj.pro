@@ -14,7 +14,6 @@ SOURCES += main.cpp \
     loss/crossentropy.cpp \
     loss/meansquarederror.cpp \
     loss/multiclasscrossentropy.cpp \
-    solver/baseoptimizer.cpp \
     layers/layercontainer.cpp \
     classifier/deeplearningmodel.cpp \
     utils/tensor.cpp \
