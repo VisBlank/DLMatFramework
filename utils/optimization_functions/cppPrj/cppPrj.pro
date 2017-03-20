@@ -40,4 +40,5 @@ HEADERS += \
     layers/fullyconnected.h \
     layers/softmax.h \
     layers/inputlayer.h \
-    utils/mathhelper.h
+    utils/mathhelper.h \
+    layers/sigmoid.h

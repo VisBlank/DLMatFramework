@@ -1,42 +1,43 @@
 #include "solver.h"
 
-template <typename T>
-Solver<T>::Solver(DeepLearningModel &net, const OptimizerType &type, const map<string, float> &config):m_net(net){
-    /*switch (type) {
-    case OptimizerType::SGD:
-        m_optimizer = new SGD();
+Solver::Solver(DeepLearningModel &net, const OptimizerType &type, const map<string, float> &config):m_net(net){
+    switch (type) {
+    case OptimizerType::T_SGD:
+        m_optimizer = unique_ptr<BaseOptimizer<float>>(new SGD<float>());
         break;
-    case OptimizerType::SGDMomentum:
-        m_optimizer = unique_ptr<BaseOptimizer>(new SGDMomentum());
+    case OptimizerType::T_SGD_Momentum:
+        m_optimizer = unique_ptr<BaseOptimizer<float>>(new SGDMomentum<float>());
         break;
-    case OptimizerType::Adam:
-        m_optimizer = unique_ptr<BaseOptimizer>(new Adam());
+    case OptimizerType::T_Adam:
+        m_optimizer = unique_ptr<BaseOptimizer<float>>(new Adam<float>());
         break;
     default:
         throw invalid_argument("Optimizer not implemented.");
         break;
-    }*/
-    m_optimizer = new Adam<T>();
+    }    
 }
 
-template <typename T>
-void Solver<T>::Train(){
-
+void Solver::Train(){
+    Step();
 }
 
-template <typename T>
-void Solver<T>::SetEpochs(int epochs){
+void Solver::SetEpochs(int epochs){
     m_epochs = epochs;
 }
 
-template <typename T>
-void Solver<T>::SetBatchSize(int batch){
+void Solver::SetBatchSize(int batch){
     m_batchSize = batch;
+}
+
+void Solver::Step(){
+    cout << "Solver::Step" << endl;    
+    Tensor<float> A,B,C;
+    m_optimizer->Optimize(A, B, C);
 }
 
 /*
  * Explicit declare template versions to avoid linker error. (This is needed if we use templates on .cpp files)
 */
-template class Solver<float>;
-template class Solver<double>;
-template class Solver<int>;
+//template class Solver<float>;
+//template class Solver<double>;
+//template class Solver<int>;

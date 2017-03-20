@@ -173,15 +173,32 @@ Tensor<T> Tensor<T>::operator-(const Tensor &b) const{
 }
 
 template<typename T>
-Tensor<T> Tensor<T>::operator=(const Tensor &b){
+Tensor<T> Tensor<T>::operator-() const{
     // Create result tensor with same dimensions
-    Tensor<T> result(vector<int>({m_dims}));
-    copy(b.begin(), b.end(), result.begin());
+    Tensor<T> result = *this;
+
+    // Negate all elements of result tensor
+    transform (result.begin(), result.end(), result.begin(), negate<T>());
+
     return result;
 }
 
 template<typename T>
-Tensor<T> Tensor<T>::EltWiseMult(Tensor &b) const{
+Tensor<T> &Tensor<T>::operator=(const Tensor &b){
+    // Create result tensor with same dimensions
+    //Tensor<T> result(vector<int>({m_dims}));
+    //Tensor<T> result(b.GetDims());
+    //copy(b.begin(), b.end(), result.begin());
+    this->SetDims(b.GetDims());
+    if (this->m_buffer.size() != this->m_numElements){
+        m_buffer = vector<T>(m_numElements,0);
+    }
+    copy(b.begin(), b.end(), m_buffer.begin());
+    return *this;
+}
+
+template<typename T>
+Tensor<T> Tensor<T>::EltWiseMult(const Tensor<T> &b) const{
     if (GetDims() != b.GetDims()){
         throw invalid_argument("Both matrices must have same dimension.");
     }
@@ -194,7 +211,7 @@ Tensor<T> Tensor<T>::EltWiseMult(Tensor &b) const{
 }
 
 template<typename T>
-Tensor<T> Tensor<T>::EltWiseDiv(Tensor &b) const{
+Tensor<T> Tensor<T>::EltWiseDiv(const Tensor<T> &b) const{
     if (GetDims() != b.GetDims()){
         throw invalid_argument("Both matrices must have same dimension.");
     }

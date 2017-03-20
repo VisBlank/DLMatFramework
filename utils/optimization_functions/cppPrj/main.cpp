@@ -16,6 +16,8 @@ https://mbevin.wordpress.com/2012/11/20/move-semantics/
 #include "utils/mathhelper.h"
 #include "solver/solver.h"
 #include "solver/sgd.h"
+#include "layers/baselayer.h"
+#include "layers/sigmoid.h"
 
 
 int main() {    
@@ -71,6 +73,10 @@ int main() {
     cout << "L=1+A" << endl;
     L.print();
 
+    Tensor<float>M = -A;
+    cout << "M=-A" << endl;
+    M.print();
+
     cout << "Test SumVec and ProdVec" << endl;
     Tensor<float> someVec(vector<int>({1,4}),{1,2,3,4});
     someVec.print();
@@ -80,6 +86,15 @@ int main() {
     cout << "Sum vector someVec=" << testSum << endl;
     cout << "Prod vector someVec=" << testProd << endl;
     testLog.print();
+
+    Tensor<float> input(vector<int>({1,2}),{1.5172, -0.0332});
+    Sigmoid sigm("Test",nullptr);
+    Tensor<float> fpAct = sigm.ForwardPropagation(input);
+    cout << "Sigmoid Forward propagation: ";fpAct.print();
+    Tensor<float> dout(vector<int>({1,2}),{-0.3002, 0.2004});
+    LayerGradient<float> bpAct = sigm.BackwardPropagation(dout);
+    cout << "Sigmoid Backward propagation: ";bpAct.dx.print();
+
 
     /*
         Xor problem
@@ -98,14 +113,14 @@ int main() {
     LayerContainer layers;
     layers <= LayerMetaData{"Input",LayerType::TInput};
     layers <= LayerMetaData{"FC_1",LayerType::TFullyConnected};
-    layers <= LayerMetaData{"Relu_1",LayerType::TRelu};
+    layers <= LayerMetaData{"Relu_1",LayerType::TSigmoid};
     layers <= LayerMetaData{"FC_2",LayerType::TFullyConnected};
     layers <= LayerMetaData{"Softmax",LayerType::TSoftMax};
 
     DeepLearningModel net(layers,LossFactory<CrossEntropy>::GetLoss());
 
     // Create solver and train
-    Solver<float> solver(net,OptimizerType::T_SGD, map<string,float>{{"learning_rate",0.1},{"L2_reg",0}});
+    Solver solver(net,OptimizerType::T_SGD, map<string,float>{{"learning_rate",0.1},{"L2_reg",0}});
     solver.SetBatchSize(1);
     solver.SetEpochs(1000);
     solver.Train();

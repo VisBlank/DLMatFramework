@@ -7,7 +7,7 @@ SGDMomentum<T>::SGDMomentum(){
 
 template<typename T>
 tuple<Tensor<T>, Tensor<T> > SGDMomentum<T>::Optimize(const Tensor<T> &params, const Tensor<T> &grad_params, const Tensor<T> &state){
-
+    cout << "SGDMomentum optimizer" << endl;
 }
 
 /*

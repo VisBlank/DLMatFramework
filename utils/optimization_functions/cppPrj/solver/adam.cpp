@@ -8,7 +8,7 @@ Adam<T>::Adam()
 
 template<typename T>
 tuple<Tensor<T>, Tensor<T> > Adam<T>::Optimize(const Tensor<T> &params, const Tensor<T> &grad_params, const Tensor<T> &state){
-
+    cout << "Adam optimizer" << endl;
 }
 
 /*

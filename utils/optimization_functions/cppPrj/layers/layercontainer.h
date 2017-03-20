@@ -19,6 +19,7 @@
 
 #include <layers/inputlayer.h>
 #include <layers/relu.h>
+#include <layers/sigmoid.h>
 #include <layers/fullyconnected.h>
 #include <layers/softmax.h>
 
@@ -37,6 +38,9 @@ public:
             break;
         case TRelu:
             layer = shared_ptr<BaseLayer>(new Relu(layerData.name, m_currentLayer));
+            break;
+        case TSigmoid:
+            layer = shared_ptr<BaseLayer>(new Sigmoid(layerData.name, m_currentLayer));
             break;
         case TFullyConnected:
             layer = shared_ptr<BaseLayer>(new FullyConnected(layerData.name, m_currentLayer));

@@ -16,8 +16,8 @@ public:
         activation.SetDims(input.GetDims());
         return activation;
     }
-    Tensor<float> BackwardPropagation() override{
-        Tensor<float> gradient;
+    LayerGradient<float> BackwardPropagation(const Tensor<float> &dout) override{
+        LayerGradient<float> gradient;
         return gradient;
     }
 };

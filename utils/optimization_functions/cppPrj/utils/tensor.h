@@ -79,11 +79,12 @@ public:
     Tensor<T> operator+(const Tensor &b) const;
     Tensor<T> operator+(const T b) const;
     Tensor<T> operator-(const Tensor &b) const;
-    Tensor<T> operator=(const Tensor &b);
+    Tensor<T> operator-() const;
+    Tensor<T> &operator=(const Tensor &b);
 
     // Element-wise operations
-    Tensor<T> EltWiseMult(Tensor &b) const;
-    Tensor<T> EltWiseDiv(Tensor &b) const;
+    Tensor<T> EltWiseMult(const Tensor<T> &b) const;
+    Tensor<T> EltWiseDiv(const Tensor<T> &b) const;
 
     // A friend operator can see the private elements of this class
     friend Tensor<T> operator+(const T &left, const Tensor<T> &right){
@@ -91,7 +92,7 @@ public:
         Tensor<T> result(right.GetDims());
 
         // For each element of m_buffer multiply by b and store the result on resVec
-        transform(right.begin(), right.end(), result.begin(),std::bind1st(std::plus<T>(),left));
+        transform(right.begin(), right.end(), result.begin(),std::bind1st(plus<T>(),left));
 
         return result;
     }
@@ -100,7 +101,16 @@ public:
         Tensor<T> result(right.GetDims());
 
         // For each element of m_buffer multiply by b and store the result on resVec
-        transform(right.begin(), right.end(), result.begin(),std::bind1st(std::plus<T>(),left));
+        transform(right.begin(), right.end(), result.begin(),std::bind1st(minus<T>(),left));
+
+        return result;
+    }
+    friend Tensor<T> operator/(const T &left, const Tensor<T> &right){
+        // Create result tensor with same dimensions
+        Tensor<T> result(right.GetDims());
+
+        // For each element of m_buffer multiply by b and store the result on resVec
+        transform(right.begin(), right.end(), result.begin(),std::bind1st(std::divides<T>(),left));
 
         return result;
     }

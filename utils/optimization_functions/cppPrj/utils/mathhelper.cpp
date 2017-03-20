@@ -26,6 +26,15 @@ Tensor<T> MathHelper<T>::Log(const Tensor<T> &in){
     return result;
 }
 
+template<typename T>
+Tensor<T> MathHelper<T>::Exp(const Tensor<T> &in){
+    Tensor<T> result(vector<int>({in.GetDims()}));
+
+    // For each element of invVec apply log(element) and store the result on resVec
+    transform(in.begin(), in.end(), result.begin(),[](T m) -> T {return exp(m);});
+    return result;
+}
+
 // Explicit template instantiation
 template class MathHelper<float>;
 template class MathHelper<double>;

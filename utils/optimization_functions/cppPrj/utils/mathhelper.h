@@ -11,8 +11,9 @@ class MathHelper
 {
 public:
     static T SumVec(const Tensor<T> &in);
-    static T ProdVec(const Tensor<T> &in);
+    static T ProdVec(const Tensor<T> &in);    
     static Tensor<T> Log(const Tensor<T> &in);
+    static Tensor<T> Exp(const Tensor<T> &in);
 
 };
 

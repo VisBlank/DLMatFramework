@@ -8,11 +8,19 @@
 
 using namespace std;
 
+template<typename T>
+class LayerGradient {
+public:
+    Tensor<T> dx;
+    Tensor<T> dWeights;
+    Tensor<T> dBias;
+};
+
 class BaseLayer
 {
 public:        
     virtual Tensor<float> ForwardPropagation(const Tensor<float> &input) = 0;
-    virtual Tensor<float> BackwardPropagation() = 0;
+    virtual LayerGradient<float> BackwardPropagation(const Tensor<float> &dout) = 0;
 
     void SetWeights(shared_ptr<Tensor<float>> weights){m_weights = weights;}
     void SetBias(shared_ptr<Tensor<float>> weights){m_bias = weights;}
@@ -24,8 +32,9 @@ protected:
     shared_ptr<Tensor<float>> m_bias;
 
     // We need to cache the activations and gradients for backprop
-    unique_ptr<Tensor<float>> m_activation;
-    unique_ptr<Tensor<float>> m_gradients;
+    Tensor<float> m_activation;
+    Tensor<float> m_previousInput;
+    Tensor<float> m_gradients;
 
     vector<int> m_activationShape;
 

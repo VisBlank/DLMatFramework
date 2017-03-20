@@ -9,7 +9,7 @@
 #include <string>
 using namespace std;
 
-enum LayerType { TInput, TFullyConnected, TRelu, TSoftMax, TConvolution, TMaxPooling, TAveragePooling, TElementWiseAdd, TDropout, TBatchNorm, TSpatialBatchNorm };
+enum LayerType { TInput, TFullyConnected, TRelu, TSigmoid, TSoftMax, TConvolution, TMaxPooling, TAveragePooling, TElementWiseAdd, TDropout, TBatchNorm, TSpatialBatchNorm };
 
 class LayerMetaData{
 public:
