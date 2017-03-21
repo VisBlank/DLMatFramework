@@ -17,7 +17,8 @@ SOURCES += main.cpp \
     layers/layercontainer.cpp \
     classifier/deeplearningmodel.cpp \
     utils/tensor.cpp \
-    utils/mathhelper.cpp
+    utils/mathhelper.cpp \
+    utils/dataset.cpp
 
 HEADERS += \    
     loss/lossfactory.h \
@@ -41,4 +42,5 @@ HEADERS += \
     layers/softmax.h \
     layers/inputlayer.h \
     utils/mathhelper.h \
-    layers/sigmoid.h
+    layers/sigmoid.h \
+    utils/dataset.h

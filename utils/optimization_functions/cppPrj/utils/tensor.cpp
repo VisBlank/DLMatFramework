@@ -209,25 +209,6 @@ Tensor<T> Tensor<T>::EltWiseDiv(const Tensor<T> &b) const{
     return result;
 }
 
-/*template<typename T>
-ostream& operator<<(ostream& os, const Tensor<T>& right){
-    stringstream ss;
-    auto start = right.GetBufferCopy().begin();
-    auto ncols = right.GetRows();
-    auto nrows = right.GetCols();
-    for (int i = 0; i < nrows; ++i){
-        // Get a slice from the vector
-        vector<T> rowSlice(start, start + right.GetCols());
-        ss << "| ";
-        for_each(rowSlice.begin(), rowSlice.end(), [](T m){cout << m << " ";});
-        start += ncols;
-        ss << "|" << endl;
-    }
-    //os << dt.mo << '/' << dt.da << '/' << dt.yr;
-    os << ss;
-    return os;
-}*/
-
 /*
  * Explicit declare template versions to avoid linker error. (This is needed if we use templates on .cpp files)
 */

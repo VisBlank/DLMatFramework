@@ -10,6 +10,7 @@ http://stackoverflow.com/questions/8384234/return-reference-to-a-vector-member-v
 https://mbevin.wordpress.com/2012/11/20/move-semantics/
 */
 #include "utils/tensor.h"
+#include "utils/dataset.h"
 #include "layers/layercontainer.h"
 #include "loss/lossfactory.h"
 #include "classifier/deeplearningmodel.h"
@@ -103,6 +104,7 @@ int main() {
     Tensor<float> Y(vector<int>({4,1}),{0,1,1,0});
     Tensor<float> Xt(vector<int>({4,2}),{0,0,0,1,1,0,1,1});
     Tensor<float> Yt(vector<int>({4,1}),{0,1,1,0});
+    Dataset<float> data(X,Y,4);
 
     cout << "Xor input" << X << endl;
     cout << "Xor output" << Y << endl;
@@ -118,10 +120,12 @@ int main() {
     DeepLearningModel net(layers,LossFactory<CrossEntropy>::GetLoss());
 
     // Create solver and train
-    Solver solver(net,OptimizerType::T_SGD, map<string,float>{{"learning_rate",0.1},{"L2_reg",0}});
+    Solver solver(net,data,OptimizerType::T_SGD, map<string,float>{{"learning_rate",0.1},{"L2_reg",0}});
     solver.SetBatchSize(1);
     solver.SetEpochs(1000);
     solver.Train();
+    auto lossHistory = solver.GetLossHistory();
+    lossHistory[2] = 1;
 
     auto score0 = net.Predict(Tensor<float>(vector<int>({1,2}),{0,0}));
     auto score1 = net.Predict(Tensor<float>(vector<int>({1,2}),{0,1}));
