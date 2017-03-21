@@ -12,6 +12,23 @@
 
 TEST_CASE( "Tensor tests "){
 
+    SECTION("Tensor reshape"){
+        Tensor<float> A(vector<int>({3,4}),{1,2,3,4,5,6,7,8,9,10,11,12});
+        cout << "A[3x4]" << A << endl;
+        CHECK_NOTHROW(A.Reshape(vector<int>({1,12})));
+        cout << "A[1x12]" << A << endl;
+        CHECK_NOTHROW(A.Reshape(vector<int>({12,1})));
+        cout << "A[12x1]" << A << endl;
+        CHECK_NOTHROW(A.Reshape(vector<int>({2,6})));
+        cout << "A[2x6]" << A << endl;
+        CHECK_NOTHROW(A.Reshape(vector<int>({6,2})));
+        cout << "A[6x2]" << A << endl;
+
+        // Should throw exception
+        REQUIRE_THROWS( A.Reshape(vector<int>({2,60})));
+        REQUIRE_THROWS_WITH( A.Reshape(vector<int>({2,60})), "Number of elements must be the same on new shape." );
+    }
+
     SECTION( "Tensor assignment"){
         Tensor<float> A(vector<int>({2,2}));
         A(0,0) = 1;
