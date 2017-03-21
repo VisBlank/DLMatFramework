@@ -44,6 +44,17 @@ void Tensor<T>::SetDims(const vector<int> &dims){
 }
 
 template<typename T>
+void Tensor<T>::Reshape(const vector<int> &newdims){
+    // Do a "prod" of all elements on vector
+    int prodDims = 1;
+    for_each(newdims.begin(), newdims.end(), [&] (int m){prodDims *= m;});
+    if (prodDims != m_numElements){
+        throw invalid_argument("Number of elements must be the same on new shape.");
+    }
+    m_dims = newdims;
+}
+
+template<typename T>
 typename vector<T>::iterator Tensor<T>::begin(){
     return m_buffer.begin();
 }

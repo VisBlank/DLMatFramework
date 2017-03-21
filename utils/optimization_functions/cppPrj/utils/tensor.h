@@ -51,7 +51,8 @@ public:
     Tensor(initializer_list<T> list);
     Tensor (const vector<int> &dims);
 
-    void SetDims(const vector<int> &dims);    
+    void SetDims(const vector<int> &dims);
+    void Reshape(const vector<int> &newdims);
 
     // The expected format will be rows,cols,channel,batch
     int GetNumDims() const {return m_num_dims;}
