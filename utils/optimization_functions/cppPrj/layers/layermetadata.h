@@ -15,6 +15,10 @@ class LayerMetaData{
 public:
     string name;
     LayerType type;
+    int p1;
+    int p2;
+    int p3;
+    int p4;
 };
 
 #endif // LAYERMETADATA_H

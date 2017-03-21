@@ -22,7 +22,7 @@ https://mbevin.wordpress.com/2012/11/20/move-semantics/
 #include "loss/crossentropy.h"
 
 
-int main() {    
+int main() {        
     Tensor<float> A(vector<int>({2,2}));
     A(0,0) = 1;
     A(0,1) = 2;
@@ -77,6 +77,11 @@ int main() {
     cout << "Prod vector someVec=" << testProd << endl;
     cout << testLog;
 
+    Tensor<float> zerosMat2d = MathHelper<float>::Zeros(vector<int>({2,4}));
+    cout << "Zeros 2d[2x4] matrix" << zerosMat2d << endl;
+    Tensor<float> randnMat2d = MathHelper<float>::Randn(vector<int>({4,4}));
+    cout << "Normal distribution 2d[4x4] matrix" << randnMat2d << endl;
+
     // Test Sigmoid
     Tensor<float> input(vector<int>({1,2}),{1.5172, -0.0332});
     Sigmoid sigm("Test",nullptr);
@@ -111,11 +116,12 @@ int main() {
 
     // Define model structure
     LayerContainer layers;
-    layers <= LayerMetaData{"Input",LayerType::TInput};
-    layers <= LayerMetaData{"FC_1",LayerType::TFullyConnected};
+    layers <= LayerMetaData{"Input",LayerType::TInput,1,2,1,1};// Rows,Cols,channels,batch-size
+    layers <= LayerMetaData{"FC_1",LayerType::TFullyConnected,2};
     layers <= LayerMetaData{"Relu_1",LayerType::TSigmoid};
-    layers <= LayerMetaData{"FC_2",LayerType::TFullyConnected};
-    layers <= LayerMetaData{"Softmax",LayerType::TSoftMax};    
+    layers <= LayerMetaData{"FC_2",LayerType::TFullyConnected,1};
+    layers <= LayerMetaData{"Softmax",LayerType::TSoftMax};
+
 
     DeepLearningModel net(layers,LossFactory<CrossEntropy>::GetLoss());
 

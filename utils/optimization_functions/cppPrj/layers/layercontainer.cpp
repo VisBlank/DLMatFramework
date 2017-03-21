@@ -24,7 +24,7 @@ void LayerContainer::operator<=(const LayerMetaData &layerData){
     shared_ptr<BaseLayer> layer;
     switch (layerData.type) {
     case TInput:
-        layer = shared_ptr<BaseLayer>(new InputLayer(layerData.name));
+        layer = shared_ptr<BaseLayer>(new InputLayer(layerData.name, layerData.p1, layerData.p2, layerData.p3, layerData.p4));
         break;
     case TRelu:
         layer = shared_ptr<BaseLayer>(new Relu(layerData.name, m_currentLayer));
@@ -33,7 +33,7 @@ void LayerContainer::operator<=(const LayerMetaData &layerData){
         layer = shared_ptr<BaseLayer>(new Sigmoid(layerData.name, m_currentLayer));
         break;
     case TFullyConnected:
-        layer = shared_ptr<BaseLayer>(new FullyConnected(layerData.name, m_currentLayer));
+        layer = shared_ptr<BaseLayer>(new FullyConnected(layerData.name, m_currentLayer,layerData.p1));
         break;
     case TSoftMax:
         layer = shared_ptr<BaseLayer>(new SoftMax(layerData.name, m_currentLayer));

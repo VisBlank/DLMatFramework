@@ -35,6 +35,24 @@ Tensor<T> MathHelper<T>::Exp(const Tensor<T> &in){
     return result;
 }
 
+template<typename T>
+Tensor<T> MathHelper<T>::Zeros(const vector<int> &dims){
+    Tensor<T> result(dims);
+    fill (result.begin(),result.end(),(T)0);
+    return result;
+}
+
+template<typename T>
+Tensor<T> MathHelper<T>::Randn(const vector<int> &dims){
+    random_device rd;
+    mt19937 gen(rd());
+    // Mean 0, standard deviation 1
+    std::normal_distribution<> d(0,1);
+    Tensor<T> result(dims);
+    generate(result.begin(), result.end(), [&d,&gen]{ return d(gen); });
+    return result;
+}
+
 // Explicit template instantiation
 template class MathHelper<float>;
 template class MathHelper<double>;
