@@ -36,50 +36,7 @@ int main() {
     if (TEST)
     {
         return runCatchTests();
-    }
-    Tensor<float> A(vector<int>({2,2}));
-    A(0,0) = 1;
-    A(0,1) = 2;
-    A(1,0) = 3;
-    A(1,1) = 4;
-    Tensor<float> B(vector<int>({2,2}));
-    B(0,0) = 5;
-    B(0,1) = 6;
-    B(1,0) = 7;
-    B(1,1) = 8;
-
-    cout << "Matrix A:" << A << endl;
-    cout << "Matrix B:" << B << endl;
-
-    Tensor<float>C = A*B; // C.assign(A.mult(B));
-    cout << "A*B" << C << endl;
-
-    Tensor<float>D = A+B;
-    cout << "A+B" << D << endl;
-
-    Tensor<float>E = A-B;
-    cout << "A-B" << E << endl;
-
-    Tensor<float>F = B;
-    cout << "F=B" << F << endl;
-
-    Tensor<float>G = A*(float)2.5;
-    cout << "G=A*2.5" << G << endl;
-
-    Tensor<float>H = A+(float)1.1;
-    cout << "H=A*1.1" << H << endl;
-
-    Tensor<float>I = A.EltWiseMult(A);
-    cout << "I=A.*A" << I << endl;
-
-    Tensor<float>J = A.EltWiseDiv(A);
-    cout << "J=A./A" << J << endl;
-
-    Tensor<float>L = (float)1.0+A;
-    cout << "L=1+A" << L << endl;
-
-    Tensor<float>M = -A;
-    cout << "M=-A" << M << endl;
+    }       
 
     cout << "Test SumVec and ProdVec" << endl;
     Tensor<float> someVec(vector<int>({1,4}),{1,2,3,4});

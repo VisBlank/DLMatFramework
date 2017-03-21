@@ -109,6 +109,18 @@ TEST_CASE( "Tensor tests"){
         REQUIRE(L == M);
     }
 
+    SECTION( " Tensor scalar addition (friend class)" ){
+        Tensor<float> L(vector<int>({2,2}));
+        L(0,0) = 2.1;
+        L(0,1) = 3.1;
+        L(1,0) = 4.1;
+        L(1,1) = 5.1;
+
+        Tensor<float>M = (float)1.1 + A;
+        cout << "A+1.1" << M << endl;
+        REQUIRE(L == M);
+    }
+
     SECTION( " Tensor eltwise mult " ){
         Tensor<float> N(vector<int>({2,2}));
         N(0,0) = 1;
