@@ -15,19 +15,22 @@ class DeepLearningModel
 private:
     LayerContainer m_layers;
     shared_ptr<BaseLoss> m_loss;
+    bool m_isTraining;
 public:
     // Delete default constructor
     DeepLearningModel() = delete;
 
     DeepLearningModel(const LayerContainer &lc, shared_ptr<BaseLoss> bl):m_layers(lc){
         m_loss = bl;
-        Tensor<float> A(vector<int>({4,1}),{0,1,1,0});
-        Tensor<float> B(vector<int>({4,1}),{0,1,1,0});
-        auto loss = m_loss->GetLossAndGradients(A,B);
+        m_isTraining = false;
+        InitWeights();
     }
 
     Tensor<float> Predict(const Tensor<float> &input);
     tuple<float, Tensor<float>> Loss(const Tensor<float> &X, const Tensor<float> &Y);
+    bool IsTraining() const {return m_isTraining;}
+private:
+    void InitWeights();
 };
 
 #endif // DEEPLEARNINGMODEL_H

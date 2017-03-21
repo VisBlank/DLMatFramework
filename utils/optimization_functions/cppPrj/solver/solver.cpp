@@ -1,6 +1,6 @@
 #include "solver.h"
 
-Solver::Solver(DeepLearningModel &net, const OptimizerType &type, const map<string, float> &config):m_net(net){
+Solver::Solver(DeepLearningModel &net, Dataset<float> &data, const OptimizerType &type, const map<string, float> &config):m_net(net),m_data(data){
     switch (type) {
     case OptimizerType::T_SGD:
         m_optimizer = unique_ptr<BaseOptimizer<float>>(new SGD<float>());
@@ -18,7 +18,13 @@ Solver::Solver(DeepLearningModel &net, const OptimizerType &type, const map<stri
 }
 
 void Solver::Train(){
-    Step();
+    int num_train = m_data.GetTrainSize();
+    int iterations_per_epoch = ceil((float)num_train / (float)m_batchSize);
+    int num_iterations = iterations_per_epoch * m_epochs;
+
+    for (int t=0; t < num_iterations; ++t){
+        Step();
+    }
 }
 
 void Solver::SetEpochs(int epochs){
@@ -29,8 +35,20 @@ void Solver::SetBatchSize(int batch){
     m_batchSize = batch;
 }
 
-void Solver::Step(){
-    cout << "Solver::Step" << endl;        
+vector<float> Solver::GetLossHistory() const {
+     return m_loss_history;
+}
+
+void Solver::Step(){    
+    // Select a mini-batch
+    Batch<float> batch = m_data.GetBatch(m_batchSize);
+
+    // Get model loss and gradients
+    auto LossGrad = m_net.Loss(batch.X, batch.Y);
+    m_loss_history.push_back(get<0>(LossGrad));
+
+    // Perform parameter update
+
     Tensor<float> A(vector<int>({1,2}),{0,0});
     Tensor<float> B(vector<int>({1,2}),{0,0});
     Tensor<float> C(vector<int>({1,2}),{0,0});
