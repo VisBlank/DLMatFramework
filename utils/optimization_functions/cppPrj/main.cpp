@@ -48,11 +48,6 @@ int main() {
     A.Reshape(vector<int>({6,2}));
     cout << "A[6x2]" << A << endl;
 
-    Tensor<float> zerosMat2d = MathHelper<float>::Zeros(vector<int>({2,4}));
-    cout << "Zeros 2d[2x4] matrix" << zerosMat2d << endl;
-    Tensor<float> randnMat2d = MathHelper<float>::Randn(vector<int>({4,4}));
-    cout << "Normal distribution 2d[4x4] matrix" << randnMat2d << endl;
-
     // Test Sigmoid
     Tensor<float> input(vector<int>({1,2}),{1.5172, -0.0332});
     Sigmoid sigm("Test",nullptr);

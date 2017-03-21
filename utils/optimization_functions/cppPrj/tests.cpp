@@ -166,10 +166,45 @@ TEST_CASE( "Tensor tests"){
         float testProd = MathHelper<float>::ProdVec(someVec);
         Tensor<float> testLog = MathHelper<float>::Log(someVec);
         cout << "Sum vector someVec=" << testSum << endl;
+        REQUIRE( testSum == 10 );
         cout << "Prod vector someVec=" << testProd << endl;
+        REQUIRE( testProd == 24 );
         cout << testLog;
+        Tensor<float> logSomeVec (vector<int>({1,4}),{0,0.693147,1.09861,1.38629});
+        cout << "Difference for log is:" << MathHelper<float>::SumVec(testLog - logSomeVec) << endl;
+        REQUIRE( MathHelper<float>::SumVec(testLog - logSomeVec) < 0.01 );
 
     }
+
+    SECTION( " matrix of zero creation "){
+
+        Tensor<float> zeroMatA(vector<int>({2,4}),{0,0,0,0,0,0,0,0});
+
+        Tensor<float> zerosMat2d = MathHelper<float>::Zeros(vector<int>({2,4}));
+        cout << "Zeros 2d[2x4] matrix" << zerosMat2d << endl;
+
+        REQUIRE( zeroMatA == zerosMat2d );
+
+    }
+
+    SECTION( " matrix of random numbers " ){
+
+        Tensor<float> randnMat2d = MathHelper<float>::Randn(vector<int>({4,4}));
+        cout << "Normal distribution 2d[4x4] matrix" << randnMat2d << endl;
+
+    }
+
+    SECTION( " sigmoid test " ){
+
+        Tensor<float> input(vector<int>({1,2}),{1.5172, -0.0332});
+        Sigmoid sigm("Test",nullptr);
+        Tensor<float> fpAct = sigm.ForwardPropagation(input);
+        cout << "Sigmoid Forward propagation: " << fpAct << endl;
+        Tensor<float> dout(vector<int>({1,2}),{-0.3002, 0.2004});
+        LayerGradient<float> bpAct = sigm.BackwardPropagation(dout);
+        cout << "Sigmoid Backward propagation: " << bpAct.dx << endl;
+    }
+
 
 
 }
