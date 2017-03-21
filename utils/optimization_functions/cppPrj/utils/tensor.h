@@ -18,6 +18,7 @@ http://www.learncpp.com/cpp-tutorial/92-overloading-the-arithmetic-operators-usi
 #include <array>
 #include <stdexcept>
 #include <initializer_list>
+#include <sstream>
 
 using namespace std;
 
@@ -50,8 +51,7 @@ public:
     Tensor(initializer_list<T> list);
     Tensor (const vector<int> &dims);
 
-    void SetDims(const vector<int> &dims);
-    void print() const;
+    void SetDims(const vector<int> &dims);    
 
     // The expected format will be rows,cols,channel,batch
     int GetNumDims() const {return m_num_dims;}
@@ -113,6 +113,27 @@ public:
         transform(right.begin(), right.end(), result.begin(),std::bind1st(std::divides<T>(),left));
 
         return result;
+    }
+    // Overload the << Operator to use this class with cout
+    // https://msdn.microsoft.com/en-us/library/1z2f6c2k.aspx
+    friend ostream& operator<<(ostream& os, const Tensor<T>& right){
+        stringstream str_stream;
+        str_stream << endl;
+        // Observe that the friend class can "see" elements from the Tensor class
+        auto start = right.m_buffer.begin();
+        auto ncols = right.GetCols();
+        auto nrows = right.GetRows();
+        for (int i = 0; i < nrows; ++i){
+            // Get a slice from the vector
+            vector<T> rowSlice(start, start + ncols);
+            str_stream << "| ";
+            for_each(rowSlice.begin(), rowSlice.end(), [&str_stream](T m){str_stream << m << " ";});
+            start += ncols;
+            str_stream << "|" << endl;
+        }
+        //os << dt.mo << '/' << dt.da << '/' << dt.yr;
+        os << str_stream.str();
+        return os;
     }
 };
 

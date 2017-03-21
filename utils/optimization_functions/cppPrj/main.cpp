@@ -33,69 +33,57 @@ int main() {
     B(1,0) = 7;
     B(1,1) = 8;
 
-    cout << "Matrix A:" << endl;
-    A.print();
-    cout << "Matrix B:" << endl;
-    B.print();
+    cout << "Matrix A:" << A << endl;
+    cout << "Matrix B:" << B << endl;
 
     Tensor<float>C = A*B; // C.assign(A.mult(B));
-    cout << "A*B" << endl;
-    C.print();
+    cout << "A*B" << C << endl;
 
     Tensor<float>D = A+B;
-    cout << "A+B" << endl;
-    D.print();
+    cout << "A+B" << D << endl;
 
     Tensor<float>E = A-B;
-    cout << "A-B" << endl;
-    E.print();
+    cout << "A-B" << E << endl;
 
     Tensor<float>F = B;
-    cout << "F=B" << endl;
-    F.print();
+    cout << "F=B" << F << endl;
 
     Tensor<float>G = A*(float)2.5;
-    cout << "G=A*2.5" << endl;
-    G.print();
+    cout << "G=A*2.5" << G << endl;
 
     Tensor<float>H = A+(float)1.1;
-    cout << "H=A*1.1" << endl;
-    H.print();
+    cout << "H=A*1.1" << H << endl;
 
     Tensor<float>I = A.EltWiseMult(A);
-    cout << "I=A.*A" << endl;
-    I.print();
+    cout << "I=A.*A" << I << endl;
 
     Tensor<float>J = A.EltWiseDiv(A);
-    cout << "J=A./A" << endl;
-    J.print();
+    cout << "J=A./A" << J << endl;
 
     Tensor<float>L = (float)1.0+A;
-    cout << "L=1+A" << endl;
-    L.print();
+    cout << "L=1+A" << L << endl;
 
     Tensor<float>M = -A;
-    cout << "M=-A" << endl;
-    M.print();
+    cout << "M=-A" << M << endl;
 
     cout << "Test SumVec and ProdVec" << endl;
     Tensor<float> someVec(vector<int>({1,4}),{1,2,3,4});
-    someVec.print();
+    cout << someVec;
     float testSum = MathHelper<float>::SumVec(someVec);
     float testProd = MathHelper<float>::ProdVec(someVec);
     Tensor<float> testLog = MathHelper<float>::Log(someVec);
     cout << "Sum vector someVec=" << testSum << endl;
     cout << "Prod vector someVec=" << testProd << endl;
-    testLog.print();
+    cout << testLog;
 
     // Test Sigmoid
     Tensor<float> input(vector<int>({1,2}),{1.5172, -0.0332});
     Sigmoid sigm("Test",nullptr);
     Tensor<float> fpAct = sigm.ForwardPropagation(input);
-    cout << "Sigmoid Forward propagation: ";fpAct.print();
+    cout << "Sigmoid Forward propagation: " << fpAct << endl;
     Tensor<float> dout(vector<int>({1,2}),{-0.3002, 0.2004});
     LayerGradient<float> bpAct = sigm.BackwardPropagation(dout);
-    cout << "Sigmoid Backward propagation: ";bpAct.dx.print();
+    cout << "Sigmoid Backward propagation: " << bpAct.dx << endl;
 
     // Test Cross entropy
     Tensor<float> scores(vector<int>({2,1}),{0.3897, 0.4049});
@@ -103,7 +91,7 @@ int main() {
     CrossEntropy cross;
     auto LossGrad = cross.GetLossAndGradients(scores,targets);
     cout << "Loss: " << get<0>(LossGrad) << endl;
-    get<1>(LossGrad).print();
+    cout << get<1>(LossGrad) << endl;
 
 
     /*
@@ -116,8 +104,8 @@ int main() {
     Tensor<float> Xt(vector<int>({4,2}),{0,0,0,1,1,0,1,1});
     Tensor<float> Yt(vector<int>({4,1}),{0,1,1,0});
 
-    cout << "Xor input" << endl;X.print();
-    cout << "Xor output" << endl;Y.print();
+    cout << "Xor input" << X << endl;
+    cout << "Xor output" << Y << endl;
 
     // Define model structure
     LayerContainer layers;
