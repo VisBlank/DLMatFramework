@@ -115,7 +115,7 @@ int main() {
     layers <= LayerMetaData{"FC_1",LayerType::TFullyConnected};
     layers <= LayerMetaData{"Relu_1",LayerType::TSigmoid};
     layers <= LayerMetaData{"FC_2",LayerType::TFullyConnected};
-    layers <= LayerMetaData{"Softmax",LayerType::TSoftMax};
+    layers <= LayerMetaData{"Softmax",LayerType::TSoftMax};    
 
     DeepLearningModel net(layers,LossFactory<CrossEntropy>::GetLoss());
 

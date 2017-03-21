@@ -10,7 +10,9 @@
 #include "baselayer.h"
 #include "layermetadata.h"
 #include <string>
+#include <map>
 #include <unordered_map>
+#include <unordered_set>
 #include <algorithm>
 #include <utility>
 #include <memory>
@@ -29,45 +31,26 @@ class LayerContainer
 {
 public:
     LayerContainer();
+    void operator<=(const LayerMetaData &layerData);
+    shared_ptr<BaseLayer> operator()(const string &layerName);
+    int GetNumLayers() const;
+    vector<list<shared_ptr<BaseLayer>>> GetGraph() const;
+    void BuildGraph();
 
-    void operator<=(const LayerMetaData &layerData){
-        shared_ptr<BaseLayer> layer;
-        switch (layerData.type) {
-        case TInput:
-            layer = shared_ptr<BaseLayer>(new InputLayer(layerData.name));
-            break;
-        case TRelu:
-            layer = shared_ptr<BaseLayer>(new Relu(layerData.name, m_currentLayer));
-            break;
-        case TSigmoid:
-            layer = shared_ptr<BaseLayer>(new Sigmoid(layerData.name, m_currentLayer));
-            break;
-        case TFullyConnected:
-            layer = shared_ptr<BaseLayer>(new FullyConnected(layerData.name, m_currentLayer));
-            break;
-        case TSoftMax:
-            layer = shared_ptr<BaseLayer>(new SoftMax(layerData.name, m_currentLayer));
-            break;
-        default:
-            throw invalid_argument("Layer not implemented.");
-            break;
-        }
-        m_hashMapLayers.insert(make_pair(layerData.name,shared_ptr<BaseLayer>(layer)));
-        m_numLayers++;
-        // Non-thread safe way to hold the last inserted layer
-        m_currentLayer = layer;
-    }
-
-    int GetNumLayers() const { return m_numLayers;}
-    vector<list<shared_ptr<BaseLayer>>> GetGraph() const {return m_adjacency_vector;}
-
-    void BuildGraph(){
-        // Populate the Adjacency vector
-    }
+    /*typename unordered_map<string,shared_ptr<BaseLayer>>::iterator begin();
+    typename unordered_map<string,shared_ptr<BaseLayer>>::iterator end();
+    typename unordered_map<string,shared_ptr<BaseLayer>>::const_iterator begin() const;
+    typename unordered_map<string,shared_ptr<BaseLayer>>::const_iterator end() const;*/
+    // We want to have the layers with the same order as we inserted them
+    typename list<string>::iterator begin();
+    typename list<string>::iterator end();
+    typename list<string>::const_iterator begin() const;
+    typename list<string>::const_iterator end() const;
 
 private:
     // Hash map of layers unique pointers (Remember that they should be moved here...)
     unordered_map<string,shared_ptr<BaseLayer>> m_hashMapLayers;
+    list<string> m_layerNamesList;
 
     // Number of layers
     int m_numLayers = 0;

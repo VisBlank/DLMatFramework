@@ -22,14 +22,17 @@ public:
     virtual Tensor<float> ForwardPropagation(const Tensor<float> &input) = 0;
     virtual LayerGradient<float> BackwardPropagation(const Tensor<float> &dout) = 0;
 
-    void SetWeights(shared_ptr<Tensor<float>> weights){m_weights = weights;}
-    void SetBias(shared_ptr<Tensor<float>> weights){m_bias = weights;}
-    string GetName() {return m_name;}
+    shared_ptr<BaseLayer> GetInputLayer() const { return m_inputLayer;}
+    string GetName() const {return m_name;}
+    vector<int> GetActivationShape() const {return m_activationShape;}
+
+    Tensor<float> &GetWeightsRef() {return ref(m_weights);}
+    Tensor<float> &GetBiasRef() {return ref(m_bias);}
 
 protected:
     // Weights and bias are references, we don't need to store them
-    shared_ptr<Tensor<float>> m_weights;
-    shared_ptr<Tensor<float>> m_bias;
+    Tensor<float> m_weights;
+    Tensor<float> m_bias;
 
     // We need to cache the activations and gradients for backprop
     Tensor<float> m_activation;
