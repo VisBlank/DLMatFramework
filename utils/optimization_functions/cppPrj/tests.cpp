@@ -10,7 +10,7 @@
 #include "layers/sigmoid.h"
 #include "loss/crossentropy.h"
 
-TEST_CASE( "Tensor tests"){
+TEST_CASE( "Tensor tests "){
 
     SECTION( "Tensor assignment"){
         Tensor<float> A(vector<int>({2,2}));
@@ -109,7 +109,7 @@ TEST_CASE( "Tensor tests"){
         REQUIRE(L == M);
     }
 
-    SECTION( " Tensor scalar addition (friend class)" ){
+    SECTION( " Tensor scalar addition (friend class) " ){
         Tensor<float> L(vector<int>({2,2}));
         L(0,0) = 2.1;
         L(0,1) = 3.1;
@@ -203,6 +203,72 @@ TEST_CASE( "Tensor tests"){
         Tensor<float> dout(vector<int>({1,2}),{-0.3002, 0.2004});
         LayerGradient<float> bpAct = sigm.BackwardPropagation(dout);
         cout << "Sigmoid Backward propagation: " << bpAct.dx << endl;
+    }
+
+    SECTION ( " cross entropy test " ){
+
+        // Test Cross entropy
+        Tensor<float> scores(vector<int>({2,1}),{0.3897, 0.4049});
+        Tensor<float> targets(vector<int>({2,1}),{0.0, 0.0});
+        CrossEntropy cross;
+        auto LossGrad = cross.GetLossAndGradients(scores,targets);
+        cout << "Loss: " << get<0>(LossGrad) << endl;
+        cout << get<1>(LossGrad) << endl;
+
+    }
+
+    SECTION( " Xor problem" ){
+
+    cout << "XOR Problem" << endl;
+    // Define input/label matrices(2d tensor)
+    Tensor<float> X(vector<int>({4,2}),{0,0,0,1,1,0,1,1});
+    Tensor<float> Y(vector<int>({4,1}),{0,1,1,0});
+    Tensor<float> Xt(vector<int>({4,2}),{0,0,0,1,1,0,1,1});
+    Tensor<float> Yt(vector<int>({4,1}),{0,1,1,0});
+    Dataset<float> data(X,Y,4);
+
+    cout << "Xor input" << X << endl;
+    cout << "Xor output" << Y << endl;
+
+    // Define model structure
+    LayerContainer layers;
+    layers <= LayerMetaData{"Input",LayerType::TInput,1,2,1,1};// Rows,Cols,channels,batch-size
+    layers <= LayerMetaData{"FC_1",LayerType::TFullyConnected,2};
+    layers <= LayerMetaData{"Relu_1",LayerType::TSigmoid};
+    layers <= LayerMetaData{"FC_2",LayerType::TFullyConnected,1};
+    layers <= LayerMetaData{"Softmax",LayerType::TSoftMax};
+
+
+    DeepLearningModel net(layers,LossFactory<CrossEntropy>::GetLoss());
+
+    // Create solver and train
+    Solver solver(net,data,OptimizerType::T_SGD, map<string,float>{{"learning_rate",0.1},{"L2_reg",0}});
+    solver.SetBatchSize(1);
+    solver.SetEpochs(1000);
+    solver.Train();
+    auto lossHistory = solver.GetLossHistory();
+    lossHistory[2] = 1;
+
+    // fix predict
+    /*
+    auto score0 = net.Predict(Tensor<float>(vector<int>({1,2}),{0,0}));
+    auto score1 = net.Predict(Tensor<float>(vector<int>({1,2}),{0,1}));
+    auto score2 = net.Predict(Tensor<float>(vector<int>({1,2}),{1,0}));
+    auto score3 = net.Predict(Tensor<float>(vector<int>({1,2}),{1,1}));
+
+
+    REQUIRE( score0 == 0 );
+    REQUIRE( score1 == 1 );
+    REQUIRE( score2 == 1 );
+    REQUIRE( score3 == 0 );
+
+    */
+
+    cout << "0 XOR 0 :" << endl;
+    cout << "0 XOR 1 :" << endl;
+    cout << "1 XOR 0 :" << endl;
+    cout << "1 XOR 1 :" << endl;
+
     }
 
 
