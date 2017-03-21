@@ -183,6 +183,30 @@ Tensor<T> &Tensor<T>::operator=(const Tensor &b){
 }
 
 template<typename T>
+bool Tensor<T>::operator==(const Tensor &b){
+
+    bool result = true;
+
+    //Check dims match
+    if (b.GetDims() != this->GetDims()){
+        throw invalid_argument("Dimensions must match.");
+    }
+
+    // Version with != operator (Overloaded on vector)
+    /*if (this->GetBufferCopy() != b.m_buffer){
+        result = false;
+        return result;
+    }*/
+    // Version with std::equal
+    if (!equal(this->begin(), this->end(), b.begin())){
+        result = false;
+        return result;
+    }
+
+    return result;
+}
+
+template<typename T>
 Tensor<T> Tensor<T>::EltWiseMult(const Tensor<T> &b) const{
     if (GetDims() != b.GetDims()){
         throw invalid_argument("Both matrices must have same dimension.");

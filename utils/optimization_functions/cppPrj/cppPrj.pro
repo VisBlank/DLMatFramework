@@ -17,7 +17,8 @@ SOURCES += main.cpp \
     layers/layercontainer.cpp \
     classifier/deeplearningmodel.cpp \
     utils/tensor.cpp \
-    utils/mathhelper.cpp
+    utils/mathhelper.cpp \
+    tests.cpp
 
 HEADERS += \    
     loss/lossfactory.h \

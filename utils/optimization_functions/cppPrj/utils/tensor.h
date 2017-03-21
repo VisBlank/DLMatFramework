@@ -81,6 +81,7 @@ public:
     Tensor<T> operator-(const Tensor &b) const;
     Tensor<T> operator-() const;
     Tensor<T> &operator=(const Tensor &b);
+    bool operator==(const Tensor &b);
 
     // Element-wise operations
     Tensor<T> EltWiseMult(const Tensor<T> &b) const;
