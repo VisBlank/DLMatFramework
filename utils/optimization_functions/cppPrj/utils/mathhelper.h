@@ -1,3 +1,9 @@
+/*
+    Helper for Math functions on tensors
+    References:
+    http://en.cppreference.com/w/cpp/algorithm/generate
+    http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
+*/
 #ifndef MATHHELPER_H
 #define MATHHELPER_H
 

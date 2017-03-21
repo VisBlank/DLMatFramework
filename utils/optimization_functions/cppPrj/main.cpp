@@ -38,15 +38,6 @@ int main() {
         return runCatchTests();
     }       
 
-    cout << "Test SumVec and ProdVec" << endl;
-    Tensor<float> someVec(vector<int>({1,4}),{1,2,3,4});
-    cout << someVec;
-    float testSum = MathHelper<float>::SumVec(someVec);
-    float testProd = MathHelper<float>::ProdVec(someVec);
-    Tensor<float> testLog = MathHelper<float>::Log(someVec);
-    cout << "Sum vector someVec=" << testSum << endl;
-    cout << "Prod vector someVec=" << testProd << endl;
-    cout << testLog;
 
     Tensor<float> zerosMat2d = MathHelper<float>::Zeros(vector<int>({2,4}));
     cout << "Zeros 2d[2x4] matrix" << zerosMat2d << endl;

@@ -71,6 +71,11 @@ T &Tensor<T>::operator()(int row, int col){
 }
 
 template<typename T>
+T &Tensor<T>::operator()(int idx){
+    return m_buffer.at(idx);
+}
+
+template<typename T>
 Tensor<T> Tensor<T>::operator+(const T b) const {
     // Create result tensor with same dimensions
     Tensor<T> result(vector<int>({m_dims}));
