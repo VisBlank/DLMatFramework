@@ -38,6 +38,7 @@ int main() {
         return runCatchTests();
     }       
 
+
     // Test Sigmoid
     Tensor<float> input(vector<int>({1,2}),{1.5172, -0.0332});
     Sigmoid sigm("Test",nullptr);

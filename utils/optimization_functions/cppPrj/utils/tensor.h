@@ -73,6 +73,7 @@ public:
         The const after the method definition means that this method will not change the class members
     */
     T& operator()(int row, int col);
+    T& operator()(int idx);
     Tensor<T> operator*(Tensor &b);
     Tensor<T> operator*(const T b) const;
     Tensor<T> operator/(const T b) const;
