@@ -12,19 +12,20 @@
 #include <cmath>
 #include "tensor.h"
 #include <math.h>
+#include <utility>
 using namespace std;
 
 template<typename T>
 class MathHelper
 {    
 public:
+    static pair<T,unsigned int> MaxVec(const Tensor<T> &in);
     static T SumVec(const Tensor<T> &in);
     static T ProdVec(const Tensor<T> &in);    
     static Tensor<T> Log(const Tensor<T> &in);
     static Tensor<T> Exp(const Tensor<T> &in);
     static Tensor<T> Zeros(const vector<int> &dims);
-    static Tensor<T> Randn(const vector<int> &dims);
-
+    static Tensor<T> Randn(const vector<int> &dims);    
 };
 
 #endif // MATHHELPER_H

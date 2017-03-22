@@ -32,6 +32,16 @@ TEST_CASE( "Tensor tests "){
         REQUIRE(rev_vector == rev_vector_ref);
     }
 
+    SECTION("Tensor(vec) max"){
+        cout << "Tensor(vec) max" << endl;
+        Tensor<int> A(vector<int>({1,5}),{1,2,3,49,9});
+        cout << "A[1x5]" << A << endl;
+        auto argMax = MathHelper<int>::MaxVec(A);
+        cout << "max(A)=[" << argMax.first << "," << argMax.second << "]" << endl;
+        REQUIRE(argMax.first == 49);
+        REQUIRE(argMax.second == 3);
+    }
+
     SECTION("Tensor repmat"){
         cout << "Tensor repmat" << endl;
         Tensor<int> A(vector<int>({1,2}),{1,2});

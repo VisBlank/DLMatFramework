@@ -6,7 +6,19 @@
 */
 
 template<typename T>
-T MathHelper<T>::SumVec(const Tensor<T> &in){    
+pair<T, unsigned int> MathHelper<T>::MaxVec(const Tensor<T> &in){
+    // max_element return an iterator for the biggest value
+    auto itMax = max_element(in.begin(),in.end());
+    // Fetch the value
+    T val = *itMax;
+    // Convert the iterator to index
+    unsigned int idx = distance(in.begin(), itMax);
+    // Return the pair (value,
+    return make_pair(val, idx);
+}
+
+template<typename T>
+T MathHelper<T>::SumVec(const Tensor<T> &in){
     T res = accumulate(in.begin(), in.end(),T(0));
     return res;
 }
