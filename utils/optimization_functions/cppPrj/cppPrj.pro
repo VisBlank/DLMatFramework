@@ -19,7 +19,11 @@ SOURCES += main.cpp \
     utils/tensor.cpp \
     utils/mathhelper.cpp \
     tests.cpp \
-    utils/dataset.cpp
+    utils/dataset.cpp \
+    layers/fullyconnected.cpp \
+    layers/inputlayer.cpp \
+    layers/relu.cpp \
+    layers/softmax.cpp
 
 HEADERS += \    
     loss/lossfactory.h \
