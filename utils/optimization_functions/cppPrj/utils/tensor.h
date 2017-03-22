@@ -77,7 +77,7 @@ public:
     T& operator()(int row, int col); // Return a reference
     T operator()(int row, int col) const; // Return a copy
     T& operator()(int idx);
-    Tensor<T> operator*(const Tensor &b);
+    Tensor<T> operator*(const Tensor &b) const;
     Tensor<T> operator*(const T b) const;
     Tensor<T> operator/(const T b) const;
     Tensor<T> operator+(const Tensor &b) const;

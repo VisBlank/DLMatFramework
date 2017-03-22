@@ -10,6 +10,10 @@ public:
 
     Tensor<float> ForwardPropagation(const Tensor<float> &input) override;
     LayerGradient<float> BackwardPropagation(const Tensor<float> &dout) override;
+
+    void setWeights(Tensor<float> &weights);
+    void setBias(Tensor<float> &bias);
+
 };
 
 #endif // FULLYCONNECTED_H

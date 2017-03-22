@@ -373,6 +373,25 @@ TEST_CASE( "Tensor tests "){
 
     }
 
+    SECTION( " fully connected test " ){
+
+        // Test FC Forward propagation
+        Tensor<float> input_test(vector<int>({1,5}),{1,2,3,4,5});
+        Tensor<float> weights_test(vector<int>({5,2}),{1,2,1,2,1,2,1,2,1,2});
+        Tensor<float> bias_test(vector<int>({1,2}),{1,1});
+        FullyConnected fc1("fc1Test",nullptr,2);
+        fc1.setWeights( weights_test);
+        fc1.setBias( bias_test);
+
+        Tensor<float> fpAct = fc1.ForwardPropagation(input_test);
+
+
+        Tensor<float> actual_result(vector<int>({1,2}),{16,31});
+
+        cout << "fc Forward propagation: " << fpAct << endl;
+        REQUIRE(fpAct == actual_result);
+
+    }
 
 
 }
