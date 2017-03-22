@@ -275,7 +275,7 @@ Tensor<T> Tensor<T>::Transpose() const{
 }
 
 template<typename T>
-Tensor<T> Tensor::Repmat(int nRows, int nCols) const{
+Tensor<T> Tensor<T>::Repmat(int nRows, int nCols) const{
     if (this->GetNumDims() > 2){
         throw invalid_argument("Only 2d matrix transpose is supported, use Permute for more dimensions");
     }

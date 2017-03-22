@@ -21,10 +21,9 @@ SOURCES += main.cpp \
     tests.cpp \
     utils/dataset.cpp \
     layers/relu.cpp \
-    layers/sigmoid.cpp
+    layers/sigmoid.cpp \    
     layers/fullyconnected.cpp \
-    layers/inputlayer.cpp \
-    layers/relu.cpp \
+    layers/inputlayer.cpp \    
     layers/softmax.cpp
 
 HEADERS += \    

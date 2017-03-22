@@ -1,6 +1,7 @@
 #include "relu.h"
 
-Relu::Relu(const string &name, shared_ptr<BaseLayer> inLayer){
+Relu::Relu(const string &name, shared_ptr<BaseLayer> inLayer)
+{
     m_inputLayer = inLayer;
     m_name = name;
 }
