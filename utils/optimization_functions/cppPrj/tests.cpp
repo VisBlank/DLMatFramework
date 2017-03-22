@@ -32,6 +32,22 @@ TEST_CASE( "Tensor tests "){
         REQUIRE(rev_vector == rev_vector_ref);
     }
 
+    SECTION("Tensor repmat"){
+        cout << "Tensor repmat" << endl;
+        Tensor<int> A(vector<int>({1,2}),{1,2});
+        Tensor<int> A_rep_ref_1_2(vector<int>({1,4}),{1,2,1,2});
+        Tensor<int> A_rep_ref_2_1(vector<int>({2,2}),{1,2,1,2});
+        Tensor<int> A_rep_ref_2_2(vector<int>({2,4}),{1,2,1,2,1,2,1,2});
+        cout << "A[1x2]" << A << endl;
+        cout << "repmat(A,[1,2])" << A.Repmat(1,2) << endl;
+        cout << "repmat(A,[2,1])" << A.Repmat(2,1) << endl;
+        cout << "repmat(A,[2,2])" << A.Repmat(2,2) << endl;
+
+        REQUIRE(A_rep_ref_1_2 == A.Repmat(1,2));
+        REQUIRE(A_rep_ref_2_1 == A.Repmat(2,1));
+        REQUIRE(A_rep_ref_2_2 == A.Repmat(2,2));
+    }
+
     SECTION("Tensor reshape"){
         cout << "Tensor reshape" << endl;
         Tensor<float> A(vector<int>({3,4}),{1,2,3,4,5,6,7,8,9,10,11,12});

@@ -277,10 +277,20 @@ Tensor<T> Tensor<T>::Transpose() const{
 template<typename T>
 Tensor<T> Tensor<T>::Repmat(int nRows, int nCols) const{
     if (this->GetNumDims() > 2){
-        throw invalid_argument("Only 2d matrix transpose is supported, use Permute for more dimensions");
+        throw invalid_argument("2d matrix support for repmat(TODO more dims)");
     }
+    auto numReps = nRows*nCols;
+
     // Create result tensor
     Tensor<T> result(vector<int>({m_dims.at(0)*nRows, m_dims.at(1)*nCols}));
+
+    // Repeat the content of "this" inside result numRep times
+    auto offset = 0;
+    for (auto i = 0; i < numReps; ++i){
+        copy(m_buffer.begin(),m_buffer.end(),result.begin()+offset);
+        // Increment with distance
+        offset+=distance(m_buffer.begin(), m_buffer.end());
+    }
 
     return result;
 }
