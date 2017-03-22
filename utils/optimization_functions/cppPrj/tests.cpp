@@ -8,6 +8,7 @@
 #include "solver/sgd.h"
 #include "layers/baselayer.h"
 #include "layers/sigmoid.h"
+#include "layers/relu.h"
 #include "loss/crossentropy.h"
 #include "utils/reverse_range_based.h"
 #include <array>
@@ -279,7 +280,7 @@ TEST_CASE( "Tensor tests "){
     }
 
     SECTION( " sigmoid test " ){
-
+        cout << "Sigmoid test" << endl;
         // Test sigmoid Forward propagation (Matlab toy example)
         Tensor<float> ref_fp(vector<int>({1,2}),{0.8201, 0.4917});
         Tensor<float> input(vector<int>({1,2}),{1.5172, -0.0332});
@@ -294,6 +295,16 @@ TEST_CASE( "Tensor tests "){
         LayerGradient<float> bpAct = sigm.BackwardPropagation(dout);
         cout << "Sigmoid Backward propagation: " << bpAct.dx << endl;
         REQUIRE( MathHelper<float>::SumVec(ref_bp - bpAct.dx) < 0.01 );
+    }
+
+    SECTION("ReLu test"){
+        cout << "Relu test" << endl;
+        Tensor<float> input(vector<int>({1,8}),{-1,2,3,-4,5,-6,7,8});
+        Tensor<float> ref_fp(vector<int>({1,8}),{0,2,3,0,5,0,7,8});
+        Relu relu("Relu1", nullptr);
+        Tensor<float> fpAct = relu.ForwardPropagation(input);
+        REQUIRE( MathHelper<float>::SumVec(ref_fp - fpAct) < 0.01 );
+        cout << "Relu Forward propagation: " << fpAct << endl;
     }
 
     SECTION ( " cross entropy test " ){

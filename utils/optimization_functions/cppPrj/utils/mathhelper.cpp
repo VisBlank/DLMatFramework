@@ -26,6 +26,14 @@ Tensor<T> MathHelper<T>::MaxVec(const Tensor<T> &in, const T &scalar){
 }
 
 template<typename T>
+Tensor<T> MathHelper<T>::MaxVec(const T &scalar, const Tensor<T> &in){
+    Tensor<T> result(vector<int>({in.GetDims()}));
+    // Return the biggest element between scalar and in(each element)
+    transform(in.begin(), in.end(), result.begin(),[&scalar](T m) -> T {return (m>scalar)?m:scalar;});
+    return result;
+}
+
+template<typename T>
 T MathHelper<T>::SumVec(const Tensor<T> &in){
     T res = accumulate(in.begin(), in.end(),T(0));
     return res;
