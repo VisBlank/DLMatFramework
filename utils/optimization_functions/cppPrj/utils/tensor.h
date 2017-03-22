@@ -99,6 +99,11 @@ public:
     */
     Tensor<T> Transpose() const;
 
+    /*
+        Repeat matrix on rows or cols
+    */
+    Tensor<T> Repmat(int nRows, int nCols) const;
+
     // A friend operator can see the private elements of this class
     friend Tensor<T> operator+(const T &left, const Tensor<T> &right){
         // Create result tensor with same dimensions

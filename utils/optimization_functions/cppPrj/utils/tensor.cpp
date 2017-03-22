@@ -274,6 +274,17 @@ Tensor<T> Tensor<T>::Transpose() const{
     return result;
 }
 
+template<typename T>
+Tensor<T> Tensor::Repmat(int nRows, int nCols) const{
+    if (this->GetNumDims() > 2){
+        throw invalid_argument("Only 2d matrix transpose is supported, use Permute for more dimensions");
+    }
+    // Create result tensor
+    Tensor<T> result(vector<int>({m_dims.at(0)*nRows, m_dims.at(1)*nCols}));
+
+    return result;
+}
+
 /*
  * Explicit declare template versions to avoid linker error. (This is needed if we use templates on .cpp files)
 */
