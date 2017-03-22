@@ -19,7 +19,9 @@ SOURCES += main.cpp \
     utils/tensor.cpp \
     utils/mathhelper.cpp \
     tests.cpp \
-    utils/dataset.cpp
+    utils/dataset.cpp \
+    layers/relu.cpp \
+    layers/sigmoid.cpp
 
 HEADERS += \    
     loss/lossfactory.h \
