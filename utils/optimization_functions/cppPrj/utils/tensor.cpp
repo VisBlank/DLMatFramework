@@ -127,7 +127,7 @@ Tensor<T> Tensor<T>::operator/(const T b) const{
 }
 
 template<typename T>
-Tensor<T> Tensor<T>::operator*(Tensor &b){
+Tensor<T> Tensor<T>::operator*(const Tensor &b){
     vector<int> bDims = b.GetDims();
     if (b.GetNumDims() > 2){
         throw invalid_argument("Only 2d matrix multiplication is supported.");
