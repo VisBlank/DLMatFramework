@@ -73,7 +73,9 @@ public:
         Overload the "()" and "*" operators to make it feel like matlab
         The const after the method definition means that this method will not change the class members
     */
-    T& operator()(int row, int col);
+
+    T& operator()(int row, int col); // Return a reference
+    T operator()(int row, int col) const; // Return a copy
     T& operator()(int idx);
     Tensor<T> operator*(Tensor &b);
     Tensor<T> operator*(const T b) const;
@@ -88,6 +90,14 @@ public:
     // Element-wise operations
     Tensor<T> EltWiseMult(const Tensor<T> &b) const;
     Tensor<T> EltWiseDiv(const Tensor<T> &b) const;
+
+    /*
+        Transpose (2d matrix only) and vanilla (with cache misses)
+        For better implementation on CPU check here:
+        http://stackoverflow.com/questions/9227747/in-place-transposition-of-a-matrix
+        https://en.wikipedia.org/wiki/In-place_matrix_transposition#Algorithms
+    */
+    Tensor<T> Transpose() const;
 
     // A friend operator can see the private elements of this class
     friend Tensor<T> operator+(const T &left, const Tensor<T> &right){
