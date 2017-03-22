@@ -9,8 +9,27 @@
 #include "layers/baselayer.h"
 #include "layers/sigmoid.h"
 #include "loss/crossentropy.h"
+#include "utils/reverse_range_based.h"
+#include <array>
 
 TEST_CASE( "Tensor tests "){
+
+    SECTION("Reverse ranged based for"){
+        vector<int> my_vector{1, 2, 3, 4};
+        vector<int> rev_vector_ref{4, 3, 2, 1};
+        vector<int> rev_vector;
+        cout << "Vector my_vector: ";
+        for_each(my_vector.begin(), my_vector.end(), [](int &n){ cout << n << " "; });
+        cout << endl;
+        auto posArray = my_vector.size();
+        for (auto &c : reverse(my_vector)) {
+                cout << "my_array[" << posArray << "]=" << c << endl;
+                //c = 2;
+                rev_vector.push_back(c);
+                posArray++;
+        }
+        REQUIRE(rev_vector == rev_vector_ref);
+    }
 
     SECTION("Tensor reshape"){
         Tensor<float> A(vector<int>({3,4}),{1,2,3,4,5,6,7,8,9,10,11,12});

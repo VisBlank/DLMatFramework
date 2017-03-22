@@ -44,4 +44,5 @@ HEADERS += \
     layers/inputlayer.h \
     utils/mathhelper.h \
     layers/sigmoid.h \
-    utils/dataset.h
+    utils/dataset.h \
+    utils/reverse_range_based.h
