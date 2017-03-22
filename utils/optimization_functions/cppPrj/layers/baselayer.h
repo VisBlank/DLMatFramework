@@ -38,7 +38,7 @@ protected:
     // We need to cache the activations and gradients for backprop
     Tensor<float> m_activation;
     Tensor<float> m_previousInput;
-    Tensor<float> m_gradients;
+    LayerGradient<float> m_gradients;
 
     vector<int> m_activationShape;
 

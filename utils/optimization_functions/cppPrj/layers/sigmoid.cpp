@@ -20,5 +20,9 @@ LayerGradient<float> Sigmoid::BackwardPropagation(const Tensor<float> &dout){
     Tensor<float> d_sigm = t.EltWiseMult(1.0-t);
     Tensor<float> dx = dout.EltWiseMult(d_sigm);
     LayerGradient<float> gradient{dx};
+
+    // Cache gradients
+    m_gradients = gradient;
+
     return gradient;
 }
