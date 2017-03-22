@@ -20,6 +20,7 @@ class MathHelper
 {    
 public:
     static pair<T,unsigned int> MaxVec(const Tensor<T> &in);
+    static Tensor<T> MaxVec(const Tensor<T> &in, const T &scalar);
     static T SumVec(const Tensor<T> &in);
     static T ProdVec(const Tensor<T> &in);    
     static Tensor<T> Log(const Tensor<T> &in);
