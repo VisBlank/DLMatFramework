@@ -15,6 +15,7 @@
 TEST_CASE( "Tensor tests "){
 
     SECTION("Reverse ranged based for"){
+        cout << "Reverse ranged based for" << endl;
         vector<int> my_vector{1, 2, 3, 4};
         vector<int> rev_vector_ref{4, 3, 2, 1};
         vector<int> rev_vector;
@@ -32,6 +33,7 @@ TEST_CASE( "Tensor tests "){
     }
 
     SECTION("Tensor reshape"){
+        cout << "Tensor reshape" << endl;
         Tensor<float> A(vector<int>({3,4}),{1,2,3,4,5,6,7,8,9,10,11,12});
         cout << "A[3x4]" << A << endl;
         CHECK_NOTHROW(A.Reshape(vector<int>({1,12})));
@@ -46,6 +48,16 @@ TEST_CASE( "Tensor tests "){
         // Should throw exception
         REQUIRE_THROWS( A.Reshape(vector<int>({2,60})));
         REQUIRE_THROWS_WITH( A.Reshape(vector<int>({2,60})), "Number of elements must be the same on new shape." );
+    }
+
+    SECTION("2d Matrix transpose"){
+        cout << "2d Matrix transpose" << endl;
+        Tensor<int> A(vector<int>({3,4}),{1,2,3,4,5,6,7,8,9,10,11,12});
+        Tensor<int> A_transp_ref(vector<int>({4,3}),{1,5,9,2,6,10,3,7,11,4,8,12});
+        cout << "A[3x4]=" << A;
+        Tensor<int> A_transp = A.Transpose();
+        cout << "A[4x3]=" << A_transp;
+        REQUIRE(A_transp_ref == A_transp);
     }
 
     SECTION( "Tensor assignment"){

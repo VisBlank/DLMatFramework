@@ -22,6 +22,10 @@ SOURCES += main.cpp \
     utils/dataset.cpp \
     layers/relu.cpp \
     layers/sigmoid.cpp
+    layers/fullyconnected.cpp \
+    layers/inputlayer.cpp \
+    layers/relu.cpp \
+    layers/softmax.cpp
 
 HEADERS += \    
     loss/lossfactory.h \

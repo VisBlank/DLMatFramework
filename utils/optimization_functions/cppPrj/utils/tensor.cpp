@@ -82,6 +82,13 @@ T &Tensor<T>::operator()(int row, int col){
 }
 
 template<typename T>
+T Tensor<T>::operator()(int row, int col) const{
+    // Using at is safer because it checks the boundaries of the vector
+    //return m_buffer[MAT_2D(row, col,m_dims[1])];
+    return m_buffer.at(MAT_2D(row, col,m_dims[1]));
+}
+
+template<typename T>
 T &Tensor<T>::operator()(int idx){
     return m_buffer.at(idx);
 }
@@ -246,6 +253,24 @@ Tensor<T> Tensor<T>::EltWiseDiv(const Tensor<T> &b) const{
     // Add contents of A and B and store results on resVec
     transform(m_buffer.begin(), m_buffer.end(), b.begin(),result.begin(), divides<T>());
 
+    return result;
+}
+
+template<typename T>
+Tensor<T> Tensor<T>::Transpose() const{
+    if (this->GetNumDims() > 2){
+        throw invalid_argument("Only 2d matrix transpose is supported, use Permute for more dimensions");
+    }
+    // Create result tensor with reversed dimensions
+    Tensor<T> result(vector<int>({m_dims.at(1), m_dims.at(0)}));
+
+    // Lot's of cache-miss here
+    #pragma omp parallel for
+    for(int i=0; i<this->GetRows(); ++i) {
+        for(int j=0; j<this->GetCols(); ++j) {
+            result(j,i) = (*this)(i,j);
+        }
+    }
     return result;
 }
 
