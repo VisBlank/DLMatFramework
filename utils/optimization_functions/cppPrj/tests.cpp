@@ -53,6 +53,46 @@ TEST_CASE( "Tensor tests "){
         REQUIRE(maxVec == A_max_ref);
     }
 
+    SECTION("Tensor >= boolean operator"){
+        cout << "Tensor >= boolean operator" << endl;
+        Tensor<int> A(vector<int>({1,8}),{-1,2,3,-4,5,-6,7,8});
+        Tensor<int> A_ref(vector<int>({1,8}),{0,1,1,0,1,0,1,1});
+        cout << "A[1x8]" << A << endl;
+        auto boolOp = (A >= 0);
+        cout << "(A >= 0):" << boolOp << endl;
+        REQUIRE(A_ref == boolOp);
+    }
+
+    SECTION("Tensor <= boolean operator"){
+        cout << "Tensor <= boolean operator" << endl;
+        Tensor<int> A(vector<int>({1,8}),{-1,2,3,-4,5,-6,7,8});
+        Tensor<int> A_ref(vector<int>({1,8}),{1,0,0,1,0,1,0,0});
+        cout << "A[1x8]" << A << endl;
+        auto boolOp = (A <= 0);
+        cout << "(A <= 0):" << boolOp << endl;
+        REQUIRE(A_ref == boolOp);
+    }
+
+    SECTION("Tensor == boolean operator"){
+        cout << "Tensor == boolean operator" << endl;
+        Tensor<int> A(vector<int>({1,8}),{-1,2,3,-4,5,-6,7,8});
+        Tensor<int> A_ref(vector<int>({1,8}),{0,1,0,0,0,0,0,0});
+        cout << "A[1x8]" << A << endl;
+        auto boolOp = (A == 2);
+        cout << "(A == 2):" << boolOp << endl;
+        REQUIRE(A_ref == boolOp);
+    }
+
+    SECTION("Tensor != boolean operator"){
+        cout << "Tensor != boolean operator" << endl;
+        Tensor<int> A(vector<int>({1,8}),{-1,2,3,-4,5,-6,7,8});
+        Tensor<int> A_ref(vector<int>({1,8}),{1,0,1,1,1,1,1,1});
+        cout << "A[1x8]" << A << endl;
+        auto boolOp = (A != 2);
+        cout << "(A != 2):" << boolOp << endl;
+        REQUIRE(A_ref == boolOp);
+    }
+
     SECTION("Tensor repmat"){
         cout << "Tensor repmat" << endl;
         Tensor<int> A(vector<int>({1,2}),{1,2});

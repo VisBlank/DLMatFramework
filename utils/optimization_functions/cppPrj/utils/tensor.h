@@ -86,6 +86,11 @@ public:
     Tensor<T> operator-() const;
     Tensor<T> &operator=(const Tensor &b);
     bool operator==(const Tensor &b);
+    // Implement the binary operators like Matlab
+    Tensor<T> operator>=(const T &scalar);
+    Tensor<T> operator<=(const T &scalar);
+    Tensor<T> operator==(const T &scalar);
+    Tensor<T> operator!=(const T &scalar);
 
     // Element-wise operations
     Tensor<T> EltWiseMult(const Tensor<T> &b) const;

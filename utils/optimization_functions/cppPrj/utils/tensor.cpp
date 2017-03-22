@@ -230,6 +230,38 @@ bool Tensor<T>::operator==(const Tensor &b){
 }
 
 template<typename T>
+Tensor<T> Tensor<T>::operator>=(const T &scalar){
+    Tensor<T> result(this->GetDims());
+    // Return the biggest element between scalar and in(each element)
+    transform(m_buffer.begin(), m_buffer.end(), result.begin(),[&scalar](T m) -> T {return (m>=scalar)?(T)1:(T)0;});
+    return result;
+}
+
+template<typename T>
+Tensor<T> Tensor<T>::operator<=(const T &scalar){
+    Tensor<T> result(this->GetDims());
+    // Return the biggest element between scalar and in(each element)
+    transform(m_buffer.begin(), m_buffer.end(), result.begin(),[&scalar](T m) -> T {return (m<=scalar)?(T)1:(T)0;});
+    return result;
+}
+
+template<typename T>
+Tensor<T> Tensor<T>::operator==(const T &scalar){
+    Tensor<T> result(this->GetDims());
+    // Return the biggest element between scalar and in(each element)
+    transform(m_buffer.begin(), m_buffer.end(), result.begin(),[&scalar](T m) -> T {return (m==scalar)?(T)1:(T)0;});
+    return result;
+}
+
+template<typename T>
+Tensor<T> Tensor<T>::operator!=(const T &scalar){
+    Tensor<T> result(this->GetDims());
+    // Return the biggest element between scalar and in(each element)
+    transform(m_buffer.begin(), m_buffer.end(), result.begin(),[&scalar](T m) -> T {return (m!=scalar)?(T)1:(T)0;});
+    return result;
+}
+
+template<typename T>
 Tensor<T> Tensor<T>::EltWiseMult(const Tensor<T> &b) const{
     if (GetDims() != b.GetDims()){
         throw invalid_argument("Both matrices must have same dimension.");
