@@ -232,13 +232,20 @@ TEST_CASE( "Tensor tests "){
 
     SECTION( " sigmoid test " ){
 
+        // Test sigmoid Forward propagation (Matlab toy example)
+        Tensor<float> ref_fp(vector<int>({1,2}),{0.8201, 0.4917});
         Tensor<float> input(vector<int>({1,2}),{1.5172, -0.0332});
         Sigmoid sigm("Test",nullptr);
-        Tensor<float> fpAct = sigm.ForwardPropagation(input);
+        Tensor<float> fpAct = sigm.ForwardPropagation(input);        
+        REQUIRE( MathHelper<float>::SumVec(ref_fp - fpAct) < 0.01 );
         cout << "Sigmoid Forward propagation: " << fpAct << endl;
+
+        // Test sigmoid Backward propagation (Matlab toy example)
+        Tensor<float> ref_bp(vector<int>({1,2}),{-0.0443, 0.0501});
         Tensor<float> dout(vector<int>({1,2}),{-0.3002, 0.2004});
         LayerGradient<float> bpAct = sigm.BackwardPropagation(dout);
         cout << "Sigmoid Backward propagation: " << bpAct.dx << endl;
+        REQUIRE( MathHelper<float>::SumVec(ref_bp - bpAct.dx) < 0.01 );
     }
 
     SECTION ( " cross entropy test " ){

@@ -27,18 +27,13 @@ https://mbevin.wordpress.com/2012/11/20/move-semantics/
 #include "layers/sigmoid.h"
 #include "loss/crossentropy.h"
 
-auto sum(int a, int b){
-    return a+b;
-}
-
 int runCatchTests()
 {
     return Catch::Session().run();
 }
 
 int main() {        
-    if (TEST)
-    {
+    if (TEST){
         return runCatchTests();
     }       
 
