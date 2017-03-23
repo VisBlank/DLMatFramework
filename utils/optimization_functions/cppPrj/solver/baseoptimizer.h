@@ -2,6 +2,7 @@
 #define BASEOPTIMIZER_H
 
 #include <tuple>
+#include <map>
 #include "utils/tensor.h"
 
 using namespace std;
@@ -22,7 +23,7 @@ template <typename T>
 class BaseOptimizer
 {
 public:    
-    virtual Tensor<T> Optimize(const Tensor<T> &params, const Tensor<T> &grad_params, const OptimizerState<T> &state) = 0;
+    virtual Tensor<T> Optimize(const Tensor<T> &params, const Tensor<T> &grad_params, const OptimizerState<T> &state) = 0;    
     virtual ~BaseOptimizer(){
         cout << "BaseOptimizer destructor" << endl;
     }

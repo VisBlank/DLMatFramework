@@ -1,8 +1,7 @@
 #include "sgd.h"
 
-template <typename T>
-SGD<T>::SGD()
-{
+template<typename T>
+SGD<T>::SGD(const map<string, float> &config){
 
 }
 

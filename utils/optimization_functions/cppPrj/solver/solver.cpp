@@ -3,13 +3,13 @@
 Solver::Solver(DeepLearningModel &net, Dataset<float> &data, const OptimizerType &type, const map<string, float> &config):m_net(net),m_data(data){
     switch (type) {
     case OptimizerType::T_SGD:
-        m_optimizer = unique_ptr<BaseOptimizer<float>>(new SGD<float>());
+        m_optimizer = unique_ptr<BaseOptimizer<float>>(new SGD<float>(config));
         break;
     case OptimizerType::T_SGD_Momentum:
-        m_optimizer = unique_ptr<BaseOptimizer<float>>(new SGDMomentum<float>());
+        m_optimizer = unique_ptr<BaseOptimizer<float>>(new SGDMomentum<float>(config));
         break;
     case OptimizerType::T_Adam:
-        m_optimizer = unique_ptr<BaseOptimizer<float>>(new Adam<float>());
+        m_optimizer = unique_ptr<BaseOptimizer<float>>(new Adam<float>(config));
         break;
     default:
         throw invalid_argument("Optimizer not implemented.");

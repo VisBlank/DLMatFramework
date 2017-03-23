@@ -1,7 +1,7 @@
 #include "sgdmomentum.h"
 
 template<typename T>
-SGDMomentum<T>::SGDMomentum(){
+SGDMomentum<T>::SGDMomentum(const map<string, float> &config){
 
 }
 
