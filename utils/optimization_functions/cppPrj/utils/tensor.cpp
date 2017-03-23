@@ -114,6 +114,11 @@ Tensor<T> Tensor<T>::operator*(const Tensor &b) const{
     if (b.GetNumDims() > 2){
         throw invalid_argument("Only 2d matrix multiplication is supported.");
     }
+    // Also check if the multiplication is possible
+    if (this->GetCols() != b.GetRows()){
+        throw invalid_argument("A rows does not match to b cols.");
+    }
+
     // Create result matrix
     Tensor<T> result(vector<int>({m_dims[0],bDims[1]}));
     int num_rows_A = m_dims[0];

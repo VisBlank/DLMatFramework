@@ -16,8 +16,13 @@ Batch<T> Dataset<T>::GetBatch(int batchSize){
         batchSize = m_trainingSize;
     }
     Batch<T> batch;
-    batch.X = m_X_Train;
-    batch.Y = m_X_Train;
+    //batch.X = m_X_Train;
+    //batch.Y = m_X_Train;
+    // TODO: Tensor select
+    Tensor<T> Xtest(vector<int>({1,2}),{0,1});
+    Tensor<T> Ytest(vector<int>({1,1}),{1});
+    batch.X = Xtest;
+    batch.Y = Ytest;
     return batch;
 }
 

@@ -8,7 +8,7 @@ FullyConnected::FullyConnected(const string &name, shared_ptr<BaseLayer> inLayer
     if (m_inputLayer != nullptr){
         auto shapeInputLayer = m_inputLayer->GetActivationShape();
         auto prodInShape = accumulate(shapeInputLayer.begin(), shapeInputLayer.end(),1,multiplies<int>());
-        m_activationShape.push_back(prodInShape);
+        m_activationShape.push_back(1);
         m_activationShape.push_back(numOutput);
 
         // Initialize weights and bias
@@ -25,9 +25,12 @@ Tensor<float> FullyConnected::ForwardPropagation (const Tensor<float> &input) {
         N = input.GetRows();
     }
     else{
-
+        // TODO: Handle batch input
     }
-
+    /*cout << "---------------- FC----------------" << endl;
+    cout << "Input" << input;
+    cout << "Weights" << m_weights;
+    cout << "Bias" << m_bias;*/
     Tensor<float> activation = input*m_weights + (m_bias.Repmat(N,1));
 
     // Cache results and input for backprop

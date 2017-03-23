@@ -54,10 +54,9 @@ void Solver::Step(){
     // Select a mini-batch
     Batch<float> batch = m_data.GetBatch(m_batchSize);
 
-    // Get model loss and gradients (The model Loss method will invoke the backpropagation)
-    auto LossGrad = m_net.Loss(batch.X, batch.Y);
-    auto grad = get<1>(LossGrad);
-    m_loss_history.push_back(get<0>(LossGrad));
+    // Get model loss and calculate gradients (The model Loss method will invoke the backpropagation)
+    auto Loss = m_net.Loss(batch.X, batch.Y);
+    m_loss_history.push_back(Loss);
 
     // Perform parameter update on each layer (Not that not all layer has parameters)
     for (auto &layerName :m_net.GetLayers()){

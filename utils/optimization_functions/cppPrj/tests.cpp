@@ -376,9 +376,9 @@ TEST_CASE( "Tensor tests "){
     LayerContainer layers;
     layers <= LayerMetaData{"Input",LayerType::TInput,1,2,1,1};// Rows,Cols,channels,batch-size
     layers <= LayerMetaData{"FC_1",LayerType::TFullyConnected,2};
-    layers <= LayerMetaData{"Relu_1",LayerType::TSigmoid};
+    layers <= LayerMetaData{"Sigm_1",LayerType::TSigmoid};
     layers <= LayerMetaData{"FC_2",LayerType::TFullyConnected,1};
-    layers <= LayerMetaData{"Softmax",LayerType::TSoftMax};
+    layers <= LayerMetaData{"Sigm_2",LayerType::TSigmoid};
 
 
     DeepLearningModel net(layers,LossFactory<CrossEntropy>::GetLoss());
