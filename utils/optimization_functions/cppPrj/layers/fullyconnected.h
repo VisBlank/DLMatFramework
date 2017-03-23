@@ -9,7 +9,7 @@ public:
     FullyConnected(const string &name, shared_ptr<BaseLayer> inLayer, int numOutput);
 
     Tensor<float> ForwardPropagation(const Tensor<float> &input) override;
-    LayerGradient<float> BackwardPropagation(const Tensor<float> &dout) override;
+    LayerGradient<float> BackwardPropagation(const LayerGradient<float> &dout) override;
 
     void setWeights(Tensor<float> &weights);
     void setBias(Tensor<float> &bias);

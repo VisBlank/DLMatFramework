@@ -15,7 +15,7 @@ Tensor<float> InputLayer::ForwardPropagation(const Tensor<float> &input){
     return activation;
 }
 
-LayerGradient<float> InputLayer::BackwardPropagation(const Tensor<float> &dout){
+LayerGradient<float> InputLayer::BackwardPropagation(const LayerGradient<float> &dout){
     LayerGradient<float> gradient;
     return gradient;
 }

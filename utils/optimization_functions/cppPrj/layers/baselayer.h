@@ -21,7 +21,7 @@ class BaseLayer
 {
 public:        
     virtual Tensor<float> ForwardPropagation(const Tensor<float> &input) = 0;
-    virtual LayerGradient<float> BackwardPropagation(const Tensor<float> &dout) = 0;
+    virtual LayerGradient<float> BackwardPropagation(const LayerGradient<float> &dout) = 0;
 
     shared_ptr<BaseLayer> GetInputLayer() const { return m_inputLayer;}
     string GetName() const {return m_name;}

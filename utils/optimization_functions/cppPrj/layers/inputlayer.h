@@ -9,6 +9,6 @@ public:
     InputLayer(const string &name, int numRows, int numCols, int numChannels, int batchSize);
 
     Tensor<float> ForwardPropagation(const Tensor<float> &input) override;
-    LayerGradient<float> BackwardPropagation(const Tensor<float> &dout) override;
+    LayerGradient<float> BackwardPropagation(const LayerGradient<float> &dout) override;
 };
 #endif // INPUTLAYER_H

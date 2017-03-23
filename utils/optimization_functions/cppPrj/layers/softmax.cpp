@@ -11,7 +11,7 @@ Tensor<float> SoftMax::ForwardPropagation(const Tensor<float> &input){
     return activation;
 }
 
-LayerGradient<float> SoftMax::BackwardPropagation(const Tensor<float> &dout){
+LayerGradient<float> SoftMax::BackwardPropagation(const LayerGradient<float> &dout){
     LayerGradient<float> gradient;
     return gradient;
 }

@@ -21,9 +21,9 @@ Tensor<float> Relu::ForwardPropagation(const Tensor<float> &input){
     return activation;
 }
 
-LayerGradient<float> Relu::BackwardPropagation(const Tensor<float> &dout){    
+LayerGradient<float> Relu::BackwardPropagation(const LayerGradient<float> &dout){
     // Backpropagate only the inputs values that have been selected during the FP
-    Tensor<float> dx = dout.EltWiseMult((m_previousInput >= (float)0));
+    Tensor<float> dx = dout.dx.EltWiseMult((m_previousInput >= (float)0));
     LayerGradient<float> gradient{dx};
 
     // Cache gradients

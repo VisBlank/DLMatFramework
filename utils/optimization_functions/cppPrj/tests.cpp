@@ -330,9 +330,10 @@ TEST_CASE( "Tensor tests "){
         cout << "Sigmoid Forward propagation: " << fpAct << endl;
 
         // Test sigmoid Backward propagation (Matlab toy example)
-        Tensor<float> ref_bp(vector<int>({1,2}),{-0.0443, 0.0501});
+        Tensor<float> ref_bp(vector<int>({1,2}),{-0.0443, 0.0501});        
         Tensor<float> dout(vector<int>({1,2}),{-0.3002, 0.2004});
-        LayerGradient<float> bpAct = sigm.BackwardPropagation(dout);
+        LayerGradient<float> doutGrad = {dout};
+        LayerGradient<float> bpAct = sigm.BackwardPropagation(doutGrad);
         cout << "Sigmoid Backward propagation: " << bpAct.dx << endl;
         REQUIRE( MathHelper<float>::SumVec(ref_bp - bpAct.dx) < 0.01 );
     }
@@ -431,7 +432,8 @@ TEST_CASE( "Tensor tests "){
 
         // Test FC Backward propagation
         Tensor<float> gradOut(vector<int>({1,2}),{0.5,1.2});
-        LayerGradient<float> bpGrad = fc1.BackwardPropagation(gradOut);
+        LayerGradient<float> d_grad = {gradOut};
+        LayerGradient<float> bpGrad = fc1.BackwardPropagation(d_grad);
 
 
         Tensor<float> actual_dBias(vector<int>({1,2}),{0.5,1.2});

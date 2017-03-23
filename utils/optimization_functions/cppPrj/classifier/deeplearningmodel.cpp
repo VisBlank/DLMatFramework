@@ -44,11 +44,11 @@ float DeepLearningModel::Loss(const Tensor<float> &X, const Tensor<float> &Y){
         if (typeid(*currLayer) == typeid(InputLayer)){continue;};
 
         //cout << "Backprop on: " << layerName << endl;
-        //currDout = currLayer->BackwardPropagation()
+        currDout = currLayer->BackwardPropagation(currDout);
 
     }
 
-    return 0.0f;
+    return dataLoss;
 }
 
 void DeepLearningModel::InitWeights(){    
