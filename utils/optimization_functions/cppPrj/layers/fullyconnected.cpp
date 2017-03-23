@@ -19,8 +19,12 @@ FullyConnected::FullyConnected(const string &name, shared_ptr<BaseLayer> inLayer
 Tensor<float> FullyConnected::ForwardPropagation (const Tensor<float> &input) {
     //batch size (not fully batch ready)
     int N;
+
     if (input.GetNumDims() < 3){
         N = input.GetRows();
+    }
+    else{
+
     }
 
     Tensor<float> activation = input*m_weights + (m_bias.Repmat(N,1));
@@ -33,7 +37,22 @@ Tensor<float> FullyConnected::ForwardPropagation (const Tensor<float> &input) {
 }
 
 LayerGradient<float> FullyConnected::BackwardPropagation(const Tensor<float> &dout){
-    LayerGradient<float> gradient;
+
+    // Recover cache and get its batch size (not fully batch ready)
+    if (m_previousInput.GetNumDims() < 3){
+        int N = m_previousInput.GetRows();
+    }
+
+    Tensor<float> dx = dout * m_weights.Transpose();
+    Tensor<float> dWeights = m_previousInput.Transpose() * dout;
+    // Bias gradient should have the same shape as the original bias (NOT FINISHED SHOULD BE SUM ACROSS COLS)
+    Tensor<float> dBias = (dout);
+
+    LayerGradient<float> gradient{dx,dWeights,dBias} ;
+
+    // cache gradients
+    m_gradients = gradient;
+
     return gradient;
 }
 
