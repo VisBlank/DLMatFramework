@@ -35,7 +35,7 @@ int runCatchTests()
 int main() {        
     if (TEST){
         return runCatchTests();
-    }       
+    }
 
     return 0;
 }

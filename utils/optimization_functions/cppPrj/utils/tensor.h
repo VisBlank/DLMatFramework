@@ -13,6 +13,7 @@ http://www.learncpp.com/cpp-tutorial/92-overloading-the-arithmetic-operators-usi
 #include <iostream>
 #include <tuple>
 #include <vector>
+#include <array>
 #include <memory>
 #include <algorithm>
 #include <array>
@@ -59,6 +60,9 @@ public:
     vector<int> GetDims() const {return m_dims;}
     int GetRows() const {return m_dims[0];}
     int GetCols() const {return m_dims[1];}
+    // TODO:
+    int GetDepth() const {return 1;}
+    int GetBatch() const {return 1;}
 
     // Return a copy of our buffer (Safe)
     vector<T> GetBufferCopy() const {return m_buffer;}
@@ -74,9 +78,46 @@ public:
         The const after the method definition means that this method will not change the class members
     */
 
-    T& operator()(int row, int col); // Return a reference
-    T operator()(int row, int col) const; // Return a copy
-    T& operator()(int idx);
+    // Address elements of tensor using a variadic template (Don't know how to add this on source)
+    template <typename ...Args>
+    T& operator()(int firstIdx, Args... otherIdx){
+        // Create array with all parameters (otherIdx...) expand during compilation time
+        array<T, sizeof...(otherIdx) + 1> pDims = {firstIdx, otherIdx...};
+        switch (pDims.size()){
+            case 1:
+                return m_buffer.at(firstIdx);
+            case 2:
+                return m_buffer.at(MAT_2D(pDims[0], pDims[1], this->GetCols()));
+            case 3:
+                return m_buffer.at(MAT_3D(pDims[0], pDims[1], pDims[2], this->GetRows(), this->GetCols()));
+            case 4:
+                return m_buffer.at(MAT_4D(pDims[0], pDims[1], pDims[2], pDims[3], this->GetRows(), this->GetCols(), this->GetDepth()));
+            default:
+                throw invalid_argument("Addressing working up to 4 dimensions");
+        }
+
+        return m_buffer.at(firstIdx);
+    }
+    template <typename ...Args>
+    T operator()(int firstIdx, Args... otherIdx) const{
+        // Create array with all parameters (otherIdx...) expand during compilation time
+        array<T, sizeof...(otherIdx) + 1> pDims = {firstIdx, otherIdx...};
+        switch (pDims.size()){
+            case 1:
+                return m_buffer.at(firstIdx);
+            case 2:
+                return m_buffer.at(MAT_2D(pDims[0], pDims[1], this->GetCols()));
+            case 3:
+                return m_buffer.at(MAT_3D(pDims[0], pDims[1], pDims[2], this->GetRows(), this->GetCols()));
+            case 4:
+                return m_buffer.at(MAT_4D(pDims[0], pDims[1], pDims[2], pDims[3], this->GetRows(), this->GetCols(), this->GetDepth()));
+            default:
+                throw invalid_argument("Addressing working up to 4 dimensions");
+        }
+
+        return m_buffer.at(firstIdx);
+    }
+
     Tensor<T> operator*(const Tensor &b) const;
     Tensor<T> operator*(const T b) const;
     Tensor<T> operator/(const T b) const;

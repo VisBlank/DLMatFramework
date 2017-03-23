@@ -74,24 +74,6 @@ typename vector<T>::const_iterator Tensor<T>::end() const {
     return m_buffer.end();
 }
 
-template<typename T>
-T &Tensor<T>::operator()(int row, int col){
-    // Using at is safer because it checks the boundaries of the vector
-    //return m_buffer[MAT_2D(row, col,m_dims[1])];
-    return m_buffer.at(MAT_2D(row, col,m_dims[1]));
-}
-
-template<typename T>
-T Tensor<T>::operator()(int row, int col) const{
-    // Using at is safer because it checks the boundaries of the vector
-    //return m_buffer[MAT_2D(row, col,m_dims[1])];
-    return m_buffer.at(MAT_2D(row, col,m_dims[1]));
-}
-
-template<typename T>
-T &Tensor<T>::operator()(int idx){
-    return m_buffer.at(idx);
-}
 
 template<typename T>
 Tensor<T> Tensor<T>::operator+(const T b) const {
@@ -333,3 +315,4 @@ Tensor<T> Tensor<T>::Repmat(int nRows, int nCols) const{
 template class Tensor<float>;
 template class Tensor<double>;
 template class Tensor<int>;
+//template Tensor<float> Tensor<float>::crazy(int firstIdx, Args... otherIdx);
