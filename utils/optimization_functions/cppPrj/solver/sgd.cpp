@@ -1,10 +1,9 @@
 #include "sgd.h"
 #include <map>
 template <typename T>
-SGD<T>::SGD(const map<string, float> &config)
-{
-    m_config = config;
-    m_base_lr = m_config["learning_rate"];
+SGD<T>::SGD(const map<string, float> &config):BaseOptimizer<T>(config){
+    // Ugly detail about templated classes (https://isocpp.org/wiki/faq/templates#nondependent-name-lookup-members)
+    m_base_lr = BaseOptimizer<T>::m_config["learning_rate"];
 }
 
 template<typename T>

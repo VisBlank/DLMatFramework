@@ -1,7 +1,7 @@
 #include "adam.h"
 
 template<typename T>
-Adam<T>::Adam(const map<string, float> &config){
+Adam<T>::Adam(const map<string, float> &config):BaseOptimizer<T>(config){
 
 }
 

@@ -1,7 +1,7 @@
 #include "sgdmomentum.h"
 
 template<typename T>
-SGDMomentum<T>::SGDMomentum(const map<string, float> &config){
+SGDMomentum<T>::SGDMomentum(const map<string, float> &config):BaseOptimizer<T>(config){
 
 }
 

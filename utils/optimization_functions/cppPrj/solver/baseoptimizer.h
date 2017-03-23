@@ -3,6 +3,7 @@
 
 #include <tuple>
 #include <map>
+#include <string>
 #include "utils/tensor.h"
 
 using namespace std;
@@ -23,10 +24,13 @@ template <typename T>
 class BaseOptimizer
 {
 public:    
-    virtual Tensor<T> Optimize(const Tensor<T> &params, const Tensor<T> &grad_params, const OptimizerState<T> &state) = 0;    
+    BaseOptimizer(const map<string,float> &conf):m_config(conf){}
+    virtual Tensor<T> Optimize(const Tensor<T> &params, const Tensor<T> &grad_params, const OptimizerState<T> &state) = 0;
     virtual ~BaseOptimizer(){
         cout << "BaseOptimizer destructor" << endl;
     }
+protected:
+    map<string,float> m_config;
 };
 
 #endif // BASEOPTIMIZER_H
