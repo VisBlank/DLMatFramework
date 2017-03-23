@@ -15,6 +15,11 @@
 
 TEST_CASE( "Tensor tests "){
 
+    SECTION("Try to print empty tensor"){
+        Tensor<int> A;
+        CHECK_NOTHROW(cout << A << endl);
+    }
+
     SECTION("Reverse ranged based for"){
         cout << "Reverse ranged based for" << endl;
         vector<int> my_vector{1, 2, 3, 4};

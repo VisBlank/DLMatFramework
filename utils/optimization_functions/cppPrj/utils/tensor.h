@@ -63,6 +63,7 @@ public:
     // TODO:
     int GetDepth() const {return 1;}
     int GetBatch() const {return 1;}
+    bool IsEmpty() const {return (m_num_dims == 0);}
 
     // Return a copy of our buffer (Safe)
     vector<T> GetBufferCopy() const {return m_buffer;}
@@ -183,17 +184,22 @@ public:
     friend ostream& operator<<(ostream& os, const Tensor<T>& right){
         stringstream str_stream;
         str_stream << endl;
-        // Observe that the friend class can "see" elements from the Tensor class
-        auto start = right.m_buffer.begin();
-        auto ncols = right.GetCols();
-        auto nrows = right.GetRows();
-        for (int i = 0; i < nrows; ++i){
-            // Get a slice from the vector
-            vector<T> rowSlice(start, start + ncols);
-            str_stream << "| ";
-            for_each(rowSlice.begin(), rowSlice.end(), [&str_stream](T m){str_stream << m << " ";});
-            start += ncols;
-            str_stream << "|" << endl;
+        if (right.IsEmpty()){
+            // Empty tensor
+            str_stream << "Empty Tensor:[]";
+        } else {
+            // Observe that the friend class can "see" elements from the Tensor class
+            auto start = right.m_buffer.begin();
+            auto ncols = right.GetCols();
+            auto nrows = right.GetRows();
+            for (int i = 0; i < nrows; ++i){
+                // Get a slice from the vector
+                vector<T> rowSlice(start, start + ncols);
+                str_stream << "| ";
+                for_each(rowSlice.begin(), rowSlice.end(), [&str_stream](T m){str_stream << m << " ";});
+                start += ncols;
+                str_stream << "|" << endl;
+            }
         }
         //os << dt.mo << '/' << dt.da << '/' << dt.yr;
         os << str_stream.str();
