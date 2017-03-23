@@ -1,11 +1,10 @@
 #include "sgd.h"
-
+#include <map>
 template <typename T>
 SGD<T>::SGD(const map<string, float> &config)
 {
     m_config = config;
-    m_base_lr = m_config.at("learning_rate");
-    m_base_lr = 0;
+    m_base_lr = m_config["learning_rate"];
 }
 
 template<typename T>
