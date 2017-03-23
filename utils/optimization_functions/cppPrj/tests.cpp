@@ -424,11 +424,25 @@ TEST_CASE( "Tensor tests "){
 
         Tensor<float> fpAct = fc1.ForwardPropagation(input_test);
 
-
         Tensor<float> actual_result(vector<int>({1,2}),{16,31});
-
         cout << "fc Forward propagation: " << fpAct << endl;
         REQUIRE(fpAct == actual_result);
+
+
+        // Test FC Backward propagation
+        Tensor<float> gradOut(vector<int>({1,2}),{0.5,1.2});
+        LayerGradient<float> bpGrad = fc1.BackwardPropagation(gradOut);
+
+
+        Tensor<float> actual_dBias(vector<int>({1,2}),{0.5,1.2});
+        Tensor<float> actual_dWeights(vector<int>({5,2}),{0.5,1.2,1,2.4,1.5,3.6,2,4.8,2.5,6});
+        Tensor<float> actual_dx(vector<int>({1,5}),{2.9,2.9,2.9,2.9,2.9});
+        cout << "fc Backward propagation dbias: " << bpGrad.dBias << endl;
+        cout << "fc Backward propagation dweights: " << bpGrad.dWeights << endl;
+        cout << "fc Backward propagation dx: " << bpGrad.dx << endl;
+        REQUIRE( bpGrad.dBias == actual_dBias);
+        REQUIRE (MathHelper<float>::SumVec( bpGrad.dWeights - actual_dWeights) < 0.001);
+        REQUIRE( bpGrad.dx == actual_dx);
 
     }
 
