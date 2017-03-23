@@ -37,7 +37,7 @@ public:
     decltype(container.rbegin()) begin() const { return container.rbegin(); }
     //auto begin() const { return container.rbegin(); }
     decltype(container.rend()) end() const { return container.rend(); }
-    //auto end() const { return container.rend(); }
+    //auto end() const { return container.rend(); }    
 };
 
 template<class T>
@@ -70,5 +70,53 @@ template<class T>
 reverse_wrapper<T> reverse(T& cont) {
   return reverse_wrapper<T>(cont);
 }
+
+/*
+ * Helper used to skip iterations on for:range loop
+ * Reference:
+ * http://stackoverflow.com/questions/25652505/skip-1st-iteration-of-range-based-for-loops
+ * */
+template <typename T>
+class skip{
+public:
+    T& t;
+    std::size_t num_skip;
+    // Constructor
+    skip(T& v, std::size_t s) : t(v), num_skip(s) {}
+
+    auto begin() -> decltype(std::begin(t)) {
+        return std::next(std::begin(t), num_skip);
+    }
+    // C++11
+    auto end() -> decltype(std::end(t)){
+        return std::end(t);
+    }
+    // C++14
+    /*auto end() {
+        return std::end(t);
+    }*/
+    auto rbegin() -> decltype(t.rbegin()) {
+        return std::next(t.rbegin(), num_skip);
+    }
+    auto rend() -> decltype(t.rend()){
+        return t.rend();
+    }
+};
+
+/*template <typename T>
+class skip_rev{
+public:
+    T& t;
+    std::size_t num_skip;
+    // Constructor
+    skip_rev(T& v, std::size_t s) : t(v), num_skip(s) {}
+
+    auto rbegin() -> decltype(t.rbegin()) {
+        return std::next(t.rbegin(), num_skip);
+    }
+    auto rend() -> decltype(t.rend()){
+        return t.rend();
+    }
+};*/
 
 #endif // REVERSE_RANGE_BASED_H

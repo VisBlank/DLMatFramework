@@ -20,6 +20,40 @@ TEST_CASE( "Tensor tests "){
         CHECK_NOTHROW(cout << A << endl);
     }
 
+    SECTION("Skip ranged based for"){
+        cout << "Reverse ranged based for" << endl;
+        vector<int> my_vector{1, 2, 3, 4};
+        vector<int> vector_skip_ref{3,4};
+        vector<int> rev_vector_skip_ref{2,1};
+        vector<int> vector_skip;
+        vector<int> rev_vector_skip;
+        cout << "Vector my_vector: ";
+        for_each(my_vector.begin(), my_vector.end(), [](int &n){ cout << n << " "; });
+        cout << endl;
+
+        // Ascendent ranged for loop skiping 2 elements
+        auto posArray = my_vector.size();
+        cout << "Test Ascendent for-range with skip:" << endl;
+        // For range loop skiping 2 elements
+        for (auto &c : skip<decltype(my_vector)>(my_vector, 2)) {
+                cout << "vector_skip[" << posArray << "]=" << c << endl;
+                vector_skip.push_back(c);
+                posArray++;
+        }
+        REQUIRE(vector_skip == vector_skip_ref);
+
+        // Descent ranged for loop skiping 2 elements
+        /*posArray = my_vector.size();
+        cout << "Test Descent for-range with skip:" << endl;
+        // For range loop skiping 2 elements
+        for (auto &c : reverse(skip_rev<decltype(my_vector)>(my_vector, 2))) {
+                cout << "vector_skip[" << posArray << "]=" << c << endl;
+                rev_vector_skip.push_back(c);
+                posArray++;
+        }
+        REQUIRE(rev_vector_skip == rev_vector_skip_ref);*/
+    }
+
     SECTION("Reverse ranged based for"){
         cout << "Reverse ranged based for" << endl;
         vector<int> my_vector{1, 2, 3, 4};
