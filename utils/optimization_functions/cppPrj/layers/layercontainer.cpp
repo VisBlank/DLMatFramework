@@ -20,6 +20,19 @@ typename list<string>::const_iterator LayerContainer::end() const {
     return m_layerNamesList.end();
 }
 
+typename list<string>::reverse_iterator LayerContainer::rbegin(){
+    return m_layerNamesList.rbegin();
+}
+typename list<string>::reverse_iterator LayerContainer::rend(){
+    return m_layerNamesList.rend();
+}
+typename list<string>::const_reverse_iterator LayerContainer::rbegin() const {
+    return m_layerNamesList.rbegin();
+}
+typename list<string>::const_reverse_iterator LayerContainer::rend() const {
+    return m_layerNamesList.rend();
+}
+
 void LayerContainer::operator<=(const LayerMetaData &layerData){
     shared_ptr<BaseLayer> layer;
     switch (layerData.type) {

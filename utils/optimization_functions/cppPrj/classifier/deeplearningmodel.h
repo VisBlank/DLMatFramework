@@ -7,6 +7,7 @@
 
 #include "layers/layercontainer.h"
 #include "loss/baseloss.h"
+#include "utils/reverse_range_based.h"
 
 using namespace std;
 

@@ -47,6 +47,11 @@ public:
     typename list<string>::const_iterator begin() const;
     typename list<string>::const_iterator end() const;
 
+    typename list<string>::reverse_iterator rbegin();
+    typename list<string>::reverse_iterator rend();
+    typename list<string>::const_reverse_iterator rbegin() const;
+    typename list<string>::const_reverse_iterator rend() const;
+
 private:
     // Hash map of layers unique pointers (Remember that they should be moved here...)
     unordered_map<string,shared_ptr<BaseLayer>> m_hashMapLayers;
