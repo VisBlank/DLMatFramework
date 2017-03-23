@@ -28,6 +28,8 @@ private:
     int m_batchSize = 1;
     unique_ptr<BaseOptimizer<float>> m_optimizer = nullptr;    
     vector<float> m_loss_history;
+    bool m_verbose = true;
+    int m_print_every = 1000;
 public:
     Solver() = delete;
     Solver(DeepLearningModel &net, Dataset<float> &data, const OptimizerType &type, const map<string,float> &config);

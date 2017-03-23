@@ -18,13 +18,24 @@ Solver::Solver(DeepLearningModel &net, Dataset<float> &data, const OptimizerType
 }
 
 void Solver::Train(){
+    // Indicate to model that training phase started
+    m_net.IsTraining(true);
+
     int num_train = m_data.GetTrainSize();
     int iterations_per_epoch = ceil((float)num_train / (float)m_batchSize);
-    int num_iterations = iterations_per_epoch * m_epochs;
+    int num_iterations = iterations_per_epoch * m_epochs;    
+    cout << "Epochs: " << m_epochs << " Iterations/Epoch: " << iterations_per_epoch << endl;
+
+    // Indicate the dataset class that we want to auto-shuffle every iterations_per_epoch iterations
+    m_data.ShuffleEveryNIterations(iterations_per_epoch);
 
     for (int t=0; t < num_iterations; ++t){
+        // Do a solver step (Get loss/gradients, update weights(SGD, Adam, etc...)
         Step();
     }
+
+    // Indicate to model that training phase is over
+    m_net.IsTraining(false);
 }
 
 void Solver::SetEpochs(int epochs){
@@ -43,16 +54,34 @@ void Solver::Step(){
     // Select a mini-batch
     Batch<float> batch = m_data.GetBatch(m_batchSize);
 
-    // Get model loss and gradients
+    // Get model loss and gradients (The model Loss method will invoke the backpropagation)
     auto LossGrad = m_net.Loss(batch.X, batch.Y);
+    auto grad = get<1>(LossGrad);
     m_loss_history.push_back(get<0>(LossGrad));
 
-    // Perform parameter update
+    // Perform parameter update on each layer (Not that not all layer has parameters)
+    for (auto &layerName :m_net.GetLayers()){
+        // Get the layer instance
+        auto layer = m_net.GetLayers()(layerName);
+        // Continue if layer has no parameter
+        if (!layer->HasParameter()) continue;
 
-    Tensor<float> A(vector<int>({1,2}),{0,0});
-    Tensor<float> B(vector<int>({1,2}),{0,0});
-    Tensor<float> C(vector<int>({1,2}),{0,0});
-    m_optimizer->Optimize(A, B, C);
+        // Select the weight and bias references (Those will be changed by the Optimizers)
+        auto weights = layer->GetWeightsRef();
+        auto bias = layer->GetBiasRef();
+
+        // Add regularization (TODO)
+
+        // Use optimizers to calculate new weights and biases (TODO: Handle Optimizer state as a class)
+        OptimizerState<float> opt;
+        auto newWeights = m_optimizer->Optimize(weights, layer->GetGradientRef().dWeights, opt);
+        auto newBias = m_optimizer->Optimize(bias, layer->GetGradientRef().dBias, opt);
+
+        // Update weights and biases on the model
+        weights = newWeights;
+        bias = newBias;
+
+    }
 }
 
 /*

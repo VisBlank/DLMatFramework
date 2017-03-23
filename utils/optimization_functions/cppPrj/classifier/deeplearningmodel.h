@@ -29,6 +29,9 @@ public:
     Tensor<float> Predict(const Tensor<float> &input);
     tuple<float, Tensor<float>> Loss(const Tensor<float> &X, const Tensor<float> &Y);
     bool IsTraining() const {return m_isTraining;}
+    void IsTraining(const bool &flag) {m_isTraining = flag;}
+    LayerContainer &GetLayers() { return ref(m_layers);}
+
 private:
     void InitWeights();
 };

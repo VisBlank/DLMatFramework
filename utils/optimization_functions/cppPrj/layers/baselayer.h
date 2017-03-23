@@ -28,7 +28,10 @@ public:
     vector<int> GetActivationShape() const {return m_activationShape;}
 
     Tensor<float> &GetWeightsRef() {return ref(m_weights);}
-    Tensor<float> &GetBiasRef() {return ref(m_bias);}
+    Tensor<float> &GetBiasRef() {return ref(m_bias);}    
+    LayerGradient<float> &GetGradientRef() {return ref(m_gradients);}
+
+    bool HasParameter() const { return m_hasParameter;}
 
 protected:
     // Weights and bias are references, we don't need to store them
@@ -43,6 +46,7 @@ protected:
     vector<int> m_activationShape;
 
     string m_name;
+    bool m_hasParameter = false;
 
     // Reference to layers connected to this current layer    
     shared_ptr<BaseLayer> m_inputLayer = nullptr;

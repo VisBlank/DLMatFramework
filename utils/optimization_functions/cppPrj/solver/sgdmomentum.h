@@ -7,7 +7,7 @@ class SGDMomentum : public BaseOptimizer<T>
 {
 public:
     SGDMomentum();
-    tuple<Tensor<T>, Tensor<T>> Optimize(const Tensor<T> &params, const Tensor<T> &grad_params, const Tensor<T> &state) override;
+    Tensor<T> Optimize(const Tensor<T> &params, const Tensor<T> &grad_params, const OptimizerState<T> &state) override;
 };
 
 #endif // SGDMOMENTUM_H

@@ -3,6 +3,7 @@
 FullyConnected::FullyConnected(const string &name, shared_ptr<BaseLayer> inLayer, int numOutput){
     m_inputLayer = inLayer;
     m_name = name;
+    m_hasParameter = true;
 
     if (m_inputLayer != nullptr){
         auto shapeInputLayer = m_inputLayer->GetActivationShape();

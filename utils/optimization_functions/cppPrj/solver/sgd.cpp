@@ -7,12 +7,11 @@ SGD<T>::SGD()
 }
 
 template<typename T>
-tuple<Tensor<T>, Tensor<T> > SGD<T>::Optimize(const Tensor<T> &params, const Tensor<T> &grad_params, const Tensor<T> &state){
+Tensor<T> SGD<T>::Optimize(const Tensor<T> &params, const Tensor<T> &grad_params, const OptimizerState<T> &state){
     //cout << "SGD optimizer" << endl;
 
-    Tensor<T> A(vector<int>({1,2}),{0,0});
-    Tensor<T> B(vector<int>({1,2}),{0,0});
-    return make_tuple(A,B);
+    Tensor<T> A(vector<int>({1,2}),{0,0});    
+    return A;
 }
 
 /*

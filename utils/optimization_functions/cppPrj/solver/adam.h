@@ -7,7 +7,7 @@ class Adam : public BaseOptimizer<T>
 {
 public:
     Adam();
-    tuple<Tensor<T>, Tensor<T>> Optimize(const Tensor<T> &params, const Tensor<T> &grad_params, const Tensor<T> &state) override;
+    Tensor<T> Optimize(const Tensor<T> &params, const Tensor<T> &grad_params, const OptimizerState<T> &state) override;
 };
 
 #endif // ADAM_H

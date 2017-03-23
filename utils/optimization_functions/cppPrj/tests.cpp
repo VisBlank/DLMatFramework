@@ -389,7 +389,6 @@ TEST_CASE( "Tensor tests "){
     solver.SetEpochs(1000);
     solver.Train();
     auto lossHistory = solver.GetLossHistory();
-    lossHistory[2] = 1;
 
     // fix predict
     /*
