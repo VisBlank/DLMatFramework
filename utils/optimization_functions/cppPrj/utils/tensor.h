@@ -62,6 +62,7 @@ public:
     vector<int> GetDims() const {return m_dims;}
     int GetRows() const {return m_dims[0];}
     int GetCols() const {return m_dims[1];}
+    int GetNumElements() const { return m_numElements;}
     // TODO:
     int GetDepth() const {return 1;}
     int GetBatch() const {return 1;}
@@ -91,6 +92,9 @@ public:
             // Some rows, all cols
             result.SetDims(vector<int>{pRanges[0].size(), inputCols});
             result.PreAloc();
+
+            // Copy elements
+            copy(m_buffer.begin(), m_buffer.begin()+result.GetNumElements(), result.begin());
         }
 
         return result;

@@ -22,7 +22,8 @@ TEST_CASE( "Tensor tests "){
         // Select rows 1:2 all cols "on matlab X(1:2,:)"
         cout << "Select rows:" << range<int>(1,2) << "and all columns" << " size range: " << range<int>(1,2).size() << endl;
         Tensor<float> X_sub = X.Select(range<int>(1,2),range<int>(-1,-1));
-        //REQUIRE(X_sub_ref == X_sub);
+        cout << "Selected matrix: " << X_sub << endl;
+        REQUIRE(X_sub_ref == X_sub);
     }
 
     SECTION("Using range"){
