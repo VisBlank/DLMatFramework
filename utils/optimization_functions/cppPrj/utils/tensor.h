@@ -114,10 +114,18 @@ public:
             auto startOffset = MAT_2D(0, selCols.Min(), inputCols);
             auto startResult = result.begin();
             for (auto idx = m_buffer.begin()+startOffset; idx < m_buffer.end(); idx+=inputCols){
-                cout << *idx << endl;
                 copy(idx, idx+selCols.size(), startResult);
                 startResult += selCols.size();
             }
+        } else if ((!allRows) && (!allCols)){
+            result.SetDims(vector<int>{pRanges[0].size(), pRanges[1].size()});
+            result.PreAloc();
+            auto selRows = pRanges[0];
+            auto selCols = pRanges[1];
+            auto startOffset = MAT_2D(selRows.Min(), selCols.Min(), inputCols);
+            auto start = m_buffer.begin()+startOffset;
+            // Copy elements
+            copy(start, start+result.GetNumElements(), result.begin());
         }
 
         return result;

@@ -208,6 +208,21 @@ TEST_CASE("Tensor tests"){
         REQUIRE_THROWS_WITH( X.Select(range<int>(3,4),range<int>(-1,-1)), "Invalid select range" );
     }
 
+    SECTION("Test Select") {
+        Tensor<float> A(vector<int>({3,3}),{1,4,7,2,5,8,3,6,9});
+        cout << A << endl;
+
+        // First row
+        cout << A.Select(range<int>(0,0),range<int>(0,2));
+
+        // Second row
+        cout << A.Select(range<int>(1,1),range<int>(0,2));
+
+        // TODO: Bad!
+        cout << A.Select(range<int>(1,2),range<int>(1,2));
+        cout << "Fuck" << endl;
+    }
+
     SECTION("Using range"){
         cout << "Range[1..5]: " << range<int>(1,5) << endl;
         cout << "Range Start:" << range<int>(1,5).Min() << endl;
