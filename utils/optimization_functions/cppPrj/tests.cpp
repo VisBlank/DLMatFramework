@@ -11,12 +11,31 @@
 #include "layers/relu.h"
 #include "loss/crossentropy.h"
 #include "utils/reverse_range_based.h"
+#include "utils/range.h"
 #include <array>
 
 TEST_CASE( "Tensor tests "){
 
+    SECTION("Tensor select"){
+        Tensor<float> X(vector<int>({4,2}),{0,0,0,1,1,0,1,1});
+        Tensor<float> X_sub_ref(vector<int>({2,2}),{0,0,0,1});
+        // Select rows 1:2 all cols "on matlab X(1:2,:)"
+        cout << "Select rows:" << range<int>(1,2) << "and all columns" << " size range: " << range<int>(1,2).size() << endl;
+        Tensor<float> X_sub = X.Select(range<int>(1,2),range<int>(-1,-1));
+        //REQUIRE(X_sub_ref == X_sub);
+    }
+
+    SECTION("Using range"){
+        cout << "Range[1..5]: " << range<int>(1,5) << endl;
+        cout << "Range Start:" << range<int>(1,5).Min() << endl;
+        cout << "Range End:" << range<int>(1,5).Max() << endl;
+        REQUIRE_THROWS_WITH( range<int>(5,1), "range(end) should be bigger than ramge(begining)." );
+        range<int> emptyRange(-1,-1);
+        cout << "Range(-1,-1): " << emptyRange << endl;
+    }
+
     SECTION("Try to print empty tensor"){
-        Tensor<int> A;
+        Tensor<int> A;        
         CHECK_NOTHROW(cout << A << endl);
     }
 

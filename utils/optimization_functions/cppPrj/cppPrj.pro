@@ -50,4 +50,5 @@ HEADERS += \
     utils/mathhelper.h \
     layers/sigmoid.h \
     utils/dataset.h \
-    utils/reverse_range_based.h
+    utils/reverse_range_based.h \
+    utils/range.h

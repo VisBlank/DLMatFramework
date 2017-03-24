@@ -20,6 +20,7 @@ http://www.learncpp.com/cpp-tutorial/92-overloading-the-arithmetic-operators-usi
 #include <stdexcept>
 #include <initializer_list>
 #include <sstream>
+#include "utils/range.h"
 
 using namespace std;
 
@@ -40,8 +41,8 @@ private:
     //unique_ptr<T[]> m_buffer;
     vector<T> m_buffer;
     vector<int> m_dims;
-    int m_num_dims;
-    int m_numElements;
+    int m_num_dims = 0;
+    int m_numElements = 0;
 public:
     // Delete default Constructor
     //Tensor() = delete;
@@ -53,6 +54,7 @@ public:
     Tensor (const vector<int> &dims);
 
     void SetDims(const vector<int> &dims);
+    void PreAloc() {m_buffer = vector<T>(m_numElements,0);}
     void Reshape(const vector<int> &newdims);
 
     // The expected format will be rows,cols,channel,batch
@@ -73,6 +75,26 @@ public:
     typename std::vector<T>::iterator end();
     typename std::vector<T>::const_iterator begin() const;
     typename std::vector<T>::const_iterator end() const;
+
+    // Select a sub tensor from tensor
+    template <typename ...Args>
+    Tensor<T> Select(const range<int> &firstRange, Args... otherRange){
+        int inputRows = this->GetRows();
+        int inputCols = this->GetCols();
+        Tensor<T> result;
+        // Create array with all ranges (otherRange...) expand during compilation time
+        array<range<int>, sizeof...(otherRange) + 1> pRanges = {firstRange, otherRange...};
+        bool allRows = pRanges[0].empty();
+        bool allCols = pRanges[1].empty();
+
+        if ((!allRows) && (allCols)){
+            // Some rows, all cols
+            result.SetDims(vector<int>{pRanges[0].size(), inputCols});
+            result.PreAloc();
+        }
+
+        return result;
+    }
 
     /*
         Overload the "()" and "*" operators to make it feel like matlab
