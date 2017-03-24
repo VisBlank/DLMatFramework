@@ -17,7 +17,7 @@ Adam<T>::Adam(const map<string, float> &config):BaseOptimizer<T>(config){
 
 template<typename T>
 Tensor<T> Adam<T>::Optimize(const Tensor<T> &params, const Tensor<T> &grad_params, const OptimizerState<T> &state){
-    cout << "Adam optimizer" << endl;
+
     //NEEDS FINISHING
     Tensor<T> A(vector<int>({1,2}),{0,0});
     return A;

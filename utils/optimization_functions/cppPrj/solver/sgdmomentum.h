@@ -10,6 +10,8 @@ public:
     SGDMomentum() = delete;
     SGDMomentum(const map<string,float> &config);
     Tensor<T> Optimize(const Tensor<T> &params, const Tensor<T> &grad_params, const OptimizerState<T> &state) override;
+protected:
+    float m_base_lr;
 };
 
 #endif // SGDMOMENTUM_H

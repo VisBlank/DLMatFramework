@@ -17,7 +17,7 @@ SGDMomentum<T>::SGDMomentum(const map<string, float> &config):BaseOptimizer<T>(c
 
 template<typename T>
 Tensor<T> SGDMomentum<T>::Optimize(const Tensor<T> &params, const Tensor<T> &grad_params, const OptimizerState<T> &state){
-    cout << "SGD with Momentum optimizer" << endl;
+
     //NEEDS FINISHING
     Tensor<T> A(vector<int>({1,2}),{0,0});    
     return A;
