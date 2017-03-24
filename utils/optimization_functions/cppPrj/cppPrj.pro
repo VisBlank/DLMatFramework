@@ -18,13 +18,16 @@ SOURCES += main.cpp \
     classifier/deeplearningmodel.cpp \
     utils/tensor.cpp \
     utils/mathhelper.cpp \
-    tests.cpp \
     utils/dataset.cpp \
     layers/relu.cpp \
     layers/sigmoid.cpp \    
     layers/fullyconnected.cpp \
     layers/inputlayer.cpp \    
-    layers/softmax.cpp
+    layers/softmax.cpp \
+    test/test_tensors.cpp \
+    test/test_optimizers.cpp \
+    test/test_xor_example.cpp \
+    test/test_layers.cpp
 
 HEADERS += \    
     loss/lossfactory.h \
