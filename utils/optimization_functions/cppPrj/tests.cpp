@@ -16,11 +16,32 @@
 
 TEST_CASE( "Tensor tests "){
 
-    SECTION("Tensor select"){
+    SECTION("Tensor select some cols all rows"){
+        Tensor<float> X(vector<int>({4,2}),{0,0,0,1,1,0,1,1});
+        Tensor<float> X_sub_ref(vector<int>({4,1}),{0,0,1,1});
+
+        cout << "All rows:" << range<int>(-1,-1) << "and some columns" << " size range: " << range<int>(0,0).size() << endl;
+        Tensor<float> X_sub = X.Select(range<int>(-1,-1),range<int>(0,0));
+        cout << "Selected matrix: " << X_sub << endl;
+        REQUIRE(X_sub_ref == X_sub);
+
+        cout << "All rows:" << range<int>(-1,-1) << "and some columns" << " size range: " << range<int>(0,1).size() << endl;
+        Tensor<float> X_sub_other = X.Select(range<int>(-1,-1),range<int>(0,1));
+        cout << "Selected matrix: " << X_sub_other << endl;
+        REQUIRE(X == X_sub_other);
+
+        // Do some invalid selects
+        REQUIRE_THROWS_WITH( X.Select(range<int>(-1,-1),range<int>(1,10)), "Invalid select range" );
+        REQUIRE_THROWS_WITH( X.Select(range<int>(-1,-1),range<int>(9,10)), "Invalid select range" );
+        REQUIRE_THROWS_WITH( X.Select(range<int>(-1,-1),range<int>(1,2)), "Invalid select range" );
+    }
+
+    SECTION("Tensor select some Rows all cols"){
         Tensor<float> X(vector<int>({4,2}),{0,0,0,1,1,0,1,1});
         Tensor<float> X_sub_ref(vector<int>({2,2}),{0,0,0,1});
         Tensor<float> X_sub_ref_other(vector<int>({2,2}),{1,0,1,1});
-        // Select rows 1:2 all cols "on matlab X(1:2,:)"
+        Tensor<float> X_sub_ref_other_single(vector<int>({1,2}),{1,1});
+
         cout << "Select rows:" << range<int>(0,1) << "and all columns" << " size range: " << range<int>(0,1).size() << endl;
         Tensor<float> X_sub = X.Select(range<int>(0,1),range<int>(-1,-1));
         cout << "Selected matrix: " << X_sub << endl;
@@ -30,6 +51,16 @@ TEST_CASE( "Tensor tests "){
         Tensor<float> X_sub_other = X.Select(range<int>(2,3),range<int>(-1,-1));
         cout << "Selected matrix: " << X_sub_other << endl;
         REQUIRE(X_sub_ref_other == X_sub_other);
+
+        cout << "Select rows:" << range<int>(3,3) << "and all columns" << " size range: " << range<int>(3,3).size() << endl;
+        Tensor<float> X_sub_other_single = X.Select(range<int>(3,3),range<int>(-1,-1));
+        cout << "Selected matrix: " << X_sub_other_single << endl;
+        REQUIRE(X_sub_ref_other_single == X_sub_other_single);
+
+        // Do some invalid selects
+        REQUIRE_THROWS_WITH( X.Select(range<int>(1,10),range<int>(-1,-1)), "Invalid select range" );
+        REQUIRE_THROWS_WITH( X.Select(range<int>(9,10),range<int>(-1,-1)), "Invalid select range" );
+        REQUIRE_THROWS_WITH( X.Select(range<int>(3,4),range<int>(-1,-1)), "Invalid select range" );
     }
 
     SECTION("Using range"){

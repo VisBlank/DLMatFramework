@@ -81,23 +81,43 @@ public:
     template <typename ...Args>
     Tensor<T> Select(const range<int> &firstRange, Args... otherRange){
         int inputRows = this->GetRows();
-        int inputCols = this->GetCols();
+        int inputCols = this->GetCols();                       
+        int inputDepth = this->GetDepth();
+        int inputBatch = this->GetBatch();
+
         Tensor<T> result;
         // Create array with all ranges (otherRange...) expand during compilation time
         array<range<int>, sizeof...(otherRange) + 1> pRanges = {firstRange, otherRange...};
         bool allRows = pRanges[0].empty();
         bool allCols = pRanges[1].empty();
 
+        // Check if ranges don't go out of the matrix
+        if ((pRanges[0].size() > inputRows) || (pRanges[1].size() > inputCols) || (pRanges[0].Min() > inputRows) || (pRanges[0].Max() > inputRows-1) || (pRanges[1].Min() > inputCols) || (pRanges[1].Max() > inputCols-1)){
+            throw invalid_argument("Invalid select range");
+        }
+
         if ((!allRows) && (allCols)){
             // Some rows, all cols
             result.SetDims(vector<int>{pRanges[0].size(), inputCols});
             result.PreAloc();
             auto selRows = pRanges[0];
-            auto startRowOffset = MAT_2D(selRows.Min(), 0, inputCols);
-            auto start = m_buffer.begin()+startRowOffset;
+            auto startOffset = MAT_2D(selRows.Min(), 0, inputCols);
+            auto start = m_buffer.begin()+startOffset;
 
             // Copy elements
             copy(start, start+result.GetNumElements(), result.begin());
+        } else if ((allRows) && (!allCols)){
+            // Some cols, all rows
+            result.SetDims(vector<int>{inputRows, pRanges[1].size()});
+            result.PreAloc();
+            auto selCols = pRanges[1];
+            auto startOffset = MAT_2D(0, selCols.Min(), inputCols);
+            auto startResult = result.begin();
+            for (auto idx = m_buffer.begin()+startOffset; idx < m_buffer.end(); idx+=inputCols){
+                cout << *idx << endl;
+                copy(idx, idx+selCols.size(), startResult);
+                startResult += selCols.size();
+            }
         }
 
         return result;
