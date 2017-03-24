@@ -136,7 +136,9 @@ public:
             copy(start, start+result.GetNumElements(), result.begin());*/
             for (auto idx = m_buffer.begin()+startOffset; idx < m_buffer.end(); idx+=inputCols){
                 copy(idx, idx+selCols.size(), startResult);
-                startResult += selCols.size();
+                startResult += selCols.size();                
+                // Check if there is still space left to add
+                if (startResult >= result.end()) break;
             }
         }
 

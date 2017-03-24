@@ -210,22 +210,40 @@ TEST_CASE("Tensor tests"){
 
     SECTION("Test Select") {
         Tensor<float> A(vector<int>({3,3}),{1,4,7,2,5,8,3,6,9});
+        Tensor<float> fRow_ref(vector<int>({1,3}),{1,4,7});
+        Tensor<float> sRow_ref(vector<int>({1,3}),{2,5,8});
         Tensor<float> A_big(vector<int>({3,4}),{1,2,3,4,5,6,7,8,9,10,11,12});
         Tensor<float> A_big_big(vector<int>({4,4}),{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16});
         cout << A << endl;
 
         // First row
-        //cout << A.Select(range<int>(0,0),range<int>(0,2));
+        cout << A.Select(range<int>(0,0),range<int>(0,2));
+        auto res1 = A.Select(range<int>(0,0),range<int>(0,2));
+        REQUIRE(fRow_ref == res1);
 
         // Second row
-        //cout << A.Select(range<int>(1,1),range<int>(0,2));
+        cout << A.Select(range<int>(1,1),range<int>(0,2));
+        auto res2 = A.Select(range<int>(1,1),range<int>(0,2));
+        REQUIRE(sRow_ref == res2);
 
-        // TODO: Bad!
-        cout << A.Select(range<int>(1,2),range<int>(1,2));
-        cout << A_big.Select(range<int>(1,2),range<int>(2,3));
-        cout << A_big.Select(range<int>(1,2),range<int>(1,2));
-        cout << A_big_big.Select(range<int>(1,2),range<int>(1,2));
-        cout << "Fuck" << endl;
+        auto res3 = A.Select(range<int>(1,2),range<int>(1,2));
+        Tensor<float> subMatrix_ref1(vector<int>({2,2}),{5,8,6,9});
+        REQUIRE(subMatrix_ref1 == res3);
+
+        cout << "A_big: " << A_big << endl;
+        auto res4 = A_big.Select(range<int>(1,2),range<int>(2,3));
+        Tensor<float> subMatrix_ref2(vector<int>({2,2}),{7,8,11,12});
+        REQUIRE(subMatrix_ref2 == res4);
+
+        auto res5 = A_big.Select(range<int>(1,2),range<int>(1,2));
+        Tensor<float> subMatrix_ref3(vector<int>({2,2}),{6,7,10,11});
+        REQUIRE(subMatrix_ref3 == res5);
+
+        cout << A_big_big << endl;
+        auto res6 = A_big_big.Select(range<int>(2,3),range<int>(2,3));
+        Tensor<float> subMatrix_ref4(vector<int>({2,2}),{11,12,15,16});
+        REQUIRE(subMatrix_ref4 == res6);
+
     }
 
     SECTION("Using range"){
