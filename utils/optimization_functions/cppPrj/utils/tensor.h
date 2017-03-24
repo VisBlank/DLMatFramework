@@ -112,9 +112,14 @@ public:
             result.PreAloc();
             auto selCols = pRanges[1];
             auto startOffset = MAT_2D(0, selCols.Min(), inputCols);
+            // Get start iterator for result tensor
             auto startResult = result.begin();
+
+            // Iterate on each line of m_buffer
             for (auto idx = m_buffer.begin()+startOffset; idx < m_buffer.end(); idx+=inputCols){
+                // Copy x cols
                 copy(idx, idx+selCols.size(), startResult);
+                // Jump to next line
                 startResult += selCols.size();
             }
         } else if ((!allRows) && (!allCols)){
@@ -123,9 +128,16 @@ public:
             auto selRows = pRanges[0];
             auto selCols = pRanges[1];
             auto startOffset = MAT_2D(selRows.Min(), selCols.Min(), inputCols);
-            auto start = m_buffer.begin()+startOffset;
+            // Get start iterator for result tensor
+            auto startResult = result.begin();
+
+            /*auto start = m_buffer.begin()+startOffset;
             // Copy elements
-            copy(start, start+result.GetNumElements(), result.begin());
+            copy(start, start+result.GetNumElements(), result.begin());*/
+            for (auto idx = m_buffer.begin()+startOffset; idx < m_buffer.end(); idx+=inputCols){
+                copy(idx, idx+selCols.size(), startResult);
+                startResult += selCols.size();
+            }
         }
 
         return result;

@@ -213,10 +213,10 @@ TEST_CASE("Tensor tests"){
         cout << A << endl;
 
         // First row
-        cout << A.Select(range<int>(0,0),range<int>(0,2));
+        //cout << A.Select(range<int>(0,0),range<int>(0,2));
 
         // Second row
-        cout << A.Select(range<int>(1,1),range<int>(0,2));
+        //cout << A.Select(range<int>(1,1),range<int>(0,2));
 
         // TODO: Bad!
         cout << A.Select(range<int>(1,2),range<int>(1,2));
