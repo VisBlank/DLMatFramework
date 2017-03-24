@@ -23,6 +23,8 @@ SGD<T>::SGD(const map<string, float> &config):BaseOptimizer<T>(config){
 template<typename T>
 Tensor<T> SGD<T>::Optimize(const Tensor<T> &params, const Tensor<T> &grad_params, const OptimizerState<T> &state){
 
+    cout << "SGD optimizer" << endl;
+
     // Gradient descent approach (Simpliest optimizer, no use of states)
     auto weights = params - (grad_params*m_base_lr);
 
