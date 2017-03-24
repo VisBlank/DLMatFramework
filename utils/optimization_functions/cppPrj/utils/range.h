@@ -21,7 +21,7 @@ private:
 public:
     range() = delete;
     range (const int &beg, const int &end):m_begRange(beg), m_endRange(end){
-        if ((end > 0) && (beg > 0)){
+        if ((end >= 0) && (beg >= 0)){
             if (end <= beg){
                 throw invalid_argument("range(end) should be bigger than ramge(begining).");
             }

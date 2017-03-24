@@ -92,9 +92,12 @@ public:
             // Some rows, all cols
             result.SetDims(vector<int>{pRanges[0].size(), inputCols});
             result.PreAloc();
+            auto selRows = pRanges[0];
+            auto startRowOffset = MAT_2D(selRows.Min(), 0, inputCols);
+            auto start = m_buffer.begin()+startRowOffset;
 
             // Copy elements
-            copy(m_buffer.begin(), m_buffer.begin()+result.GetNumElements(), result.begin());
+            copy(start, start+result.GetNumElements(), result.begin());
         }
 
         return result;
