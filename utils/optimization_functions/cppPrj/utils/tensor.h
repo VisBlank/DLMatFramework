@@ -79,7 +79,7 @@ public:
 
     // Select a sub tensor from tensor
     template <typename ...Args>
-    Tensor<T> Select(const range<int> &firstRange, Args... otherRange){
+    Tensor<T> Select(const range<int> &firstRange, Args... otherRange) const{
         int inputRows = this->GetRows();
         int inputCols = this->GetCols();                       
         int inputDepth = this->GetDepth();
@@ -141,7 +141,6 @@ public:
                 if (startResult >= result.end()) break;
             }
         }
-
         return result;
     }
 

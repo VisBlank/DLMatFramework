@@ -40,6 +40,48 @@ T MathHelper<T>::SumVec(const Tensor<T> &in){
 }
 
 template<typename T>
+Tensor<T> MathHelper<T>::Sum(const Tensor<T> &in, int dim){
+    auto inRows = in.GetRows();
+    auto inCols = in.GetCols();
+    // Create the result tensor
+    Tensor<T> result;
+    switch (dim) {
+        case 0: {
+            // Sum column
+            result.SetDims(vector<int>{1,inCols});
+            result.PreAloc();
+            auto startResult = result.begin();
+            for (auto c = 0; c < inCols; ++c){
+                // Select a column
+                auto colTensor = in.Select(range<int>(-1,-1),range<int>(c,c));
+                T sumCol = MathHelper<T>::SumVec(colTensor);
+                *startResult = sumCol;
+                startResult++;
+            }
+            break;
+        }
+        case 1: {
+            // Sum each col
+            result.SetDims(vector<int>({inRows,1}));
+            result.PreAloc();
+            auto startResult = result.begin();
+            for (auto r = 0; r < inRows; ++r){
+                // Select a row
+                auto rowTensor = in.Select(range<int>(r,r),range<int>(-1,-1));
+                T sumRow = MathHelper<T>::SumVec(rowTensor);
+                *startResult = sumRow;
+                startResult++;
+            }
+            break;
+        }
+        default:
+            throw invalid_argument("Dimension not supported");
+            break;
+    }
+    return result;
+}
+
+template<typename T>
 T MathHelper<T>::ProdVec(const Tensor<T> &in){    
     T res = accumulate(in.begin(), in.end(),1,multiplies<T>());
     return res;

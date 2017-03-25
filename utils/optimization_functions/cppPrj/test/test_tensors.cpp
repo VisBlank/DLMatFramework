@@ -16,6 +16,21 @@
 
 TEST_CASE("Tensor tests"){
 
+    SECTION("Tensor sum"){
+        Tensor<float> A(vector<int>({2,3}),{1,2,3,4,5,6});
+        Tensor<float> sumRows_ref(vector<int>({2,1}),{6,15});
+        Tensor<float> sumCols_ref(vector<int>({1,3}),{5,7,9});
+        cout << A << endl;
+
+        auto resSumCols = MathHelper<float>::Sum(A,0);
+        cout << resSumCols << endl;
+        REQUIRE(resSumCols == sumCols_ref);
+
+        auto resSumRows = MathHelper<float>::Sum(A,1);
+        cout << resSumRows << endl;
+        REQUIRE(resSumRows == sumRows_ref);
+    }
+
     SECTION("Tensor assignment"){
         Tensor<float> A(vector<int>({2,2}));
         A(0,0) = 1;
