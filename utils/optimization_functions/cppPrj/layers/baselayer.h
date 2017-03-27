@@ -27,9 +27,13 @@ public:
     string GetName() const {return m_name;}
     vector<int> GetActivationShape() const {return m_activationShape;}
 
-    Tensor<float> &GetWeightsRef() {return ref(m_weights);}
-    Tensor<float> &GetBiasRef() {return ref(m_bias);}    
-    LayerGradient<float> &GetGradientRef() {return ref(m_gradients);}
+    const Tensor<float> &GetWeightsRef() const {return ref(m_weights);}
+    const Tensor<float> &GetBiasRef() const {return ref(m_bias);}
+    const LayerGradient<float> &GetGradientRef() const {return ref(m_gradients);}
+
+    void SetWeights(const Tensor<float> &in){ m_weights = in;}
+    void SetBias(const Tensor<float> &in){ m_bias = in;}
+    void SetGradient(const LayerGradient<float> &in){ m_gradients = in;}
 
     bool HasParameter() const { return m_hasParameter;}
 

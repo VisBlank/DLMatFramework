@@ -24,7 +24,7 @@ Batch<T> Dataset<T>::GetBatch(int batchSize){
     // Shuffle dataset on first iteration or if reaching set iter. Then reset the counter for place in the batch and set iter.
     if (m_iterationCounter == 0 || m_iterationCounter == m_shuffleTime){
         auto seed = std::chrono::system_clock::now().time_since_epoch().count();
-        //shuffle(m_indexShuffle.begin(), m_indexShuffle.end(),default_random_engine(seed));
+        shuffle(m_indexShuffle.begin(), m_indexShuffle.end(),default_random_engine(seed));
         m_batchPosition = 0;
         m_iterationCounter = 0;
     }

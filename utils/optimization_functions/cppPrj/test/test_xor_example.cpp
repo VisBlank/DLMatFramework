@@ -43,19 +43,15 @@ TEST_CASE("Xor problem test"){
         // Fix starting point to compare with different implementations (ie: with Matlab)
         auto fc1 = net.GetLayers()("FC_1");
         auto fc2 = net.GetLayers()("FC_2");
-        auto weights_fc1 = fc1->GetWeightsRef();
-        auto bias_fc1 = fc1->GetBiasRef();
-        auto weights_fc2 = fc2->GetWeightsRef();
-        auto bias_fc2 = fc2->GetBiasRef();
-
         Tensor<float> fc1_weights(vector<int>({2,2}),{0.1709, -0.0224, 0.6261, 0.4194});
         Tensor<float> fc1_bias(vector<int>({1,2}),{0.7202, -0.4302});
-
         Tensor<float> fc2_weights(vector<int>({2,1}),{-0.7704,0.5143});
         Tensor<float> fc2_bias(vector<int>({1,1}),{-0.0697});
+        fc1->SetWeights(fc1_weights);
+        fc1->SetBias(fc1_bias);
+        fc2->SetWeights(fc2_weights);
+        fc2->SetBias(fc2_bias);
 
-        weights_fc1 = fc1_weights;
-        weights_fc2 = fc2_weights;
 
         // Create solver and train
         Solver solver(net,data,OptimizerType::T_SGD, map<string,float>{{"learning_rate",0.1},{"L2_reg",0}});
@@ -70,18 +66,17 @@ TEST_CASE("Xor problem test"){
         auto score2 = net.Predict(Tensor<float>(vector<int>({1,2}),{1,0}))(0);
         auto score3 = net.Predict(Tensor<float>(vector<int>({1,2}),{1,1}))(0);
 
+        // Print results
+        cout << "0 XOR 0 :" << round(score0) << endl;
+        cout << "0 XOR 1 :" << round(score1) << endl;
+        cout << "1 XOR 0 :" << round(score2) << endl;
+        cout << "1 XOR 1 :" << round(score3) << endl;
 
-        /*REQUIRE( score0 == 0 );
-        REQUIRE( score1 == 1 );
-        REQUIRE( score2 == 1 );
-        REQUIRE( score3 == 0 );
 
-        */
-
-        cout << "0 XOR 0 :" << score0 << endl;
-        cout << "0 XOR 1 :" << score1 << endl;
-        cout << "1 XOR 0 :" << score2 << endl;
-        cout << "1 XOR 1 :" << score3 << endl;
+        REQUIRE( round(score0) == 0 );
+        REQUIRE( round(score1) == 1 );
+        REQUIRE( round(score2) == 1 );
+        REQUIRE( round(score3) == 0 );
 
     }
 

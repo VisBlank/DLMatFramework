@@ -65,11 +65,9 @@ void Solver::Step(){
         // Continue if layer has no parameter
         if (!layer->HasParameter()) continue;
 
-        // Select the weight and bias references (Those will be changed by the Optimizers)
+        // Add regularization (TODO)
         auto weights = layer->GetWeightsRef();
         auto bias = layer->GetBiasRef();
-
-        // Add regularization (TODO)
 
         // Use optimizers to calculate new weights and biases (TODO: Handle Optimizer state as a class)
         OptimizerState<float> opt;
@@ -77,8 +75,8 @@ void Solver::Step(){
         auto newBias = m_optimizer->Optimize(bias, layer->GetGradientRef().dBias, opt);
 
         // Update weights and biases on the model
-        weights = newWeights;
-        bias = newBias;
+        layer->SetWeights(newWeights);
+        layer->SetBias(newBias);
 
     }
 }
