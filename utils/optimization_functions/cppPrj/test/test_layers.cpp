@@ -47,17 +47,6 @@ TEST_CASE( "Layer tests"){
         cout << "Relu Forward propagation: " << fpAct << endl;
     }
 
-    SECTION ("Cross entropy test"){
-
-        // Test Cross entropy
-        Tensor<float> scores(vector<int>({2,1}),{0.3897, 0.4049});
-        Tensor<float> targets(vector<int>({2,1}),{0.0, 0.0});
-        CrossEntropy cross;
-        auto LossGrad = cross.GetLossAndGradients(scores,targets);
-        cout << "Loss: " << get<0>(LossGrad) << endl;
-        cout << get<1>(LossGrad) << endl;
-
-    }
     SECTION("Fully connected test"){
 
         // Test FC Forward propagation

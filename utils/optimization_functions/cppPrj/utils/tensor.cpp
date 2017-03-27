@@ -103,7 +103,8 @@ Tensor<T> Tensor<T>::operator-(const T b) const{
     Tensor<T> result(vector<int>({m_dims}));
 
     // For each element of m_buffer multiply by b and store the result on resVec
-    transform(m_buffer.begin(), m_buffer.end(), result.begin(),std::bind1st(std::minus<T>(),b));
+    //transform(m_buffer.begin(), m_buffer.end(), result.begin(),std::bind1st(std::minus<T>(),b));
+    transform(m_buffer.begin(), m_buffer.end(), result.begin(),[&b](T m)->T{ return m-b;});
 
     return result;
 }
@@ -114,7 +115,8 @@ Tensor<T> Tensor<T>::operator/(const T b) const{
     Tensor<T> result(vector<int>({m_dims}));
 
     // For each element of m_buffer multiply by b and store the result on resVec
-    transform(m_buffer.begin(), m_buffer.end(), result.begin(),std::bind1st(std::divides<T>(),b));
+    //transform(m_buffer.begin(), m_buffer.end(), result.begin(),std::bind1st(std::divides<T>(),b));
+    transform(m_buffer.begin(), m_buffer.end(), result.begin(),[&b](T m)->T{ return m/b;});
 
     return result;
 }

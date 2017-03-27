@@ -87,6 +87,24 @@ pair<Tensor<T>, Tensor<T>> MathHelper<T>::MaxTensor(const Tensor<T> &in, int dim
 }
 
 template<typename T>
+Tensor<T> MathHelper<T>::GetNonZero(const Tensor<T> &in){
+    // Create the result tensor
+    Tensor<T> result;
+    result.SetDims(vector<int>{in.GetRows(),1});
+    result.PreAloc();
+    auto resultIdx = result.begin();
+    for (auto idx = in.begin(); idx < in.end(); ++idx){
+        auto val = *idx;
+        if (val != 0.0){
+            *resultIdx = val;
+            resultIdx++;
+        }
+    }
+
+    return result;
+}
+
+template<typename T>
 T MathHelper<T>::SumVec(const Tensor<T> &in){
     T res = accumulate(in.begin(), in.end(),T(0));
     return res;
@@ -146,6 +164,15 @@ Tensor<T> MathHelper<T>::Log(const Tensor<T> &in){
 
     // For each element of invVec apply log(element) and store the result on resVec
     transform(in.begin(), in.end(), result.begin(),[](T m) -> T {return log(m);});
+    return result;
+}
+
+template<typename T>
+Tensor<T> MathHelper<T>::Abs(const Tensor<T> &in){
+    Tensor<T> result(vector<int>({in.GetDims()}));
+
+    // For each element of invVec apply log(element) and store the result on resVec
+    transform(in.begin(), in.end(), result.begin(),[](T m) -> T {return abs(m);});
     return result;
 }
 

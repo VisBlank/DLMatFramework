@@ -27,7 +27,8 @@ SOURCES += main.cpp \
     test/test_tensors.cpp \
     test/test_optimizers.cpp \
     test/test_xor_example.cpp \
-    test/test_layers.cpp
+    test/test_layers.cpp \
+    test/test_loss.cpp
 
 HEADERS += \    
     loss/lossfactory.h \

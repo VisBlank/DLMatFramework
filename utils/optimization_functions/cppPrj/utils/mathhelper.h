@@ -22,11 +22,13 @@ public:
     static pair<T,unsigned int> MaxVec(const Tensor<T> &in);
     static Tensor<T> MaxVec(const Tensor<T> &in, const T &scalar);
     static Tensor<T> MaxVec(const T &scalar, const Tensor<T> &in);    
-    static pair<Tensor<T>, Tensor<T>> MaxTensor(const Tensor<T> &in, int dim = 0);
+    static pair<Tensor<T>, Tensor<T>> MaxTensor(const Tensor<T> &in, int dim = 0);    
+    static Tensor<T> GetNonZero(const Tensor<T> &in);
     static T SumVec(const Tensor<T> &in);
     static Tensor<T> Sum(const Tensor<T> &in, int dim);
     static T ProdVec(const Tensor<T> &in);    
     static Tensor<T> Log(const Tensor<T> &in);
+    static Tensor<T> Abs(const Tensor<T> &in);
     static Tensor<T> Exp(const Tensor<T> &in);
     static Tensor<T> Zeros(const vector<int> &dims);
     static Tensor<T> Randn(const vector<int> &dims);    

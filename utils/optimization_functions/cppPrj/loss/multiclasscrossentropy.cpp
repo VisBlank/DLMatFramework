@@ -11,21 +11,31 @@ tuple<float, Tensor<float> > MultiClassCrossEntropy::GetLossAndGradients(const T
 
     // Get the indexes of the correct classes
     auto argMaxTargets = MathHelper<float>::MaxTensor(targets,1);
+    auto idxCorrect = argMaxTargets.second;
 
     // Get the probabilities of the correct class
-    auto probCorrect = argMaxTargets.second;
+    auto selScoresTargets = scores.EltWiseMult(targets);
+    auto probCorrect = MathHelper<float>::GetNonZero(selScoresTargets);
 
     // Calculate the loss
-    auto loss = 0.1F;
+    auto loss = -MathHelper<float>::SumVec(MathHelper<float>::Log(probCorrect))/N;
 
     // Get the gradient of the loss w.r.t
     auto gradients = scores;
     auto gradients_correct = probCorrect - 1;
-    // Put the calculated gradients back on...
 
+    // Update on each row of gradients (using the index from idxCorrect) the correct gradient (gradients_correct)
+    auto rowsGradients = gradients.GetRows();
+    auto idxCorrectIt = idxCorrect.begin();
+    auto gradients_correct_it = gradients_correct.begin();
+    for (auto rows = 0; rows < rowsGradients; ++rows){
+        // Select
+        gradients(rows, *idxCorrectIt) = *gradients_correct_it;
+        gradients_correct_it++;
+        idxCorrectIt++;
+    }
+    // Take the effect of the batch size
     gradients = gradients / N;
 
-
-    cout << "From MultiClassCrossEntropy" << endl;
     return make_tuple(loss,gradients);
 }

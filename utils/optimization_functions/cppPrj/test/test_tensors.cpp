@@ -164,9 +164,11 @@ TEST_CASE("Tensor tests"){
     SECTION("Tensor scalar subtraction"){
         Tensor<float> L(vector<int>({2,2}));
         L(0,0) = 0.0;
-        L(0,1) = -1.0;
-        L(1,0) = -2.0;
-        L(1,1) = -3.0;
+        L(0,1) = 1.0;
+        L(1,0) = 2.0;
+        L(1,1) = 3.0;
+
+        cout << A << endl;
 
         Tensor<float>M = A-(float)1.0;
         cout << "A-1.0" << M << endl;
