@@ -16,6 +16,31 @@
 
 TEST_CASE("Tensor tests"){
 
+    SECTION("Tensor max"){
+        Tensor<float> A(vector<int>({3,3}),{1,2,3,4,5,6,7,8,9});
+        Tensor<float> maxRows_ref(vector<int>({3,1}),{3,6,9});
+        Tensor<float> maxCols_ref(vector<int>({1,3}),{7,8,9});
+
+        auto maxCols = MathHelper<float>::MaxTensor(A,0);
+        cout << maxCols << endl;
+        REQUIRE(maxCols_ref == maxCols);
+
+        auto maxRows = MathHelper<float>::MaxTensor(A,1);
+        cout << maxCols << endl;
+        REQUIRE(maxRows_ref == maxRows);
+
+        Tensor<float> B(vector<int>({1,6}),{1,2,3,4,5,6});
+        Tensor<float> t1_ref(vector<int>({1,6}),{1,2,3,4,5,6});
+        Tensor<float> t2_ref(vector<int>({1,1}),{6});
+        auto t1 = MathHelper<float>::MaxTensor(B,0);
+        cout << t1 << endl;
+        REQUIRE(t1 == t1_ref);
+
+        auto t2 = MathHelper<float>::MaxTensor(B,1);
+        cout << t2 << endl;
+        REQUIRE(t2 == t2_ref);
+    }
+
     SECTION("Tensor sum"){
         Tensor<float> A(vector<int>({2,3}),{1,2,3,4,5,6});
         Tensor<float> sumRows_ref(vector<int>({2,1}),{6,15});

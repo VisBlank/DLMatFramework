@@ -34,6 +34,48 @@ Tensor<T> MathHelper<T>::MaxVec(const T &scalar, const Tensor<T> &in){
 }
 
 template<typename T>
+Tensor<T> MathHelper<T>::MaxTensor(const Tensor<T> &in, int dim){
+    auto inRows = in.GetRows();
+    auto inCols = in.GetCols();
+    // Create the result tensor
+    Tensor<T> result;
+    switch (dim) {
+        case 0: {
+            // Get the max on each column
+            result.SetDims(vector<int>{1,inCols});
+            result.PreAloc();
+            auto startResult = result.begin();
+            for (auto c = 0; c < inCols; ++c){
+                // Select a column
+                auto colTensor = in.Select(range<int>(-1,-1),range<int>(c,c));
+                auto argMax = MathHelper<T>::MaxVec(colTensor);
+                *startResult = argMax.first;
+                startResult++;
+            }
+            break;
+        }
+        case 1: {
+            // Get the max on each row
+            result.SetDims(vector<int>({inRows,1}));
+            result.PreAloc();
+            auto startResult = result.begin();
+            for (auto r = 0; r < inRows; ++r){
+                // Select a row
+                auto rowTensor = in.Select(range<int>(r,r),range<int>(-1,-1));
+                auto argMax = MathHelper<T>::MaxVec(rowTensor);
+                *startResult = argMax.first;
+                startResult++;
+            }
+            break;
+        }
+        default:
+            throw invalid_argument("Dimension not supported");
+            break;
+    }
+    return result;
+}
+
+template<typename T>
 T MathHelper<T>::SumVec(const Tensor<T> &in){
     T res = accumulate(in.begin(), in.end(),T(0));
     return res;
