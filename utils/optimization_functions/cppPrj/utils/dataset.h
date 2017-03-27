@@ -19,6 +19,13 @@ private:
     Tensor<T> m_Y_Train;
     int m_trainingSize;
     int m_shuffleTime;
+    int m_iterationCounter;
+    int m_batchPosition;
+    vector<int> m_indexShuffle;
+
+
+
+
 public:
     Dataset() = delete;
     Dataset(const Tensor<T> &X, const Tensor<T> &Y, int numSamples, bool doOneHot = false);
