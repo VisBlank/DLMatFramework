@@ -41,16 +41,14 @@ float DeepLearningModel::Loss(const Tensor<float> &X, const Tensor<float> &Y){
         // Skip the last layer
         if (!skipCounter) {skipCounter++; continue;};        
         // Also skip the input layer (No backprop on input)
-        if (typeid(*currLayer) == typeid(InputLayer)){continue;};
-        cout << layerName << endl;
-
+        if (typeid(*currLayer) == typeid(InputLayer)){continue;};        
 
         currDout = currLayer->BackwardPropagation(currDout);
-        cout << "------------------" << endl;
+        /*cout << "------------------" << endl;
         cout << currDout.dx;
         cout << currDout.dWeights;
         cout << currDout.dBias;
-        cout << "------------------" << endl;
+        cout << "------------------" << endl;*/
 
     }
 

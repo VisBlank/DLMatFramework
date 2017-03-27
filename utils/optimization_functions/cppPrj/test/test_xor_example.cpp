@@ -40,10 +40,27 @@ TEST_CASE("Xor problem test"){
 
         DeepLearningModel net(layers,LossFactory<CrossEntropy>::GetLoss());
 
+        // Fix starting point to compare with different implementations (ie: with Matlab)
+        auto fc1 = net.GetLayers()("FC_1");
+        auto fc2 = net.GetLayers()("FC_2");
+        auto weights_fc1 = fc1->GetWeightsRef();
+        auto bias_fc1 = fc1->GetBiasRef();
+        auto weights_fc2 = fc2->GetWeightsRef();
+        auto bias_fc2 = fc2->GetBiasRef();
+
+        Tensor<float> fc1_weights(vector<int>({2,2}),{0.1709, -0.0224, 0.6261, 0.4194});
+        Tensor<float> fc1_bias(vector<int>({1,2}),{0.7202, -0.4302});
+
+        Tensor<float> fc2_weights(vector<int>({2,1}),{-0.7704,0.5143});
+        Tensor<float> fc2_bias(vector<int>({1,1}),{-0.0697});
+
+        weights_fc1 = fc1_weights;
+        weights_fc2 = fc2_weights;
+
         // Create solver and train
-        Solver solver(net,data,OptimizerType::T_SGD, map<string,float>{{"learning_rate",0.01},{"L2_reg",0}});
+        Solver solver(net,data,OptimizerType::T_SGD, map<string,float>{{"learning_rate",0.1},{"L2_reg",0}});
         solver.SetBatchSize(1);
-        solver.SetEpochs(10);
+        solver.SetEpochs(1000);
         solver.Train();
         auto lossHistory = solver.GetLossHistory();
 
