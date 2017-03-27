@@ -41,31 +41,30 @@ TEST_CASE("Xor problem test"){
         DeepLearningModel net(layers,LossFactory<CrossEntropy>::GetLoss());
 
         // Create solver and train
-        Solver solver(net,data,OptimizerType::T_SGD, map<string,float>{{"learning_rate",0.1},{"L2_reg",0}});
+        Solver solver(net,data,OptimizerType::T_SGD, map<string,float>{{"learning_rate",0.01},{"L2_reg",0}});
         solver.SetBatchSize(1);
-        solver.SetEpochs(1000);
+        solver.SetEpochs(10);
         solver.Train();
         auto lossHistory = solver.GetLossHistory();
 
-        // fix predict
-        /*
-    auto score0 = net.Predict(Tensor<float>(vector<int>({1,2}),{0,0}));
-    auto score1 = net.Predict(Tensor<float>(vector<int>({1,2}),{0,1}));
-    auto score2 = net.Predict(Tensor<float>(vector<int>({1,2}),{1,0}));
-    auto score3 = net.Predict(Tensor<float>(vector<int>({1,2}),{1,1}));
+
+        auto score0 = net.Predict(Tensor<float>(vector<int>({1,2}),{0,0}))(0);
+        auto score1 = net.Predict(Tensor<float>(vector<int>({1,2}),{0,1}))(0);
+        auto score2 = net.Predict(Tensor<float>(vector<int>({1,2}),{1,0}))(0);
+        auto score3 = net.Predict(Tensor<float>(vector<int>({1,2}),{1,1}))(0);
 
 
-    REQUIRE( score0 == 0 );
-    REQUIRE( score1 == 1 );
-    REQUIRE( score2 == 1 );
-    REQUIRE( score3 == 0 );
+        /*REQUIRE( score0 == 0 );
+        REQUIRE( score1 == 1 );
+        REQUIRE( score2 == 1 );
+        REQUIRE( score3 == 0 );
 
-    */
+        */
 
-        cout << "0 XOR 0 :" << endl;
-        cout << "0 XOR 1 :" << endl;
-        cout << "1 XOR 0 :" << endl;
-        cout << "1 XOR 1 :" << endl;
+        cout << "0 XOR 0 :" << score0 << endl;
+        cout << "0 XOR 1 :" << score1 << endl;
+        cout << "1 XOR 0 :" << score2 << endl;
+        cout << "1 XOR 1 :" << score3 << endl;
 
     }
 
