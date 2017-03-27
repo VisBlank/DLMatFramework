@@ -34,23 +34,29 @@ Tensor<T> MathHelper<T>::MaxVec(const T &scalar, const Tensor<T> &in){
 }
 
 template<typename T>
-Tensor<T> MathHelper<T>::MaxTensor(const Tensor<T> &in, int dim){
+pair<Tensor<T>, Tensor<T>> MathHelper<T>::MaxTensor(const Tensor<T> &in, int dim){
     auto inRows = in.GetRows();
     auto inCols = in.GetCols();
     // Create the result tensor
     Tensor<T> result;
+    Tensor<T> idx_result;
     switch (dim) {
         case 0: {
             // Get the max on each column
             result.SetDims(vector<int>{1,inCols});
             result.PreAloc();
+            idx_result.SetDims(vector<int>{1,inCols});
+            idx_result.PreAloc();
             auto startResult = result.begin();
+            auto startIdxResult = idx_result.begin();
             for (auto c = 0; c < inCols; ++c){
                 // Select a column
                 auto colTensor = in.Select(range<int>(-1,-1),range<int>(c,c));
                 auto argMax = MathHelper<T>::MaxVec(colTensor);
                 *startResult = argMax.first;
+                *startIdxResult = argMax.second;
                 startResult++;
+                startIdxResult++;
             }
             break;
         }
@@ -58,13 +64,18 @@ Tensor<T> MathHelper<T>::MaxTensor(const Tensor<T> &in, int dim){
             // Get the max on each row
             result.SetDims(vector<int>({inRows,1}));
             result.PreAloc();
+            idx_result.SetDims(vector<int>({inRows,1}));
+            idx_result.PreAloc();
             auto startResult = result.begin();
+            auto startIdxResult = idx_result.begin();
             for (auto r = 0; r < inRows; ++r){
                 // Select a row
                 auto rowTensor = in.Select(range<int>(r,r),range<int>(-1,-1));
                 auto argMax = MathHelper<T>::MaxVec(rowTensor);
                 *startResult = argMax.first;
+                *startIdxResult = argMax.second;
                 startResult++;
+                startIdxResult++;
             }
             break;
         }
@@ -72,7 +83,7 @@ Tensor<T> MathHelper<T>::MaxTensor(const Tensor<T> &in, int dim){
             throw invalid_argument("Dimension not supported");
             break;
     }
-    return result;
+    return make_pair(result, idx_result);
 }
 
 template<typename T>

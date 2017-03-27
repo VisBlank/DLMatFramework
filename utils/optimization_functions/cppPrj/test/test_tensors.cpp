@@ -19,26 +19,34 @@ TEST_CASE("Tensor tests"){
     SECTION("Tensor max"){
         Tensor<float> A(vector<int>({3,3}),{1,2,3,4,5,6,7,8,9});
         Tensor<float> maxRows_ref(vector<int>({3,1}),{3,6,9});
+        Tensor<float> maxRows_ref_idx(vector<int>({3,1}),{2,2,2});
         Tensor<float> maxCols_ref(vector<int>({1,3}),{7,8,9});
+        Tensor<float> maxCols_ref_idx(vector<int>({1,3}),{2,2,2});
 
         auto maxCols = MathHelper<float>::MaxTensor(A,0);
-        cout << maxCols << endl;
-        REQUIRE(maxCols_ref == maxCols);
+        cout << maxCols.first << endl;
+        REQUIRE(maxCols_ref == maxCols.first);
+        REQUIRE(maxCols_ref_idx == maxCols.second);
 
         auto maxRows = MathHelper<float>::MaxTensor(A,1);
-        cout << maxCols << endl;
-        REQUIRE(maxRows_ref == maxRows);
+        cout << maxCols.first << endl;
+        REQUIRE(maxRows_ref == maxRows.first);
+        REQUIRE(maxRows_ref_idx == maxRows.second);
 
         Tensor<float> B(vector<int>({1,6}),{1,2,3,4,5,6});
         Tensor<float> t1_ref(vector<int>({1,6}),{1,2,3,4,5,6});
+        Tensor<float> t1_ref_idx(vector<int>({1,6}),{0,0,0,0,0,0});
         Tensor<float> t2_ref(vector<int>({1,1}),{6});
+        Tensor<float> t2_ref_idx(vector<int>({1,1}),{5});
         auto t1 = MathHelper<float>::MaxTensor(B,0);
-        cout << t1 << endl;
-        REQUIRE(t1 == t1_ref);
+        cout << t1.first << endl;
+        REQUIRE(t1.first == t1_ref);
+        REQUIRE(t1_ref_idx == t1.second);
 
         auto t2 = MathHelper<float>::MaxTensor(B,1);
-        cout << t2 << endl;
-        REQUIRE(t2 == t2_ref);
+        cout << t2.first << endl;
+        REQUIRE(t2.first == t2_ref);
+        REQUIRE(t2_ref_idx == t2.second);
     }
 
     SECTION("Tensor sum"){
