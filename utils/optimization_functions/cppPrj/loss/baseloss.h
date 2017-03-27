@@ -3,6 +3,7 @@
 #include <iostream>
 #include <tuple>
 #include "utils/tensor.h"
+#include "utils/mathhelper.h"
 using namespace std;
 
 class BaseLoss

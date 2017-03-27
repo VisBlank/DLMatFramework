@@ -195,6 +195,7 @@ public:
     Tensor<T> operator+(const Tensor &b) const;
     Tensor<T> operator+(const T b) const;
     Tensor<T> operator-(const Tensor &b) const;
+    Tensor<T> operator-(const T b) const;
     Tensor<T> operator-() const;
     Tensor<T> &operator=(const Tensor &b);
     bool operator==(const Tensor &b);

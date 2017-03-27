@@ -98,6 +98,17 @@ Tensor<T> Tensor<T>::operator*(const T b) const{
 }
 
 template<typename T>
+Tensor<T> Tensor<T>::operator-(const T b) const{
+    // Create result tensor with same dimensions
+    Tensor<T> result(vector<int>({m_dims}));
+
+    // For each element of m_buffer multiply by b and store the result on resVec
+    transform(m_buffer.begin(), m_buffer.end(), result.begin(),std::bind1st(std::minus<T>(),b));
+
+    return result;
+}
+
+template<typename T>
 Tensor<T> Tensor<T>::operator/(const T b) const{
     // Create result tensor with same dimensions
     Tensor<T> result(vector<int>({m_dims}));
