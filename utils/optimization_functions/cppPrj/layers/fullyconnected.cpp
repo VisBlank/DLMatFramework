@@ -49,8 +49,7 @@ LayerGradient<float> FullyConnected::BackwardPropagation(const LayerGradient<flo
 
     Tensor<float> dx = dout.dx * m_weights.Transpose();
     Tensor<float> dWeights = m_previousInput.Transpose() * dout.dx;
-    // Bias gradient should have the same shape as the original bias (NOT FINISHED SHOULD BE SUM ACROSS COLS)
-    Tensor<float> dBias = (dout.dx);
+    Tensor<float> dBias = MathHelper<float>::Sum(dout.dx,0);
 
     LayerGradient<float> gradient{dx,dWeights,dBias} ;
 
