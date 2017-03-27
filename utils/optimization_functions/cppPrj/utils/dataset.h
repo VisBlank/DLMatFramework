@@ -17,10 +17,10 @@ class Dataset
 private:
     Tensor<T> m_X_Train;
     Tensor<T> m_Y_Train;
-    int m_trainingSize;
-    int m_shuffleTime;
-    int m_iterationCounter;
-    int m_batchPosition;
+    int m_trainingSize = 0;
+    int m_shuffleTime = 0;
+    int m_iterationCounter = 0;
+    int m_batchPosition = 0;
     vector<int> m_indexShuffle;
 
 

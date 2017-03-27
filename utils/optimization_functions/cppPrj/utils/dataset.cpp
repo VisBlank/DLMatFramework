@@ -53,8 +53,7 @@ Batch<T> Dataset<T>::GetBatch(int batchSize){
         m_batchPosition += batchSize;
     }
 
-    Batch<T> batch;
-    cout << selIndex.size() << endl;
+    Batch<T> batch;    
     batch.X = MathHelper<T>::Zeros(vector<int>({selIndex.size(),2}));
     batch.Y = MathHelper<T>::Zeros(vector<int>({selIndex.size(),1}));
 
