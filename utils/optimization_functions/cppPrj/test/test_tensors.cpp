@@ -448,6 +448,12 @@ TEST_CASE("Tensor tests"){
         REQUIRE(A_rep_ref_1_2 == A.Repmat(1,2));
         REQUIRE(A_rep_ref_2_1 == A.Repmat(2,1));
         REQUIRE(A_rep_ref_2_2 == A.Repmat(2,2));
+
+        Tensor<int> B(vector<int>({4,1}),{10,2,3,10});
+        Tensor<int> B_rep_ref_1_2(vector<int>({4,3}),{10,10,10,2,2,2,3,3,3,10,10,10});
+        cout << "B" << B << endl;
+        cout << "repmat(B,[1,3])" << B.Repmat(1,3) << endl;
+        REQUIRE(B_rep_ref_1_2 == B.Repmat(1,3));
     }
 
     SECTION("Tensor reshape"){

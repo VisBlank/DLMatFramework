@@ -12,6 +12,7 @@
 #include "loss/crossentropy.h"
 #include "utils/reverse_range_based.h"
 #include "utils/range.h"
+#include "layers/softmax.h"
 #include <array>
 
 TEST_CASE( "Layer tests"){
@@ -99,6 +100,21 @@ TEST_CASE( "Layer tests"){
         REQUIRE( bpGrad.dBias == actual_dBias);
         REQUIRE (MathHelper<float>::SumVec( bpGrad.dWeights - actual_dWeights) < 0.001);
         REQUIRE( bpGrad.dx == actual_dx);
+
+    }
+
+    SECTION( "Softmax test" ){
+
+        cout << "Softmax test" << endl;
+        // Test sigmoid Forward propagation (Matlab toy example)
+        Tensor<float> input(vector<int>({4,3}),{10, 5,2,1,1,2,3,2,2,10,8,5});
+        Tensor<float> ref_fp(vector<int>({4,3}),{0.993,0.0067,0,0.2119,0.2119,0.5761,0.5761,0.2119,0.2119,0.8756,0.1185,0.0059});
+        SoftMax softm("Test",nullptr);
+        Tensor<float> fpAct = softm.ForwardPropagation(input);
+        auto dif = abs(MathHelper<float>::SumVec(ref_fp - fpAct));
+        REQUIRE( dif < 0.001 );
+        cout << "Softmax Forward propagation: " << fpAct << endl;
+
 
     }
 }
