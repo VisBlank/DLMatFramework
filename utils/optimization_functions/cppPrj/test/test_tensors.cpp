@@ -449,6 +449,19 @@ TEST_CASE("Tensor tests"){
         REQUIRE(A_rep_ref_2_1 == A.Repmat(2,1));
         REQUIRE(A_rep_ref_2_2 == A.Repmat(2,2));
 
+        Tensor<int> M(vector<int>({2,2}),{1,2,3,4});
+        Tensor<int> M_rep_ref_1_2(vector<int>({2,4}),{1,2,1,2,3,4,3,4});
+        Tensor<int> M_rep_ref_2_1(vector<int>({4,2}),{1,2,3,4,1,2,3,4});
+        Tensor<int> M_rep_ref_2_2(vector<int>({4,4}),{1,2,1,2,3,4,3,4,1,2,1,2,3,4,3,4});
+        cout << "M[2x2]" << M << endl;
+        cout << "repmat(M,[1,2])" << M.Repmat(1,2) << endl;
+        cout << "repmat(M,[2,1])" << M.Repmat(2,1) << endl;
+        cout << "repmat(M,[2,2])" << M.Repmat(2,2) << endl;
+
+        REQUIRE(M_rep_ref_1_2 == M.Repmat(1,2));
+        REQUIRE(M_rep_ref_2_1 == M.Repmat(2,1));
+        REQUIRE(M_rep_ref_2_2 == M.Repmat(2,2));
+
         Tensor<int> B(vector<int>({4,1}),{10,2,3,10});
         Tensor<int> B_rep_ref_1_2(vector<int>({4,3}),{10,10,10,2,2,2,3,3,3,10,10,10});
         cout << "B" << B << endl;

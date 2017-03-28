@@ -316,12 +316,21 @@ Tensor<T> Tensor<T>::Repmat(int nRows, int nCols) const{
     // Create result tensor
     Tensor<T> result(vector<int>({m_dims.at(0)*nRows, m_dims.at(1)*nCols}));
 
-    // Repeat the content of "this" inside result numRep times
-    auto offset = 0;
-    for (auto i = 0; i < numReps; ++i){
-        copy(m_buffer.begin(),m_buffer.end(),result.begin()+offset);
-        // Increment with distance
-        offset+=distance(m_buffer.begin(), m_buffer.end());
+    // Repeat the content of "this" inside result numRep times    
+    // Iterate over the input matrix
+    for (int r = 0; r < this->GetRows(); ++r){
+        for (int c = 0; c < this->GetCols(); ++c){
+            int resRows = r;
+            // Number of times that this particular values should change
+            for (int nrRep = 0; nrRep < nRows; ++nrRep){
+                int resCols = c;
+                for (int ncRep = 0; ncRep < nCols; ++ncRep){
+                    result(resRows,resCols) = (*this)(r,c);
+                    resCols += this->GetCols();
+                }
+                resRows += this->GetRows();
+            }
+        }
     }
 
     return result;
