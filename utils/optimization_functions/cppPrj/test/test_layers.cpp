@@ -36,15 +36,35 @@ TEST_CASE( "Layer tests"){
         REQUIRE( MathHelper<float>::SumVec(ref_bp - bpAct.dx) < 0.01 );
     }
 
-    SECTION("ReLu test"){
+    SECTION("ReLu test Forward Propagation"){
 
-        cout << "Relu test" << endl;
+        cout << "Relu test Forward Propagation" << endl;
         Tensor<float> input(vector<int>({1,8}),{-1,2,3,-4,5,-6,7,8});
         Tensor<float> ref_fp(vector<int>({1,8}),{0,2,3,0,5,0,7,8});
         Relu relu("Relu1", nullptr);
         Tensor<float> fpAct = relu.ForwardPropagation(input);
-        REQUIRE( MathHelper<float>::SumVec(ref_fp - fpAct) < 0.01 );
+        REQUIRE( MathHelper<float>::SumVec(ref_fp - fpAct) < 0.001 );
         cout << "Relu Forward propagation: " << fpAct << endl;
+    }
+
+    SECTION("ReLu test Backward Propagation"){
+
+        cout << "Relu test Forward Propagation" << endl;
+        Tensor<float> input(vector<int>({3,4}),{0.0784, 0.0117, 0.6391, -1.2539, -0.0050, 0.5033, -0.4471, 1.7654, 0.0938, 0.1949, 0.6188, -0.8953 });
+        Tensor<float> ref_fp(vector<int>({3,4}),{0.0784, 0.0117, 0.6391, 0, 0, 0.5033, 0, 1.7654, 0.0938, 0.1949, 0.6188, 0 });
+        Relu relu("Relu1", nullptr);
+        Tensor<float> fpAct = relu.ForwardPropagation(input);
+        REQUIRE( MathHelper<float>::SumVec(ref_fp - fpAct) < 0.001 );
+        cout << "Relu Forward propagation: " << fpAct << endl;
+
+        // Backprop
+        Tensor<float> dx(vector<int>({3,4}),{0.0643, -0.0081, 0.3181, -0.0099, -0.0417, 0.0324, -0.1325, -0.0783, 0.0595, -0.0019, 0.3098, -0.0267 });
+        Tensor<float> dxGradRef(vector<int>({3,4}),{0.0643, -0.0081, 0.3181, 0, 0, 0.0324, 0, -0.0783, 0.0595, -0.0019, 0.3098, 0 });
+        Tensor<float> dWeight, dBias;
+        LayerGradient<float> doutGrad = {dx,dWeight,dBias};
+        LayerGradient<float> bpAct = relu.BackwardPropagation(doutGrad);
+        cout << "Relu Backward propagation: " << bpAct.dx << endl;
+        REQUIRE( MathHelper<float>::SumVec(dxGradRef - bpAct.dx) < 0.001 );
     }
 
     SECTION("Fully connected test"){
