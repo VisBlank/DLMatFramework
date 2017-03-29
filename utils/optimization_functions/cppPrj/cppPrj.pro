@@ -2,7 +2,7 @@ TEMPLATE = app
 CONFIG += console c++11
 CONFIG -= app_bundle
 CONFIG -= qt
-LIBS += -fopenmp
+LIBS += -fopenmp -lhdf5 -lhdf5_cpp -lhdf5_hl_cpp
 QMAKE_CXXFLAGS += -fopenmp
 
 SOURCES += main.cpp \    
@@ -29,7 +29,9 @@ SOURCES += main.cpp \
     test/test_xor_example.cpp \
     test/test_layers.cpp \
     test/test_loss.cpp \
-    test/test_toy_example.cpp
+    test/test_toy_example.cpp \
+    utils/hdf5tensor.cpp \
+    test/test_hdf5helper.cpp
 
 HEADERS += \    
     loss/lossfactory.h \
@@ -56,4 +58,5 @@ HEADERS += \
     layers/sigmoid.h \
     utils/dataset.h \
     utils/reverse_range_based.h \
-    utils/range.h
+    utils/range.h \
+    utils/hdf5tensor.h
