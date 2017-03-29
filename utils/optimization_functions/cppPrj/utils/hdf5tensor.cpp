@@ -1,6 +1,7 @@
 #include "hdf5tensor.h"
 
-HDF5Tensor::HDF5Tensor(const string &filename){
+template<typename T>
+HDF5Tensor<T>::HDF5Tensor(const string &filename){
     try{
         // Initialize H5File structure
         m_file = unique_ptr<H5::H5File>(new H5::H5File(filename, H5F_ACC_RDONLY));
@@ -9,8 +10,9 @@ HDF5Tensor::HDF5Tensor(const string &filename){
     }
 }
 
-Tensor<float> HDF5Tensor::GetData(const string &datasetName){
-    Tensor<float> resp;
+template<typename T>
+Tensor<T> HDF5Tensor<T>::GetData(const string &datasetName){
+    Tensor<T> resp;
     try{
         H5::DataSet dataset = m_file->openDataSet(datasetName);
         H5::DataSpace dataspace = dataset.getSpace();
@@ -30,7 +32,7 @@ Tensor<float> HDF5Tensor::GetData(const string &datasetName){
         resp.SetDims(vector<int>({rows,cols}));
         resp.PreAloc();
         //float data_out[numElements];
-        unique_ptr<float[]> data_out = unique_ptr<float[]>(new float[numElements]);
+        unique_ptr<T[]> data_out = unique_ptr<T[]>(new T[numElements]);
         dataset.read(data_out.get(), H5::PredType::NATIVE_FLOAT, dataspace);
         resp.SetDataFromBuffer(std::move(data_out));
 
@@ -42,3 +44,10 @@ Tensor<float> HDF5Tensor::GetData(const string &datasetName){
 
     return resp;
 }
+
+/*
+ * Explicit declare template versions to avoid linker error. (This is needed if we use templates on .cpp files)
+*/
+template class HDF5Tensor<float>;
+template class HDF5Tensor<double>;
+template class HDF5Tensor<int>;

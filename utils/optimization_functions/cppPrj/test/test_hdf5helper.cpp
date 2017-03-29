@@ -18,7 +18,7 @@
 
 TEST_CASE( "HDF5 tests"){
     SECTION( "Read dataset" ){
-        HDF5Tensor obj(string("/home/leo/work/DLMatFramework/learn/python_notebooks/for_leo.h5"));
+        HDF5Tensor<float> obj(string("../../../learn/python_notebooks/for_leo.h5"));
         auto X = obj.GetData(string("X"));
         Tensor<float> X_ref(vector<int>({2,3}),{1,2,3,4,5,6});
         cout << "Tensor X:" << X << endl;

@@ -2,6 +2,20 @@
 #include <random>
 #include <chrono>
 #include "mathhelper.h"
+
+template<typename T>
+Dataset<T>::Dataset(const string &hdf5File, bool doOneHot){
+    HDF5Tensor<T> hdf5Tensor(hdf5File);
+    m_X_Train = hdf5Tensor.GetData(string("m_X"));
+    if (doOneHot){
+        m_Y_Train = hdf5Tensor.GetData(string("m_Y_onehot"));
+    } else {
+        m_Y_Train = hdf5Tensor.GetData(string("m_Y"));
+    }
+    m_trainingSize = m_Y_Train.GetRows();
+    for (int ii=0; ii<m_trainingSize; ++ii) m_indexShuffle.push_back(ii);
+}
+
 template<typename T>
 Dataset<T>::Dataset(const Tensor<T> &X, const Tensor<T> &Y, int numSamples, bool doOneHot){
     m_X_Train = X;
@@ -54,15 +68,19 @@ Batch<T> Dataset<T>::GetBatch(int batchSize){
     }
 
     Batch<T> batch;    
-    batch.X = MathHelper<T>::Zeros(vector<int>({selIndex.size(),2}));
-    batch.Y = MathHelper<T>::Zeros(vector<int>({selIndex.size(),1}));
+    batch.X = MathHelper<T>::Zeros(vector<int>({selIndex.size(),m_X_Train.GetCols()}));
+    batch.Y = MathHelper<T>::Zeros(vector<int>({selIndex.size(),m_Y_Train.GetCols()}));
 
     for (int kk = 0; kk < selIndex.size(); ++kk){
         Tensor<T> selected_row = m_X_Train.Select(range<int>(selIndex[kk],selIndex[kk]),range<int>(-1,-1));
+
         for (int jj = 0; jj < selected_row.GetDims()[1]; ++jj){
             batch.X(kk,jj) = selected_row(0,jj);
         }
-        batch.Y(kk,0) = m_Y_Train(selIndex[kk]);
+        // TODO: Wrong will not work for m_Y_Train that is not a vector
+        for (int cc = 0; cc < batch.Y.GetCols(); ++cc){
+            batch.Y(kk,cc) = m_Y_Train(selIndex[kk],cc);
+        }
     }
     m_iterationCounter++;
 

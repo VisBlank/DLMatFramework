@@ -1,6 +1,7 @@
 #ifndef DATASET_H
 #define DATASET_H
 #include "tensor.h"
+#include "hdf5tensor.h"
 
 using namespace std;
 
@@ -28,6 +29,7 @@ private:
 
 public:
     Dataset() = delete;
+    Dataset(const string &hdf5File, bool doOneHot = false);
     Dataset(const Tensor<T> &X, const Tensor<T> &Y, int numSamples, bool doOneHot = false);
     Batch<T> GetBatch(int numBatches);
     int GetTrainSize() const { return m_trainingSize;}

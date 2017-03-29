@@ -15,13 +15,14 @@
 
 using namespace std;
 
+template <typename T>
 class HDF5Tensor
 {
 private:
     unique_ptr<H5::H5File> m_file;
 public:
     HDF5Tensor(const string &filename);
-    Tensor<float> GetData(const string &datasetName);
+    Tensor<T> GetData(const string &datasetName);
 };
 
 #endif // HDF5TENSOR_H
