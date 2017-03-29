@@ -84,8 +84,7 @@ Batch<T> Dataset<T>::GetBatch(int batchSize){
 
         for (int jj = 0; jj < selected_row.GetDims()[1]; ++jj){
             batch.X(kk,jj) = selected_row(0,jj);
-        }
-        // TODO: Wrong will not work for m_Y_Train that is not a vector
+        }        
         for (int cc = 0; cc < batch.Y.GetCols(); ++cc){
             batch.Y(kk,cc) = m_Y_Train(selIndex[kk],cc);
         }
