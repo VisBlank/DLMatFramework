@@ -99,7 +99,7 @@ public:
 
         if ((!allRows) && (allCols)){
             // Some rows, all cols
-            result.SetDims(vector<int>{pRanges[0].size(), inputCols});
+            result.SetDims(vector<int>{(int)pRanges[0].size(), inputCols});
             result.PreAloc();
             auto selRows = pRanges[0];
             auto startOffset = MAT_2D(selRows.Min(), 0, inputCols);
@@ -109,7 +109,7 @@ public:
             copy(start, start+result.GetNumElements(), result.begin());
         } else if ((allRows) && (!allCols)){
             // Some cols, all rows
-            result.SetDims(vector<int>{inputRows, pRanges[1].size()});
+            result.SetDims(vector<int>{inputRows, (int)pRanges[1].size()});
             result.PreAloc();
             auto selCols = pRanges[1];
             auto startOffset = MAT_2D(0, selCols.Min(), inputCols);
@@ -124,7 +124,7 @@ public:
                 startResult += selCols.size();
             }
         } else if ((!allRows) && (!allCols)){
-            result.SetDims(vector<int>{pRanges[0].size(), pRanges[1].size()});
+            result.SetDims(vector<int>{(int)pRanges[0].size(), (int)pRanges[1].size()});
             result.PreAloc();
             auto selRows = pRanges[0];
             auto selCols = pRanges[1];
@@ -154,7 +154,7 @@ public:
     template <typename ...Args>
     T& operator()(int firstIdx, Args... otherIdx){
         // Create array with all parameters (otherIdx...) expand during compilation time
-        array<T, sizeof...(otherIdx) + 1> pDims = {firstIdx, otherIdx...};
+        array<int, sizeof...(otherIdx) + 1> pDims = {(int)firstIdx, (int)otherIdx...};
         switch (pDims.size()){
             case 1:
                 return m_buffer.at(firstIdx);
@@ -173,7 +173,7 @@ public:
     template <typename ...Args>
     T operator()(int firstIdx, Args... otherIdx) const{
         // Create array with all parameters (otherIdx...) expand during compilation time
-        array<T, sizeof...(otherIdx) + 1> pDims = {firstIdx, otherIdx...};
+        array<int, sizeof...(otherIdx) + 1> pDims = {(int)firstIdx, (int)otherIdx...};
         switch (pDims.size()){
             case 1:
                 return m_buffer.at(firstIdx);

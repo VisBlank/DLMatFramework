@@ -76,8 +76,8 @@ Batch<T> Dataset<T>::GetBatch(int batchSize){
     }
 
     Batch<T> batch;    
-    batch.X = MathHelper<T>::Zeros(vector<int>({selIndex.size(),m_X_Train.GetCols()}));
-    batch.Y = MathHelper<T>::Zeros(vector<int>({selIndex.size(),m_Y_Train.GetCols()}));
+    batch.X = MathHelper<T>::Zeros(vector<int>({(int)selIndex.size(),m_X_Train.GetCols()}));
+    batch.Y = MathHelper<T>::Zeros(vector<int>({(int)selIndex.size(),m_Y_Train.GetCols()}));
 
     for (int kk = 0; kk < selIndex.size(); ++kk){
         Tensor<T> selected_row = m_X_Train.Select(range<int>(selIndex[kk],selIndex[kk]),range<int>(-1,-1));

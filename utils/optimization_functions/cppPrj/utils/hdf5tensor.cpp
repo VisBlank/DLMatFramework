@@ -29,7 +29,7 @@ Tensor<T> HDF5Tensor<T>::GetData(const string &datasetName){
         auto numElements = 1;
         for_each(dims_array.begin(), dims_array.end(), [&] (int m){numElements *= m;});
 
-        resp.SetDims(vector<int>({rows,cols}));
+        resp.SetDims(vector<int>({(int)rows,(int)cols}));
         resp.PreAloc();
         //float data_out[numElements];
         unique_ptr<T[]> data_out = unique_ptr<T[]>(new T[numElements]);
