@@ -9,8 +9,12 @@ Dataset<T>::Dataset(const string &hdf5File, bool doOneHot){
     m_X_Train = hdf5Tensor.GetData(string("m_X"));
     if (doOneHot){
         m_Y_Train = hdf5Tensor.GetData(string("m_Y_onehot"));
+        m_numClasses = m_Y_Train.GetCols();
     } else {
         m_Y_Train = hdf5Tensor.GetData(string("m_Y"));
+        // Get unique values
+        std::set<T> sa(m_Y_Train.begin(), m_Y_Train.end());
+        m_numClasses = sa.size();
     }
     m_trainingSize = m_Y_Train.GetRows();
     for (int ii=0; ii<m_trainingSize; ++ii) m_indexShuffle.push_back(ii);
@@ -21,6 +25,10 @@ Dataset<T>::Dataset(const Tensor<T> &X, const Tensor<T> &Y, int numSamples, bool
     m_X_Train = X;
     m_Y_Train = Y;
     m_trainingSize = numSamples;
+
+    // Get unique values
+    std::set<T> sa(m_Y_Train.begin(), m_Y_Train.end());
+    m_numClasses = sa.size();
 
     for (int ii=0; ii<numSamples; ++ii) m_indexShuffle.push_back(ii);
 
@@ -85,6 +93,11 @@ Batch<T> Dataset<T>::GetBatch(int batchSize){
     m_iterationCounter++;
 
     return batch;
+}
+
+template<typename T>
+size_t Dataset<T>::GetNumClasses() const{
+    return m_numClasses;
 }
 
 

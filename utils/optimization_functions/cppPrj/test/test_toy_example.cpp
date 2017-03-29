@@ -26,7 +26,7 @@ TEST_CASE( "Toy example 2 layer FC deep test"){
         layers <= LayerMetaData{"Input",LayerType::TInput,1,2,1,1};// Rows,Cols,channels,batch-size
         layers <= LayerMetaData{"FC_1",LayerType::TFullyConnected,100};
         layers <= LayerMetaData{"Relu_1",LayerType::TRelu};
-        layers <= LayerMetaData{"FC_2",LayerType::TFullyConnected,3};
+        layers <= LayerMetaData{"FC_2",LayerType::TFullyConnected,data.GetNumClasses()};
         layers <= LayerMetaData{"Softmax",LayerType::TSoftMax};
 
         DeepLearningModel net(layers,LossFactory<MultiClassCrossEntropy>::GetLoss());
@@ -34,10 +34,12 @@ TEST_CASE( "Toy example 2 layer FC deep test"){
         // Create solver and train
         Solver solver(net,data,OptimizerType::T_SGD, map<string,float>{{"learning_rate",0.2},{"L2_reg",0}});
         solver.SetBatchSize(300);
-        solver.SetEpochs(10000);
+        solver.SetEpochs(1000);
         solver.Train();
         auto lossHistory = solver.GetLossHistory();
+        auto lastLoss = lossHistory.back();
         cout << "Done" << endl;
+        REQUIRE( lastLoss < 0.1 );
     }
 
 
