@@ -28,6 +28,31 @@ classdef (Sealed) Dataset < handle
         shuffleTime = 0;
         indexShuffle;
     end
+            
+    methods(Static)
+        function obj = loadFromHDF5(filename)
+            obj = [];
+            % load the hdf5 file into the data class
+            obj.m_X = h5read(filename,'/m_X');
+            obj.m_Y = h5read(filename,'/m_Y');
+            obj.m_Y_one_hot = h5read(filename,'/m_Y_onehot');
+            obj.m_X_Tensor = h5read(filename,'/m_X_Tensor');
+            try
+                obj.m_X_val = h5read(filename,'/m_X_val');
+            end
+            try
+                obj.m_Y_val = h5read(filename,'/m_Y_val');
+            end
+            try
+                obj.m_Y_val_one_hot = h5read(filename,'/m_Y_val_one_hot');
+            end
+            try
+                obj.m_X_Val_Tensor = h5read(filename, 'm_X_Val_Tensor');
+            end
+            
+            %obj = Dataset(m_X,m_Y,size(),size(m_X,2),size(m_Y,1),size(m_X,3),true);
+        end
+    end
     
     methods(Access = private)
         function oneHotLabels = oneHot(obj,labels)
@@ -218,6 +243,56 @@ classdef (Sealed) Dataset < handle
             if ~isempty(obj.m_X_Val_Tensor)
                 obj.m_X_Val_Tensor = gpuArray(obj.m_X_Val_Tensor);
                 obj.m_Y_val_one_hot = gpuArray(obj.m_Y_val_one_hot);
+            end
+        end
+        
+        function saveToHDF5(obj,filename)
+            % set a default filename if not supplied
+            if ~exist('filename','var')
+                filename = 'dataset.h5';
+            end
+            % get the data and create hdf5 file
+            m_X_hdf = obj.m_X;
+            m_Y_hdf = obj.m_Y;
+            m_Y_onehot_hdf = obj.m_Y_one_hot;
+            m_X_Tensor_hdf = obj.m_X_Tensor;
+            if ~isempty(obj.m_X_val)
+                m_X_val_hdf = obj.m_X_val;
+                h5create(filename,'/m_X_val',size(m_X_val_hdf));
+            end
+            if ~isempty(obj.m_Y_val)
+                m_Y_val_hdf = obj.m_Y_val;
+                h5create(filename,'/m_Y_val',size(m_Y_val_hdf));
+            end
+            if ~isempty(obj.m_Y_val_one_hot)
+                m_Y_val_one_hot_val_hdf = obj.m_Y_val_one_hot;
+                h5create(filename,'/m_Y_val_one_hot',size(m_Y_val_one_hot_val_hdf));
+            end
+            if ~isempty(obj.m_X_Val_Tensor)
+                m_X_Val_Tensor_hdf = obj.m_X_Val_Tensor;
+                h5create(filename,'/m_X_Val_Tensor',size(m_X_Val_Tensor_hdf));
+            end
+            h5create(filename,'/m_X',size(m_X_hdf));
+            h5create(filename,'/m_Y',size(m_Y_hdf));
+            h5create(filename,'/m_Y_onehot',size(m_Y_onehot_hdf));
+            h5create(filename,'/m_X_Tensor',size(m_X_Tensor_hdf));
+            
+            % write data to the hdf5 file
+            h5write(filename,'/m_X',m_X_hdf);
+            h5write(filename,'/m_Y',m_Y_hdf);
+            h5write(filename,'/m_Y_onehot',m_Y_onehot_hdf);
+            h5write(filename,'/m_X_Tensor',m_X_Tensor_hdf);
+            if ~isempty(obj.m_X_val)
+                h5write(filename,'/m_X_val',size(m_X_val_hdf));
+            end
+            if ~isempty(obj.m_Y_val)
+                h5write(filename,'/m_Y_val',size(m_Y_val_hdf));
+            end
+            if ~isempty(obj.m_Y_val_one_hot)
+                h5write(filename,'/m_Y_val_one_hot',size(m_Y_val_one_hot_val_hdf));
+            end
+            if ~isempty(obj.m_X_Val_Tensor)
+                h5write(filename,'/m_X_Val_Tensor',size(m_X_Val_Tensor_hdf));
             end
         end
     end
