@@ -56,6 +56,7 @@ public:
     void SetDims(const vector<int> &dims);
     void PreAloc() {m_buffer = vector<T>(m_numElements,0);}
     void Reshape(const vector<int> &newdims);
+    void SetDataFromBuffer(unique_ptr<T[]> ptrBuff);
 
     // The expected format will be rows,cols,channel,batch
     int GetNumDims() const {return m_num_dims;}

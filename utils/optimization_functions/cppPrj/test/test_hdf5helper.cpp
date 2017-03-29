@@ -19,8 +19,14 @@
 TEST_CASE( "HDF5 tests"){
     SECTION( "Read dataset" ){
         HDF5Tensor obj(string("/home/leo/work/DLMatFramework/learn/python_notebooks/for_leo.h5"));
-        auto someTensor = obj.GetData(string("X"));
+        auto X = obj.GetData(string("X"));
+        Tensor<float> X_ref(vector<int>({2,3}),{1,2,3,4,5,6});
+        cout << "Tensor X:" << X << endl;
+        REQUIRE(X == X_ref);
 
-        cout << "Tensor:" << someTensor << endl;
+        auto Y = obj.GetData(string("Y"));
+        Tensor<float> Y_ref(vector<int>({4,1}),{5,6,7,8});
+        cout << "Tensor Y:" << Y << endl;
+        REQUIRE(Y == Y_ref);
     }
 }

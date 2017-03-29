@@ -1,3 +1,9 @@
+/*
+    HDF5 Helper
+    References:
+    http://stackoverflow.com/questions/25568446/loading-data-from-hdf5-to-vector-in-c
+    http://stackoverflow.com/questions/17110435/reading-hdf5-files-to-dynamic-arrays-in-c
+*/
 #ifndef HDF5TENSOR_H
 #define HDF5TENSOR_H
 #include <iostream>

@@ -55,6 +55,14 @@ void Tensor<T>::Reshape(const vector<int> &newdims){
 }
 
 template<typename T>
+void Tensor<T>::SetDataFromBuffer(unique_ptr<T[]> ptrBuff){
+    auto cont = 0;
+    for (auto &it :m_buffer){
+        it = ptrBuff[cont++];
+    }
+}
+
+template<typename T>
 typename vector<T>::iterator Tensor<T>::begin(){
     return m_buffer.begin();
 }
