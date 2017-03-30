@@ -23,8 +23,7 @@ public:
 
     DeepLearningModel(const LayerContainer &lc, shared_ptr<BaseLoss> bl):m_layers(lc){
         m_loss = bl;
-        m_isTraining = false;
-        InitWeights();
+        m_isTraining = false;        
     }
 
     Tensor<float> Predict(const Tensor<float> &input);
@@ -32,9 +31,6 @@ public:
     bool IsTraining() const {return m_isTraining;}
     void IsTraining(const bool &flag) {m_isTraining = flag;}
     LayerContainer &GetLayers() { return ref(m_layers);}
-
-private:
-    void InitWeights();
 };
 
 #endif // DEEPLEARNINGMODEL_H

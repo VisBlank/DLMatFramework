@@ -43,33 +43,7 @@ float DeepLearningModel::Loss(const Tensor<float> &X, const Tensor<float> &Y){
         // Also skip the input layer (No backprop on input)
         if (typeid(*currLayer) == typeid(InputLayer)){continue;};        
 
-        currDout = currLayer->BackwardPropagation(currDout);
-        /*cout << "------------------" << endl;
-        cout << currDout.dx;
-        cout << currDout.dWeights;
-        cout << currDout.dBias;
-        cout << "------------------" << endl;*/
-
+        currDout = currLayer->BackwardPropagation(currDout);        
     }
-
     return dataLoss;
 }
-
-void DeepLearningModel::InitWeights(){    
-    // Iterate on all layers (C++11 for each, stuff)
-    for (auto layer:m_layers){
-        auto currLayer = m_layers(layer);
-        auto layerInput = currLayer->GetInputLayer();
-        // Skip the input layer
-        if (layerInput == nullptr)
-            continue;
-        auto shapeInput = layerInput->GetActivationShape();
-        std::cout << "Layer:" << layer << " input layer:" << layerInput->GetName() << endl;
-
-        // Initialize weights only on layers that need it
-        if (typeid(*currLayer) == typeid(FullyConnected)){
-            cout << "Create FC" << endl;
-        }
-    }
-}
-
