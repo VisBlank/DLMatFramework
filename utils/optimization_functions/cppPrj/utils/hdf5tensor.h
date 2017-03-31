@@ -14,6 +14,7 @@
 #include "tensor.h"
 
 using namespace std;
+#define NAME_OF_VARIABLE( v ) #v
 
 template <typename T>
 class HDF5Tensor
@@ -23,6 +24,8 @@ private:
 public:
     HDF5Tensor(const string &filename);
     Tensor<T> GetData(const string &datasetName);
+    static void WriteData(const string &filename, const string &group, const string &datasetName, const Tensor<T> &tensor);
+    static void WriteData(const string &filename, const string &group, const string &datasetName, const vector<T> &vec);
 };
 
 #endif // HDF5TENSOR_H

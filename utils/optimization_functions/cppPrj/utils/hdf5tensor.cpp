@@ -45,6 +45,58 @@ Tensor<T> HDF5Tensor<T>::GetData(const string &datasetName){
     return resp;
 }
 
+template<typename T>
+void HDF5Tensor<T>::WriteData(const string &filename, const string &group, const string &datasetName, const Tensor<T> &tensor){
+    try {
+        H5::H5File file(filename, H5F_ACC_TRUNC);
+        int rank = (int) tensor.GetNumDims();
+        array<hsize_t, 10> dims_array; dims_array.fill(1);
+        dims_array[0] = tensor.GetRows();
+        dims_array[1] = tensor.GetCols();
+        H5::DataSpace dataspace(rank, dims_array.data());
+        vector<T> m_buff(tensor.begin(), tensor.end());
+
+        H5::DataSet dataset = file.createDataSet(datasetName, H5::PredType::NATIVE_FLOAT, dataspace);
+        dataset.write(m_buff.data(), H5::PredType::NATIVE_FLOAT, dataspace);
+
+        // Close resources
+        dataspace.close();
+        dataset.close();
+        file.close();
+    }
+    catch(H5::FileIException error){
+        error.printError();
+    }
+    catch (H5::DataSetIException error){
+        error.printError();
+    }
+}
+
+template<typename T>
+void HDF5Tensor<T>::WriteData(const string &filename, const string &group, const string &datasetName, const vector<T> &vec){
+    try {
+        H5::H5File file(filename, H5F_ACC_TRUNC);
+        int rank = (int) 1;
+        array<hsize_t, 10> dims_array; dims_array.fill(1);
+        dims_array[0] = vec.size();
+        H5::DataSpace dataspace(rank, dims_array.data());
+
+        H5::DataSet dataset = file.createDataSet(datasetName, H5::PredType::NATIVE_FLOAT, dataspace);
+        dataset.write(vec.data(), H5::PredType::NATIVE_FLOAT, dataspace);
+
+        // Close resources
+        dataspace.close();
+        dataset.close();
+        file.close();
+    }
+    catch(H5::FileIException error){
+        error.printError();
+    }
+    catch (H5::DataSetIException error){
+        error.printError();
+    }
+}
+
 /*
  * Explicit declare template versions to avoid linker error. (This is needed if we use templates on .cpp files)
 */

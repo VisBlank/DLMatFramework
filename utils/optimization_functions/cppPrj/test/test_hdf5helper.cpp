@@ -29,4 +29,10 @@ TEST_CASE( "HDF5 tests"){
         cout << "Tensor Y:" << Y << endl;
         REQUIRE(Y == Y_ref);
     }
+
+    SECTION( "Write dataset" ){
+        Tensor<float> X_ref(vector<int>({2,3}),{1,2,3,4,5,6});
+        cout << "Tensor X:" << X_ref << endl;
+        HDF5Tensor<float>::WriteData("./test.f5", "Data", NAME_OF_VARIABLE(X_ref), X_ref);
+    }
 }

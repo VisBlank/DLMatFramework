@@ -1,4 +1,5 @@
 #include "tensor.h"
+#include "utils/hdf5tensor.h"
 /*
 Tensor Implementation
 
@@ -60,6 +61,13 @@ void Tensor<T>::SetDataFromBuffer(unique_ptr<T[]> ptrBuff){
     for (auto &it :m_buffer){
         it = ptrBuff[cont++];
     }
+}
+
+template<typename T>
+void Tensor<T>::SaveToHDF5(const string &fileName) const{
+    const string dataSpaceName = "Data";
+    const string varName = "Tensor";
+    HDF5Tensor<T>::WriteData(fileName, dataSpaceName, varName, (*this));
 }
 
 template<typename T>

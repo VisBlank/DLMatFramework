@@ -39,6 +39,9 @@ TEST_CASE( "Toy example 2 layer FC deep test"){
         auto lossHistory = solver.GetLossHistory();
         auto lastLoss = lossHistory.back();
         REQUIRE( lastLoss < 0.1 );
+        // On matlab open like this:
+        // loss = h5read('ToyExample.h5',/lossHistory');
+        HDF5Tensor<float>::WriteData("./ToyExample.h5","data","lossHistory",lossHistory);
     }
 
 

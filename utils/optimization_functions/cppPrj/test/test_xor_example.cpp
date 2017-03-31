@@ -59,7 +59,7 @@ TEST_CASE("Xor problem test"){
         solver.SetEpochs(1000);
         solver.Train();
         auto lossHistory = solver.GetLossHistory();
-
+        HDF5Tensor<float>::WriteData("./XORLossHistory.h5","data","lossHistory",lossHistory);
 
         auto score0 = net.Predict(Tensor<float>(vector<int>({1,2}),{0,0}))(0);
         auto score1 = net.Predict(Tensor<float>(vector<int>({1,2}),{0,1}))(0);
