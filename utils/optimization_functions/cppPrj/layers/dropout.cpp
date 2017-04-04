@@ -1,11 +1,15 @@
 #include "dropout.h"
 
-DropOut::DropOut(const string &name, shared_ptr<BaseLayer> inLayer, float prob)
-{
+DropOut::DropOut(const string &name, shared_ptr<BaseLayer> inLayer, float prob){
     m_name = name;
     m_inputLayer = inLayer;
     m_dropoutProb = prob;
     m_isTraining = true;
+
+    // Dropout does not change the shape of it's input
+    if (m_inputLayer != nullptr){
+        m_activationShape = m_inputLayer->GetActivationShape();
+    }
 }
 
 Tensor<float> DropOut::ForwardPropagation(const Tensor<float> &input){
