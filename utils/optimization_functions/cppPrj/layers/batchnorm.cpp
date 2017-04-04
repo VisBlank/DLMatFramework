@@ -4,6 +4,7 @@ BatchNorm::BatchNorm(const string &name, shared_ptr<BaseLayer> inLayer, float ep
     m_name = name;
     m_inputLayer = inLayer;
     m_isTraining = true;
+    m_hasParameter = true;
     m_eps = eps;
     m_momentum = momentum;
 
@@ -45,10 +46,10 @@ Tensor<float> BatchNorm::ForwardPropagation(const Tensor<float> &input){
         m_sqrtvar = MathHelper<float>::Sqrt(m_var + m_eps);
 
         // Setp 6: Invert the Square root
-        auto ivar = 1.0/m_sqrtvar;
+        m_ivar = 1.0/m_sqrtvar;
 
         // Step 7: Do Normalization
-        m_xhat = m_xmu.EltWiseMult(ivar.Repmat(N,1));
+        m_xhat = m_xmu.EltWiseMult(m_ivar.Repmat(N,1));
 
         // Step 8: Nor the two transformations steps
         auto gammax = (m_weights.Repmat(N,1)).EltWiseMult(m_xhat);
@@ -76,5 +77,58 @@ Tensor<float> BatchNorm::ForwardPropagation(const Tensor<float> &input){
 }
 
 LayerGradient<float> BatchNorm::BackwardPropagation(const LayerGradient<float> &dout){
+    //batch size (not fully batch ready)
+    auto N = (float)m_previousInput.GetRows();
+    auto D = m_previousInput.GetCols();
 
+    // Step 9:
+    auto dbeta = MathHelper<float>::Sum(dout.dx,0);
+    auto dgammax = dout.dx;
+
+    // Step 8:
+    auto dgamma = MathHelper<float>::Sum(dgammax.EltWiseMult(m_xhat),0);
+    auto dxhat = dgammax.EltWiseMult(m_weights.Repmat(N,1));
+
+    // Step 7:
+    auto divar = MathHelper<float>::Sum(dxhat.EltWiseMult(m_xmu),0);
+    auto dxmu1 = dxhat.EltWiseMult(m_ivar.Repmat(N,1));
+
+    // Step 6:
+    auto dsqrtvar = (-1.0 / (m_sqrtvar.EltWisePow(2))).EltWiseMult(divar);
+
+    // Step 5:
+    auto dvar = (0.5 / MathHelper<float>::Sqrt(m_var+m_eps)).EltWiseMult(dsqrtvar);
+
+    // Step 4:
+    auto onesMatN = MathHelper<float>::Ones(vector<int>({N,D})) * N;
+    auto dsq = (1.0 / onesMatN.EltWiseMult(dvar.Repmat(N,1)));
+
+    // Step 3:
+    auto dxmu2 = m_xmu.EltWiseMult(dsq)*2;
+
+    // Step 2:
+    auto dx1 = (dxmu2+dxmu1);
+    auto dmu = MathHelper<float>::Sum(dx1,0) * -1.0;
+
+    // Step 1:
+    auto dx2 = (1.0 / onesMatN.EltWiseMult(dmu.Repmat(N,1)));
+
+    Tensor<float> dx = dx1+dx2;
+    Tensor<float> dWeights = dgamma;
+    Tensor<float> dBias = dbeta;
+
+    LayerGradient<float> gradient{dx,dWeights,dBias};
+
+    // cache gradients
+    m_gradients = gradient;
+
+    return gradient;
+}
+
+void BatchNorm::setWeights(Tensor<float> &weights){
+    m_weights = weights;
+}
+
+void BatchNorm::setBias(Tensor<float> &bias){
+    m_bias = bias;
 }

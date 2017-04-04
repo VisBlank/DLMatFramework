@@ -26,7 +26,7 @@ TEST_CASE( "Toy example 2 layer FC deep test and Dropout"){
         layers <= LayerMetaData{"Input",LayerType::TInput,1,2,1,1};// Rows,Cols,channels,batch-size
         layers <= LayerMetaData{"FC_1",LayerType::TFullyConnected,100};
         layers <= LayerMetaData{"Relu_1",LayerType::TRelu};
-        layers <= LayerMetaData{"DRP_1",LayerType::TDropout, (float)0.9};
+        layers <= LayerMetaData{"DRP_1",LayerType::TDropout, (float)0.5};
         layers <= LayerMetaData{"FC_2",LayerType::TFullyConnected,(int)data.GetNumClasses()};
         layers <= LayerMetaData{"Softmax",LayerType::TSoftMax};
 
@@ -39,7 +39,7 @@ TEST_CASE( "Toy example 2 layer FC deep test and Dropout"){
         solver.Train();
         auto lossHistory = solver.GetLossHistory();
         auto lastLoss = lossHistory.back();
-        REQUIRE( lastLoss < 0.3 );
+        REQUIRE( lastLoss < 0.5 );
         // On matlab open like this:
         // loss = h5read('ToyExampleDropout.h5',/lossHistory');
         HDF5Tensor<float>::WriteData("./ToyExampleDropout.h5","data","lossHistory",lossHistory);
