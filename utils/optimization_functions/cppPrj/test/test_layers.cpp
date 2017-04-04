@@ -111,10 +111,31 @@ TEST_CASE( "Layer tests"){
         Tensor<float> ref_fp(vector<int>({4,3}),{0.993,0.0067,0,0.2119,0.2119,0.5761,0.5761,0.2119,0.2119,0.8756,0.1185,0.0059});
         SoftMax softm("Test",nullptr);
         Tensor<float> fpAct = softm.ForwardPropagation(input);
+        cout << "Softmax Forward propagation: " << input << endl;
+
         auto dif = abs(MathHelper<float>::SumVec(ref_fp - fpAct));
         REQUIRE( dif < 0.001 );
         cout << "Softmax Forward propagation: " << fpAct << endl;
 
 
     }
+
+    SECTION( "Dropout test" ){
+
+        /*cout << "Dopout test" << endl;
+        // Test dropout Forward propagation
+        Tensor<float> input(vector<int>({3,3}),{1,1,1,2,2,2,3,3,3});
+
+        DropOut drpout("Test",nullptr,0.5);
+        Tensor<float> fpAct = drpout.ForwardPropagation(input);
+        cout << "Dropout Forward propagation: " << input << endl;
+
+        //auto dif = abs(MathHelper<float>::SumVec(ref_fp - fpAct));
+        //REQUIRE( dif < 0.001 );
+        cout << "Dropout Forward propagation: " << fpAct << endl;
+*/
+
+    }
+
+
 }
