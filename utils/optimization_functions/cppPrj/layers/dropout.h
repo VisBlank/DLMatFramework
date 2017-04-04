@@ -6,14 +6,13 @@ class DropOut : public BaseLayer
 {
 public:
     DropOut(const string &name, shared_ptr<BaseLayer> inLayer, float dropoutProb);
-
     Tensor<float> ForwardPropagation(const Tensor<float> &input) override;
     LayerGradient<float> BackwardPropagation(const LayerGradient<float> &dout) override;
+    Tensor<float> GetDropoutMask() const;
 
 private:
     Tensor<float> m_dropoutMask;
-    float m_dropoutProb;
-
+    float m_dropoutProb;    
 };
 
 

@@ -12,6 +12,7 @@
 #include "loss/crossentropy.h"
 #include "utils/reverse_range_based.h"
 #include "utils/range.h"
+#include "layers/dropout.h"
 #include "layers/softmax.h"
 #include <array>
 
@@ -121,21 +122,14 @@ TEST_CASE( "Layer tests"){
     }
 
     SECTION( "Dropout test" ){
-
-        /*cout << "Dopout test" << endl;
+        cout << "Dopout test" << endl;
         // Test dropout Forward propagation
-        Tensor<float> input(vector<int>({3,3}),{1,1,1,2,2,2,3,3,3});
+        Tensor<float> input(vector<int>({3,3}),{1,2,3,4,5,6,7,8,9});
 
-        DropOut drpout("Test",nullptr,0.5);
-        Tensor<float> fpAct = drpout.ForwardPropagation(input);
-        cout << "Dropout Forward propagation: " << input << endl;
-
-        //auto dif = abs(MathHelper<float>::SumVec(ref_fp - fpAct));
-        //REQUIRE( dif < 0.001 );
-        cout << "Dropout Forward propagation: " << fpAct << endl;
-*/
-
+        DropOut dropout("Test",nullptr,0.5);
+        Tensor<float> fpAct = dropout.ForwardPropagation(input);
+        cout << "Dropout Input: " << input << endl;
+        cout << "Dropout Activation: " << fpAct << endl;
+        cout << "Dropout Mask:" << dropout.GetDropoutMask() << endl;
     }
-
-
 }

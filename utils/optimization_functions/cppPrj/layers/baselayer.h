@@ -37,6 +37,9 @@ public:
 
     bool HasParameter() const { return m_hasParameter;}
 
+    bool IsTraining() const { return m_isTraining;}
+    void SetTrainingMode(bool flag){ m_isTraining = flag;}
+
 protected:
     // Weights and bias are references, we don't need to store them
     Tensor<float> m_weights;
@@ -51,6 +54,9 @@ protected:
 
     string m_name;
     bool m_hasParameter = false;
+
+    // Flag to detect if we're on training mode (Used on batch-norm, dropout)
+    bool m_isTraining;
 
     // Reference to layers connected to this current layer    
     shared_ptr<BaseLayer> m_inputLayer = nullptr;

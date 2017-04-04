@@ -6,6 +6,7 @@
 # http://derekmolloy.ie/hello-world-introductions-to-cmake/
 # http://stackoverflow.com/questions/21163188/most-simple-but-complete-cmake-example
 # http://blog.beuc.net/posts/Cross-compiling_with_CMake/
+# https://cmake.org/cmake/help/v3.0/manual/cmake-toolchains.7.html
 
 # Running with Debug
 # cmake .. -DCMAKE_BUILD_TYPE=Debug; make -j8
