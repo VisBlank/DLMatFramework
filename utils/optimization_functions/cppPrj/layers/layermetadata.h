@@ -46,14 +46,19 @@ public:
         pf2 = pP2;
     }
 
+    // Integer parameters
     int GetP1() const {return p1;}
     int GetP2() const {return p2;}
     int GetP3() const {return p3;}
     int GetP4() const {return p4;}
-    int GetPF1() const {return pf1;}
-    int GetPF2() const {return pf2;}
-    int GetPF3() const {return pf3;}
-    int GetPF4() const {return pf4;}
+
+    // Float parameters
+    float GetPF1() const {return pf1;}
+    float GetPF2() const {return pf2;}
+    float GetPF3() const {return pf3;}
+    float GetPF4() const {return pf4;}
+
+    // Layer name/type
     LayerType GetType() const {return type;}
     string GetName() const {return name;}
 private:

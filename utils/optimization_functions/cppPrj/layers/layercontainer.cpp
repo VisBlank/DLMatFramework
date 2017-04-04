@@ -51,6 +51,9 @@ void LayerContainer::operator<=(const LayerMetaData &layerData){
     case TDropout:
         layer = shared_ptr<BaseLayer>(new DropOut(layerData.GetName(), m_currentLayer,layerData.GetPF1()));
         break;
+    case TBatchNorm:
+        layer = shared_ptr<BaseLayer>(new BatchNorm(layerData.GetName(), m_currentLayer,layerData.GetPF1(), layerData.GetPF2()));
+        break;
     case TSoftMax:
         layer = shared_ptr<BaseLayer>(new SoftMax(layerData.GetName(), m_currentLayer));
         break;

@@ -210,6 +210,7 @@ public:
     // Element-wise operations
     Tensor<T> EltWiseMult(const Tensor<T> &b) const;
     Tensor<T> EltWiseDiv(const Tensor<T> &b) const;
+    Tensor<T> EltWisePow(const T &b) const;
 
     /*
         Transpose (2d matrix only) and vanilla (with cache misses)

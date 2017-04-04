@@ -34,7 +34,8 @@ SOURCES += main.cpp \
     test/test_hdf5helper.cpp \
     layers/dropout.cpp \
     layers/batchnorm.cpp \
-    test/test_toy_example_dropout.cpp
+    test/test_toy_example_dropout.cpp \
+    test/test_toy_example_batchnorm.cpp
 
 HEADERS += \    
     loss/lossfactory.h \

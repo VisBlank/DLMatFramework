@@ -180,8 +180,17 @@ template<typename T>
 Tensor<T> MathHelper<T>::Exp(const Tensor<T> &in){
     Tensor<T> result(vector<int>({in.GetDims()}));
 
-    // For each element of invVec apply log(element) and store the result on resVec
+    // For each element of invVec apply exp(element) and store the result on resVec
     transform(in.begin(), in.end(), result.begin(),[](T m) -> T {return exp(m);});
+    return result;
+}
+
+template<typename T>
+Tensor<T> MathHelper<T>::Sqrt(const Tensor<T> &in){
+    Tensor<T> result(vector<int>({in.GetDims()}));
+
+    // For each element of invVec apply sqrt(element) and store the result on resVec
+    transform(in.begin(), in.end(), result.begin(),[](T m) -> T {return sqrt(m);});
     return result;
 }
 
@@ -189,6 +198,13 @@ template<typename T>
 Tensor<T> MathHelper<T>::Zeros(const vector<int> &dims){
     Tensor<T> result(dims);
     fill (result.begin(),result.end(),(T)0);
+    return result;
+}
+
+template<typename T>
+Tensor<T> MathHelper<T>::Ones(const vector<int> &dims){
+    Tensor<T> result(dims);
+    fill (result.begin(),result.end(),(T)1);
     return result;
 }
 
