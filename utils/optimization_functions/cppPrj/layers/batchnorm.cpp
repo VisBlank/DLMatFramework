@@ -101,7 +101,8 @@ LayerGradient<float> BatchNorm::BackwardPropagation(const LayerGradient<float> &
 
     // Step 4:
     auto onesMatN = MathHelper<float>::Ones(vector<int>({N,D})) * N;
-    auto dsq = (1.0 / onesMatN.EltWiseMult(dvar.Repmat(N,1)));
+    auto dsq_part1 = (1.0 / onesMatN);
+    auto dsq = dsq_part1.EltWiseMult(dvar.Repmat(N,1));
 
     // Step 3:
     auto dxmu2 = m_xmu.EltWiseMult(dsq)*2;
@@ -111,7 +112,8 @@ LayerGradient<float> BatchNorm::BackwardPropagation(const LayerGradient<float> &
     auto dmu = MathHelper<float>::Sum(dx1,0) * -1.0;
 
     // Step 1:
-    auto dx2 = (1.0 / onesMatN.EltWiseMult(dmu.Repmat(N,1)));
+    auto dx2_part1 = (1.0 / onesMatN);
+    auto dx2 = dx2_part1.EltWiseMult(dmu.Repmat(N,1));
 
     Tensor<float> dx = dx1+dx2;
     Tensor<float> dWeights = dgamma;
