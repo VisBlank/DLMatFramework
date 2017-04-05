@@ -35,28 +35,34 @@ typename list<string>::const_reverse_iterator LayerContainer::rend() const {
 
 void LayerContainer::operator<=(const LayerMetaData &layerData){
     shared_ptr<BaseLayer> layer;
-    switch (layerData.type) {
+    switch (layerData.GetType()) {
     case TInput:
-        layer = shared_ptr<BaseLayer>(new InputLayer(layerData.name, layerData.p1, layerData.p2, layerData.p3, layerData.p4));
+        layer = shared_ptr<BaseLayer>(new InputLayer(layerData.GetName(), layerData.GetP1(), layerData.GetP2(), layerData.GetP3(), layerData.GetP4()));
         break;
     case TRelu:
-        layer = shared_ptr<BaseLayer>(new Relu(layerData.name, m_currentLayer));
+        layer = shared_ptr<BaseLayer>(new Relu(layerData.GetName(), m_currentLayer));
         break;
     case TSigmoid:
-        layer = shared_ptr<BaseLayer>(new Sigmoid(layerData.name, m_currentLayer));
+        layer = shared_ptr<BaseLayer>(new Sigmoid(layerData.GetName(), m_currentLayer));
         break;
     case TFullyConnected:
-        layer = shared_ptr<BaseLayer>(new FullyConnected(layerData.name, m_currentLayer,layerData.p1));
+        layer = shared_ptr<BaseLayer>(new FullyConnected(layerData.GetName(), m_currentLayer,layerData.GetP1()));
+        break;
+    case TDropout:
+        layer = shared_ptr<BaseLayer>(new DropOut(layerData.GetName(), m_currentLayer,layerData.GetPF1()));
+        break;
+    case TBatchNorm:
+        layer = shared_ptr<BaseLayer>(new BatchNorm(layerData.GetName(), m_currentLayer,layerData.GetPF1(), layerData.GetPF2()));
         break;
     case TSoftMax:
-        layer = shared_ptr<BaseLayer>(new SoftMax(layerData.name, m_currentLayer));
+        layer = shared_ptr<BaseLayer>(new SoftMax(layerData.GetName(), m_currentLayer));
         break;
     default:
         throw invalid_argument("Layer not implemented.");
         break;
     }
-    m_hashMapLayers.insert(make_pair(layerData.name,shared_ptr<BaseLayer>(layer)));
-    m_layerNamesList.push_back(layerData.name);
+    m_hashMapLayers.insert(make_pair(layerData.GetName(),shared_ptr<BaseLayer>(layer)));
+    m_layerNamesList.push_back(layerData.GetName());
     m_numLayers++;
     // Non-thread safe way to hold the last inserted layer
     m_currentLayer = layer;

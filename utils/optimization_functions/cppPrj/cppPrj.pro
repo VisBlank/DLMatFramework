@@ -31,7 +31,11 @@ SOURCES += main.cpp \
     test/test_loss.cpp \
     test/test_toy_example.cpp \
     utils/hdf5tensor.cpp \
-    test/test_hdf5helper.cpp
+    test/test_hdf5helper.cpp \
+    layers/dropout.cpp \
+    layers/batchnorm.cpp \
+    test/test_toy_example_dropout.cpp \
+    test/test_toy_example_batchnorm.cpp
 
 HEADERS += \    
     loss/lossfactory.h \
@@ -59,4 +63,6 @@ HEADERS += \
     utils/dataset.h \
     utils/reverse_range_based.h \
     utils/range.h \
-    utils/hdf5tensor.h
+    utils/hdf5tensor.h \
+    layers/dropout.h \
+    layers/batchnorm.h

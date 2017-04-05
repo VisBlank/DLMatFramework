@@ -24,6 +24,8 @@
 #include <layers/sigmoid.h>
 #include <layers/fullyconnected.h>
 #include <layers/softmax.h>
+#include <layers/dropout.h>
+#include <layers/batchnorm.h>
 
 using namespace std;
 

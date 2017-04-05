@@ -30,7 +30,9 @@ public:
     static Tensor<T> Log(const Tensor<T> &in);
     static Tensor<T> Abs(const Tensor<T> &in);
     static Tensor<T> Exp(const Tensor<T> &in);
+    static Tensor<T> Sqrt(const Tensor<T> &in);
     static Tensor<T> Zeros(const vector<int> &dims);
+    static Tensor<T> Ones(const vector<int> &dims);
     static Tensor<T> Randn(const vector<int> &dims);    
 };
 

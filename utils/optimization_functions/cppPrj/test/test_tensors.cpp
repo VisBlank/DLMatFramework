@@ -16,6 +16,17 @@
 
 TEST_CASE("Tensor tests"){
 
+    SECTION("Tensor pow"){
+        Tensor<float> A(vector<int>({1,4}),{1,2,3,4});
+        Tensor<float> powRef(vector<int>({1,4}),{1,4,9,16});
+
+        cout << "A:" << A << endl;
+        auto powResp = A.EltWisePow(2);
+        cout << "A .^ 2:" << powResp << endl;
+
+        REQUIRE(powRef == powResp);
+    }
+
     SECTION("Tensor max"){
         Tensor<float> A(vector<int>({3,3}),{1,2,3,4,5,6,7,8,9});
         Tensor<float> maxRows_ref(vector<int>({3,1}),{3,6,9});

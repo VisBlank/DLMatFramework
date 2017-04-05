@@ -305,6 +305,17 @@ Tensor<T> Tensor<T>::EltWiseDiv(const Tensor<T> &b) const{
 }
 
 template<typename T>
+Tensor<T> Tensor<T>::EltWisePow(const T &scalar) const{
+    // Create result tensor with same dimensions
+    Tensor<T> result(vector<int>({m_dims}));
+
+    // Do a pow for each element
+    transform(m_buffer.begin(), m_buffer.end(), result.begin(),[&scalar](T m) -> T {return std::pow(m,scalar);});
+
+    return result;
+}
+
+template<typename T>
 Tensor<T> Tensor<T>::Transpose() const{
     if (this->GetNumDims() > 2){
         throw invalid_argument("Only 2d matrix transpose is supported, use Permute for more dimensions");
