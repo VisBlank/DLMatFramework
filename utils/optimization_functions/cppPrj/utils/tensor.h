@@ -66,8 +66,8 @@ public:
     int GetCols() const {return m_dims[1];}
     int GetNumElements() const { return m_numElements;}
     // TODO:
-    int GetDepth() const {return 1;}
-    int GetBatch() const {return 1;}
+    int GetDepth() const {if (m_dims.size()>2) return m_dims[2]; else return 1;}
+    int GetBatch() const {if (m_dims.size()>3) return m_dims[3]; else return 1;}
     bool IsEmpty() const {return (m_num_dims == 0);}
 
     // Return a copy of our buffer (Safe)
@@ -212,6 +212,10 @@ public:
     Tensor<T> EltWiseDiv(const Tensor<T> &b) const;
     Tensor<T> EltWisePow(const T &b) const;
 
+    // Convert a image image on a 2d tensor
+    static Tensor<T> im2col(const Tensor<T> &input, int kx, int ky, int stride, int pad);
+    static Tensor<T> im2col_back(const Tensor<T> &dout, int kx, int ky, int stride, int HH, int WW, int CC);
+
     /*
         Transpose (2d matrix only) and vanilla (with cache misses)
         For better implementation on CPU check here:
@@ -266,13 +270,18 @@ public:
             auto start = right.m_buffer.begin();
             auto ncols = right.GetCols();
             auto nrows = right.GetRows();
-            for (int i = 0; i < nrows; ++i){
-                // Get a slice from the vector
-                vector<T> rowSlice(start, start + ncols);
-                str_stream << "| ";
-                for_each(rowSlice.begin(), rowSlice.end(), [&str_stream](T m){str_stream << m << " ";});
-                start += ncols;
-                str_stream << "|" << endl;
+            auto nchann = right.GetDepth();
+            for (int channel = 0; channel < nchann; ++channel){
+                if (nchann > 1)
+                    str_stream << "Channel:" << channel << endl;
+                for (int i = 0; i < nrows; ++i){
+                    // Get a slice from the vector
+                    vector<T> rowSlice(start, start + ncols);
+                    str_stream << "| ";
+                    for_each(rowSlice.begin(), rowSlice.end(), [&str_stream](T m){str_stream << m << " ";});
+                    start += ncols;
+                    str_stream << "|" << endl;
+                }
             }
         }
         //os << dt.mo << '/' << dt.da << '/' << dt.yr;

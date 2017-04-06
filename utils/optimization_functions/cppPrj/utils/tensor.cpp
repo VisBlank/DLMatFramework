@@ -316,6 +316,140 @@ Tensor<T> Tensor<T>::EltWisePow(const T &scalar) const{
 }
 
 template<typename T>
+Tensor<T> Tensor<T>::im2col(const Tensor<T> &input, int kx, int ky, int stride, int pad){
+    // calculate output matrix dimensions
+    int height_col = (input.GetRows() + (2 * pad) - ky) / stride + 1;
+    int width_col = (input.GetCols() + (2 * pad) - kx) / stride + 1;
+    auto cols_height = input.GetDepth()*kx*ky;
+    auto cols_width = height_col * width_col;
+    int kernelProd = kx * ky;
+
+    // Detect fractional size convolution
+    float frac_height = ((float)input.GetRows() + (2.0 * (float)pad) - (float)ky) / (float)stride + 1.0;
+    float frac_width = ((float)input.GetCols() + (2.0 * (float)pad) - (float)kx) / (float)stride + 1.0;
+    int isFract = 0;
+    if ( ((frac_height - (int)frac_height) == 0) && ((frac_width - (int)frac_width) == 0) ){
+        isFract = 0;
+    } else {
+        isFract = 1;
+    }
+
+
+    //Calculate biggest row/col size considering padding or fractional convolution
+    int maxHeight = input.GetRows() - isFract + ((2 * pad)-1);
+    int maxWidth = input.GetCols() - isFract + ((2 * pad)-1);
+
+    /*
+        Create variables to support richard formula, that calculates idxCol_out
+        from (n_rows,n_cols,row,col,ky,kx,stride,width_col)
+        Number of collumns that your slide window will cross on
+        each dimension.
+        Product k(x,y) * stride, calculating outside to avoid this multiplication
+        for every row,col,channel
+    */
+    int n_cols = width_col * kx;
+    int n_rows = height_col * ky;
+    int prod_ky_stride = ky * stride;
+    int prod_kx_stride = kx * stride;
+
+    Tensor<T> result(vector<int>({cols_height,cols_width}));
+
+    /* Iterate on the input image (could be virtually padded) */
+    for (int channel = 0; channel < input.GetDepth(); channel++) {
+        /* Move down on the image */
+        for (int row = 0; row < input.GetRows() + (2 * pad); row += stride) {
+            /* Move left on the image */
+            for (int col = 0; col < input.GetCols() + (2 * pad); col += stride) {
+                /*
+                If the window is out of the image we should ignore the current
+                iteration. But take care that this also may happen when we have
+                padding, so check. Because if even with padding we go out of the
+                window we should ignore(continue).
+                */
+                if (((row + (ky-1)) > maxHeight) || ((col + (kx-1)) > maxWidth)) {
+                    continue;
+                }
+
+                /* Position the row of output channel related to the current channel */
+                int idxRow_out = channel * (kernelProd);
+                /*
+                  X coordinate on output 2d matrix (Move right on output matrix)
+                  Richard formula to calculate the collumn position of the output matrix
+                  given (n_rows,n_cols,row,col,ky,kx,stride,width_col). Previously this
+                  was calculated as "idxCol_out = (idxCol_out + 1) % with_data_col;"
+                  after each window slide, but this was breaking full parallelization.
+                */
+                int idxCol_out = ((n_rows - (n_rows - row*ky))/(prod_ky_stride))*width_col + ((n_cols - (n_cols - col*kx)))/(prod_kx_stride) ;
+                int m,n;
+                /* Select window [ky x kx] on input volume on each channel */
+                for (m = 0; m < ky; m++) {
+                    for (n = 0; n < kx; n++) {
+                        /*
+                            Fix offset if we're doing padding
+                        */
+                        int row_pad = (row + n) - pad;
+                        int col_pad = (col + m) - pad;
+                        /* Avoid running out of input image boundaries */
+                        if ((row_pad >= 0) && (col_pad >= 0) && (row_pad < input.GetRows()) && (col_pad < input.GetCols())) {
+                            result(idxRow_out, idxCol_out) = input(row_pad, col_pad, channel);
+                        } else {
+                            /* If we're out return 0 */
+                            result(idxRow_out, idxCol_out) = 0;
+
+                        }
+                        /*
+                            Move down on the output 2d array to add current element
+                            from the patch
+                        */
+                        idxRow_out++;
+                    }
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
+template<typename T>
+Tensor<T> Tensor<T>::im2col_back(const Tensor<T> &dout, int kx, int ky, int stride, int HH, int WW, int CC){
+    int H = (dout.GetRows() - 1) * stride + ky;
+    int W = (dout.GetCols() - 1) * stride + kx;
+
+    Tensor<T> img_grad(vector<int>({H,W,CC}));
+
+    auto dout_H = dout.GetRows();
+    auto dout_W = dout.GetCols();
+
+    //select patch
+    #pragma omp parallel for
+    for (int patchNum = 0; patchNum < (dout_H * dout_W); patchNum++){
+
+      //starting upper left spatial coordinate for this patch
+      int h_start = floor(((patchNum)/dout_W) * stride);
+      int w_start = ( patchNum % dout_W ) * stride;
+
+      //go over all the elements in selected patch placing/adding them into the output matrix
+      int patchElement = 0; //counter for our current patch
+      for (int channel = 0; channel < CC; channel++){
+
+          for (int row = 0; row < HH; row++){
+
+              for (int col = 0; col < WW; col++){
+
+                  // Place patch on output, but increment values where patches overlap
+                  // starting at col = (w_start * H) row = (h_start + row) go across the output, channel by channel (channel * H * W) and column by column (col * W)
+                  //img_grad[(w_start * H) + (h_start + row) + (col * W) + (channel * H * W)] = img_grad[(w_start * H) + (h_start + row) + (col * W) + (channel * H * W)] + dout[patchNum + (patchElement * dout_H * dout_W)];
+                  img_grad(h_start + row, w_start + col, channel) = img_grad(h_start + row, w_start + col, channel) + dout(patchNum + (patchElement * dout_H * dout_W));
+                  patchElement++;
+              }
+          }
+      }
+    }
+    return img_grad;
+}
+
+template<typename T>
 Tensor<T> Tensor<T>::Transpose() const{
     if (this->GetNumDims() > 2){
         throw invalid_argument("Only 2d matrix transpose is supported, use Permute for more dimensions");
@@ -324,7 +458,7 @@ Tensor<T> Tensor<T>::Transpose() const{
     Tensor<T> result(vector<int>({m_dims.at(1), m_dims.at(0)}));
 
     // Lot's of cache-miss here
-    #pragma omp parallel for
+#pragma omp parallel for
     for(int i=0; i<this->GetRows(); ++i) {
         for(int j=0; j<this->GetCols(); ++j) {
             result(j,i) = (*this)(i,j);
@@ -343,7 +477,7 @@ Tensor<T> Tensor<T>::Repmat(int nRows, int nCols) const{
     // Create result tensor
     Tensor<T> result(vector<int>({m_dims.at(0)*nRows, m_dims.at(1)*nCols}));
 
-    // Repeat the content of "this" inside result numRep times    
+    // Repeat the content of "this" inside result numRep times
     // Iterate over the input matrix
     for (int r = 0; r < this->GetRows(); ++r){
         for (int c = 0; c < this->GetCols(); ++c){

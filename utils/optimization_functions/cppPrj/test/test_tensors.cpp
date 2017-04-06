@@ -16,6 +16,14 @@
 
 TEST_CASE("Tensor tests"){
 
+    SECTION("Tensor im2col"){
+        //Tensor<float> Img = MathHelper<float>::Ones(vector<int>{7,7,3});
+        Tensor<float> Img(vector<int>({5,5,3}),{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3});
+        cout << "Img:" << Img << endl;
+        Tensor<float> colImg = Tensor<float>::im2col(Img,3,3,1,0);
+        cout << "colImg:" << colImg << endl;
+    }
+
     SECTION("Tensor pow"){
         Tensor<float> A(vector<int>({1,4}),{1,2,3,4});
         Tensor<float> powRef(vector<int>({1,4}),{1,4,9,16});
