@@ -25,12 +25,9 @@ Tensor<float> FullyConnected::ForwardPropagation (const Tensor<float> &input) {
         N = input.GetRows();
     }
     else{
-        // TODO: Handle batch input
+        N = input.GetBatch();
     }
-    /*cout << "---------------- FC----------------" << endl;
-    cout << "Input" << input;
-    cout << "Weights" << m_weights;
-    cout << "Bias" << m_bias;*/
+
     Tensor<float> activation = input*m_weights + (m_bias.Repmat(N,1));
 
     // Cache results and input for backprop

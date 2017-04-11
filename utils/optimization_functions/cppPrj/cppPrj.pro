@@ -35,7 +35,10 @@ SOURCES += main.cpp \
     layers/dropout.cpp \
     layers/batchnorm.cpp \
     test/test_toy_example_dropout.cpp \
-    test/test_toy_example_batchnorm.cpp
+    test/test_toy_example_batchnorm.cpp \
+    layers/convolution.cpp \
+    layers/avgpooling.cpp \
+    layers/maxpooling.cpp
 
 HEADERS += \    
     loss/lossfactory.h \
@@ -65,4 +68,7 @@ HEADERS += \
     utils/range.h \
     utils/hdf5tensor.h \
     layers/dropout.h \
-    layers/batchnorm.h
+    layers/batchnorm.h \
+    layers/convolution.h \
+    layers/avgpooling.h \
+    layers/maxpooling.h
