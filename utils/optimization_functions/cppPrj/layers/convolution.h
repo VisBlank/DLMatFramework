@@ -14,7 +14,7 @@ public:
     void setWeights(Tensor<float> &weights);
     void setBias(Tensor<float> &bias);
 private:
-    int m_H_prime, m_W_prime, m_C, m_F, m_HH, m_WW;
+    int m_H_prime, m_W_prime, m_C, m_F, m_HH, m_WW, m_stride, m_pad;
 
 };
 

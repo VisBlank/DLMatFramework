@@ -472,6 +472,23 @@ Tensor<T> Tensor<T>::GetTensorFromBatch(const Tensor<T> &input, const int batch)
 }
 
 template<typename T>
+void Tensor<T>::PutTensorOnBatch(const Tensor<T> &input, const int batch){
+    // Check if the input fits on the tensor
+    if ((GetRows() != input.GetRows()) || (GetCols() != input.GetCols()) || (GetDepth() != input.GetDepth()) || (input.GetBatch() != 1)){
+        throw invalid_argument("Input tensor does not fit on the original 4d m");
+    }
+
+    // Iterate on input tensor
+    for (auto depth = 0; depth < input.GetDepth(); ++depth){
+        for (auto rows = 0; rows < input.GetRows(); ++rows){
+            for (auto cols = 0; cols < input.GetCols(); ++cols){
+                (*this)(rows,cols,depth,batch) = input(rows,cols,depth);
+            }
+        }
+    }
+}
+
+template<typename T>
 Tensor<T> Tensor<T>::Transpose() const{
     if (this->GetNumDims() > 2){
         throw invalid_argument("Only 2d matrix transpose is supported, use Permute for more dimensions");

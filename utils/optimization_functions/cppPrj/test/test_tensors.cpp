@@ -18,14 +18,22 @@ TEST_CASE("Tensor tests"){
 
     SECTION("Batch Select"){
         Tensor<float> ImgBatch(vector<int>({5,5,3,2}),{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30});
+        Tensor<float> ImgBatchResult(vector<int>({5, 5, 3, 2}));
         Tensor<float> ImgB0(vector<int>({5,5,3}),{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3});
         Tensor<float> ImgB1(vector<int>({5,5,3}),{10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30});
+
+        // Get some stuff from the batch tensor
         Tensor<float> resB0 = Tensor<float>::GetTensorFromBatch(ImgBatch,0);
         cout << resB0 << endl;
         Tensor<float> resB1 = Tensor<float>::GetTensorFromBatch(ImgBatch,1);
         cout << resB1 << endl;
         REQUIRE(resB0 == ImgB0);
         REQUIRE(resB1 == ImgB1);
+
+        // Insert something inside the batch
+        ImgBatchResult.PutTensorOnBatch(ImgB0,0);
+        ImgBatchResult.PutTensorOnBatch(ImgB1,1);
+        REQUIRE(ImgBatchResult == ImgBatch);
     }
 
     SECTION("Tensor im2col"){

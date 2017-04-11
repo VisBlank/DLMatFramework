@@ -219,6 +219,9 @@ public:
     // Select a tensor from batch
     static Tensor<T> GetTensorFromBatch(const Tensor<T> &input, const int batch);
 
+    // Put an image inside a 4d tensor
+    void PutTensorOnBatch(const Tensor<T> &input, const int batch);
+
     /*
         Transpose (2d matrix only) and vanilla (with cache misses)
         For better implementation on CPU check here:

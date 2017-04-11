@@ -16,6 +16,8 @@ Convolution::Convolution(const string &name, shared_ptr<BaseLayer> inLayer, int 
         m_F = F;
         m_HH = ky;
         m_WW = kx;
+        m_stride = stride;
+        m_pad = pad;
 
         m_activationShape.push_back(m_H_prime);
         m_activationShape.push_back(m_W_prime);
@@ -51,14 +53,19 @@ Tensor<float> Convolution::ForwardPropagation(const Tensor<float> &input){
      *  par-for implementation with OpenMP on CPU
      *
     */
-    for (auto idxBatch = 1; idxBatch < N; ++idxBatch){
-        // Select batch
-        // auto im_col
+    for (auto idxBatch = 0; idxBatch < N; ++idxBatch){
+        // Select image from batch
+        auto img = Tensor<float>::GetTensorFromBatch(input, idxBatch);
+
+        // Convert image to cols
+        auto im_col = Tensor<float>::im2col(img,m_HH,m_WW,m_stride,m_pad);
 
         // Convert to 2d matrix (im2col)
-        //auto mul = (m_weights * im_col) + bias_m;
+        auto mul = (m_weights * im_col) + m_bias;
 
         // Set activation
+        //activations(:,:,:,idxBatch) =  reshape_row_major_custom(mul,[H_prime W_prime size(mul,1)]);
+        //activations.PutTensorOnBatch(ImgB0,idxBatch);
     }
 
     // Cache results for backpropagation
