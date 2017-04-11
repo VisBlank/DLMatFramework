@@ -216,6 +216,9 @@ public:
     static Tensor<T> im2col(const Tensor<T> &input, int kx, int ky, int stride, int pad);
     static Tensor<T> im2col_back(const Tensor<T> &dout, int kx, int ky, int stride, int HH, int WW, int CC);
 
+    // Select a tensor from batch
+    static Tensor<T> GetTensorFromBatch(const Tensor<T> &input, const int batch);
+
     /*
         Transpose (2d matrix only) and vanilla (with cache misses)
         For better implementation on CPU check here:

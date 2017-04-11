@@ -450,6 +450,28 @@ Tensor<T> Tensor<T>::im2col_back(const Tensor<T> &dout, int kx, int ky, int stri
 }
 
 template<typename T>
+Tensor<T> Tensor<T>::GetTensorFromBatch(const Tensor<T> &input, const int batch){
+    // Check if batch is valid
+    if ((batch < 0) || (batch > input.GetBatch())){
+        throw invalid_argument("Invalid batch number");
+    }
+
+    // Create result tensor with the input tensor dimensions, but excluding the batch
+    Tensor<T> result(vector<int>({input.GetRows(), input.GetCols(), input.GetDepth()}));
+
+    // Iterate on input tensor
+    for (auto depth = 0; depth < input.GetDepth(); ++depth){
+        for (auto rows = 0; rows < input.GetRows(); ++rows){
+            for (auto cols = 0; cols < input.GetCols(); ++cols){
+                result(rows,cols,depth) = input(rows,cols,depth,batch);
+            }
+        }
+    }
+
+    return result;
+}
+
+template<typename T>
 Tensor<T> Tensor<T>::Transpose() const{
     if (this->GetNumDims() > 2){
         throw invalid_argument("Only 2d matrix transpose is supported, use Permute for more dimensions");
