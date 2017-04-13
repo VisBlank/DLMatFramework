@@ -35,6 +35,7 @@ SOURCES += main.cpp \
     layers/dropout.cpp \
     layers/batchnorm.cpp \
     test/test_toy_example_dropout.cpp \
+    test/test_toy_example_batchnorm.cpp\
     layers/convolution.cpp \
     layers/avgpooling.cpp \
     layers/maxpooling.cpp
