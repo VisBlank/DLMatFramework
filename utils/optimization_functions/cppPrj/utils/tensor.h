@@ -94,7 +94,7 @@ public:
         bool allCols = pRanges[1].empty();
 
         // Check if ranges don't go out of the matrix
-        if ((pRanges[0].size() > inputRows) || (pRanges[1].size() > inputCols) || (pRanges[0].Min() > inputRows) || (pRanges[0].Max() > inputRows-1) || (pRanges[1].Min() > inputCols) || (pRanges[1].Max() > inputCols-1)){
+        if ((pRanges[0].size() > inputRows) || (pRanges[1].size() > inputCols) || (pRanges[0].Min() > inputRows) || (pRanges[0].Max() > inputRows-1) || (pRanges[1].Min() > inputCols) || (pRanges[1].Max() > inputCols-1) ){
             throw invalid_argument("Invalid select range");
         }
 
@@ -124,7 +124,7 @@ public:
                 // Jump to next line
                 startResult += selCols.size();
             }
-        } else if ((!allRows) && (!allCols)){
+        }else if ((!allRows) && (!allCols)){
             result.SetDims(vector<int>{(int)pRanges[0].size(), (int)pRanges[1].size()});
             result.PreAloc();
             auto selRows = pRanges[0];
@@ -138,11 +138,12 @@ public:
             copy(start, start+result.GetNumElements(), result.begin());*/
             for (auto idx = m_buffer.begin()+startOffset; idx < m_buffer.end(); idx+=inputCols){
                 copy(idx, idx+selCols.size(), startResult);
-                startResult += selCols.size();                
+                startResult += selCols.size();
                 // Check if there is still space left to add
                 if (startResult >= result.end()) break;
             }
         }
+
         return result;
     }
 

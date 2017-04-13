@@ -68,7 +68,7 @@ TEST_CASE("Tensor tests"){
         REQUIRE(maxCols_ref_idx == maxCols.second);
 
         auto maxRows = MathHelper<float>::MaxTensor(A,1);
-        cout << maxCols.first << endl;
+        cout << maxRows.first << endl;
         REQUIRE(maxRows_ref == maxRows.first);
         REQUIRE(maxRows_ref_idx == maxRows.second);
 
