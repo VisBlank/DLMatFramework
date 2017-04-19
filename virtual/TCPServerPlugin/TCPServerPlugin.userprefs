@@ -1,0 +1,13 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="TCPServerPlugin/TCPServerPlugin.cs">
+    <Files>
+      <File FileName="TCPServerPlugin/TCPServerPlugin.cs" Line="13" Column="97" />
+      <File FileName="../Downloads/TCPServerUnity.cs" Line="250" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
