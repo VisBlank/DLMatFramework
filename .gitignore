@@ -4,3 +4,4 @@
 *.autosave
 *.pyc
 *.mexa64
+.ipynb_checkpoints
