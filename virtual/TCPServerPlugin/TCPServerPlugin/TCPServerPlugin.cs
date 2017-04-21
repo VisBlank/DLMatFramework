@@ -36,7 +36,6 @@ namespace TCPServerPlugin
 		private String textMessageToBeSent;
 		private byte[] byteArrayToBeSent;
 		private Boolean stopListen;
-		private float m1, m2, m3, m4;
 
 		// Lock to avoid the unity engine thread and this thread to read/write at the same time
 		private Object thisLock;
