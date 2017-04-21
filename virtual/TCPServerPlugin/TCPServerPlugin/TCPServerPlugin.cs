@@ -1,6 +1,7 @@
 /*
  * https://docs.unity3d.com/Manual/UsingDLL.html
  * https://unity3d.com/pt/learn/tutorials/topics/scripting/writing-plugins
+ * 
  */
 using System;
 using System.Text;
@@ -10,12 +11,16 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Net;
 
+// Used for list
+using System.Collections.Generic;
+
 namespace TCPServerPlugin
 {
 	// Delegate(aka function pointer) to help logging on unity console
 	public delegate void DebugLogDelegate(String message);
 	// Delegate used on unity to update the control information (ie: Steering angle, speed, etc...) 
-	public delegate void UpdateControls(float m1, float m2, float m3, float m4);
+	//public delegate void UpdateControls(float m1, float m2, float m3, float m4);
+	public delegate void UpdateControls(List<float> commands);
 
 
 	public class TCPServerUnity
@@ -154,32 +159,22 @@ namespace TCPServerPlugin
 				recv_command = recv_command.Trim();
 				if (recv_command.Contains("motor|"))
 				{
+					//mDebug("Motor command received....");  
 					string [] resp = recv_command.Split('|');
-					string m1Val = "";
-					string m2Val = "";
-					string m3Val = "";
-					string m4Val = "";
-					if (resp.Length > 4) {
-						m1Val = resp[1];
-						m2Val = resp[2];
-						m3Val = resp[3];
-						m4Val = resp[4];
-
-						m1 = float.Parse(m1Val);
-						m2 = float.Parse(m2Val);
-						m3 = float.Parse(m3Val);
-						m4 = float.Parse(m4Val);
-						mUpdateControls(m1, m2, m3, m4);
-
-						// Send some bytes
-						byte[] buffer = encoder.GetBytes("Ok\r\n");
-						clientStream.Write(buffer, 0, buffer.Length);
-						clientStream.Flush();
-					} else {
-						byte[] buffer = encoder.GetBytes("NOk\r\n");
-						clientStream.Write(buffer, 0, buffer.Length);
-						clientStream.Flush();
+					//mDebug("Size elements: " + resp.Length);  
+					// Parse commands and add to a list
+					List<float> listCommands = new List<float>();
+					for (int idx = 1; idx <= resp.Length-1; idx++) {
+						listCommands.Add (float.Parse(resp[idx]));
 					}
+					// Call some delegate with parsed commands (This delegate will be defined on the game side)
+					//mDebug("Call delegate");  
+					mUpdateControls(listCommands);
+
+					// Send some bytes
+					byte[] buffer = encoder.GetBytes("Ok\r\n");
+					clientStream.Write(buffer, 0, buffer.Length);
+					clientStream.Flush();
 				} else {
 					switch(recv_command)
 					{ 
