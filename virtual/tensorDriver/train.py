@@ -33,14 +33,17 @@ batch_size = 100
 for epoch in range(epochs):
   for i in range(int(driving_data.num_images/batch_size)):
     xs, ys = driving_data.LoadTrainBatch(batch_size)
-    train_step.run(feed_dict={model.x: xs, model.y_: ys, model.keep_prob: 0.8})
+    #train_step.run(feed_dict={model.x: xs, model.y_: ys, model.keep_prob: 0.8})
+    train_step.run(feed_dict={model.x: xs, model.y_: ys})
     if i % 10 == 0:
       xs, ys = driving_data.LoadValBatch(batch_size)
-      loss_value = loss.eval(feed_dict={model.x:xs, model.y_: ys, model.keep_prob: 1.0})
+      #loss_value = loss.eval(feed_dict={model.x:xs, model.y_: ys, model.keep_prob: 1.0})
+      loss_value = loss.eval(feed_dict={model.x:xs, model.y_: ys})
       print("Epoch: %d, Step: %d, Loss: %g" % (epoch, epoch * batch_size + i, loss_value))
 
     # write logs at every iteration
-    summary = merged_summary_op.eval(feed_dict={model.x:xs, model.y_: ys, model.keep_prob: 1.0})
+    #summary = merged_summary_op.eval(feed_dict={model.x:xs, model.y_: ys, model.keep_prob: 1.0})
+    summary = merged_summary_op.eval(feed_dict={model.x:xs, model.y_: ys})
     summary_writer.add_summary(summary, epoch * batch_size + i)
 
     if i % batch_size == 0:

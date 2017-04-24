@@ -75,7 +75,7 @@ conv3 = conv2d(conv2, 5, 5, 36, 48, 2,"conv3")
 #b_conv4 = bias_variable([64])
 
 #h_conv4 = tf.nn.relu(conv2d(h_conv3, W_conv4, 1) + b_conv4)
-conv4 = conv2d(conv3, 3, 3, 48, 64, 1, "conv3")
+conv4 = conv2d(conv3, 3, 3, 48, 64, 1, "conv4")
 
 #fifth convolutional layer
 #W_conv5 = weight_variable([3, 3, 64, 64])
@@ -91,12 +91,12 @@ conv5 = conv2d(conv4, 3, 3, 64, 64, 1, "conv5")
 # Needs calculation... (-1 means any batch size)
 conv5_flat = tf.reshape(conv5, [-1, 1152])
 #h_fc1 = tf.nn.relu(tf.matmul(h_conv5_flat, W_fc1) + b_fc1)
-fc1 = fc_layer(conv5_flat, 7*7*64, 1164, "fc1")
+fc1 = fc_layer(conv5_flat, 1152, 1164, "fc1")
 
 #keep_prob = tf.placeholder(tf.float32)
 #h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 # Add dropout to the fully connected layer
-fc1_drop = tf.nn.dropout(fc1, 0.5)
+fc1_drop = tf.nn.dropout(fc1, 0.8)
 
 #FCL 2
 #W_fc2 = weight_variable([1164, 100])
@@ -106,7 +106,7 @@ fc1_drop = tf.nn.dropout(fc1, 0.5)
 fc2 = fc_layer(fc1_drop, 1164, 100, "fc2")
 
 #h_fc2_drop = tf.nn.dropout(h_fc2, keep_prob)
-fc2_drop = tf.nn.dropout(fc2, 0.5)
+fc2_drop = tf.nn.dropout(fc2, 0.8)
 
 #FCL 3
 #W_fc3 = weight_variable([100, 50])
@@ -116,7 +116,7 @@ fc2_drop = tf.nn.dropout(fc2, 0.5)
 fc3 = fc_layer(fc2_drop, 100, 50, "fc3")
 
 #h_fc3_drop = tf.nn.dropout(h_fc3, keep_prob)
-fc3_drop = tf.nn.dropout(fc3, 0.5)
+fc3_drop = tf.nn.dropout(fc3, 0.8)
 
 #FCL 4
 #W_fc4 = weight_variable([50, 10])
@@ -126,10 +126,12 @@ fc3_drop = tf.nn.dropout(fc3, 0.5)
 fc4 = fc_layer(fc3_drop, 50, 10, "fc4")
 
 #h_fc4_drop = tf.nn.dropout(h_fc4, keep_prob)
-fc4_drop = tf.nn.dropout(fc4, 0.5)
+fc4_drop = tf.nn.dropout(fc4, 0.8)
 
 #Output
 W_fc5 = weight_variable([10, 1])
 b_fc5 = bias_variable([1])
 
+# Normalize output between -2..2
+# https://www.wolframalpha.com/input/?i=atan(x)
 y = tf.multiply(tf.atan(tf.matmul(fc4_drop, W_fc5) + b_fc5), 2) #scale the atan output
