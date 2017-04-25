@@ -1,9 +1,12 @@
 import tensorflow as tf
 
+# References:
 # https://gist.github.com/kukuruza/03731dc494603ceab0c5
+# https://github.com/tensorflow/tensorflow/issues/908
 # http://nbviewer.jupyter.org/github/BVLC/caffe/blob/master/examples/00-classification.ipynb
 # http://stackoverflow.com/questions/35759220/how-to-visualize-learned-filters-on-tensorflow
 # http://stackoverflow.com/questions/33783672/how-can-i-visualize-the-weightsvariables-in-cnn-in-tensorflow
+# https://www.youtube.com/watch?v=5tW3y7lm7V0
 def put_kernels_on_grid (kernel, grid_Y, grid_X, pad = 1):
 
     '''Visualize conv. features as an image (mostly for the 1st layer).
@@ -19,14 +22,13 @@ def put_kernels_on_grid (kernel, grid_Y, grid_X, pad = 1):
       Tensor of shape [(Y+2*pad)*grid_Y, (X+2*pad)*grid_X, NumChannels, 1].
     '''
 
+    # Normalize weights
     x_min = tf.reduce_min(kernel)
     x_max = tf.reduce_max(kernel)
-
     kernel1 = (kernel - x_min) / (x_max - x_min)
 
-    # pad X and Y
+    # pad X and Y (Just to create a border on the grid)
     x1 = tf.pad(kernel1, tf.constant( [[pad,pad],[pad, pad],[0,0],[0,0]] ), mode = 'CONSTANT')
-
     # X and Y dimensions, w.r.t. padding
     Y = kernel1.get_shape()[0] + 2 * pad
     X = kernel1.get_shape()[1] + 2 * pad
