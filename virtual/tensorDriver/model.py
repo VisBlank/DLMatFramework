@@ -43,8 +43,9 @@ def output_layer(x, channels_in, channels_out, name="output"):
         tf.summary.histogram("activation", activation)
         return activation    
 
-def bound_layer(val_in, bound_val, name="bounding_func"):
+def bound_layer(val_in, bound_val, name="bound_scale"):
     with tf.name_scope(name):        
+        # Bound val_in between -1..1 and scale by multipling by bound_val
         activation = tf.multiply(tf.atan(val_in), bound_val)
         # Add summaries for helping debug        
         tf.summary.histogram("val_in", val_in)
