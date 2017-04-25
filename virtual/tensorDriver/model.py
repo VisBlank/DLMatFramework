@@ -1,57 +1,5 @@
 import tensorflow as tf
-import scipy
-
-def conv2d(x, k_h, k_w, channels_in, channels_out, stride, name="conv"):
-    with tf.name_scope(name):
-        # Define weights
-        w = tf.Variable(tf.truncated_normal([k_h,k_w, channels_in, channels_out], stddev=0.1), name="weights")
-        b = tf.Variable(tf.constant(0.1, shape=[channels_out]), name="bias")    
-        # Convolution
-        #conv = tf.nn.conv2d(x, w, strides=[1, 1, 1, 1], padding='SAME')    
-        conv = tf.nn.conv2d(x, w, strides=[1, stride, stride, 1], padding='VALID')    
-        # Relu
-        activation = tf.nn.relu(conv + b)
-        # Add summaries for helping debug
-        tf.summary.histogram("weights", w)
-        tf.summary.histogram("bias", b)
-        tf.summary.histogram("activation", activation)
-        return activation
-
-def max_pool(x, k_h, k_w, S, name="maxpool"):
-    with tf.name_scope(name):
-        return tf.nn.max_pool(x, ksize=[1, k_h, k_w, 1],strides=[1, S, S, 1], padding='SAME')
-
-def fc_layer(x, channels_in, channels_out, name="fc"):
-    with tf.name_scope(name):
-        w = tf.Variable(tf.truncated_normal([channels_in, channels_out], stddev=0.1), name="weights")
-        b = tf.Variable(tf.constant(0.1, shape=[channels_out]), name="bias")    
-        activation = tf.nn.relu(tf.matmul(x, w) + b)
-        # Add summaries for helping debug
-        tf.summary.histogram("weights", w)
-        tf.summary.histogram("bias", b)
-        tf.summary.histogram("activation", activation)
-        return activation
-
-def output_layer(x, channels_in, channels_out, name="output"):
-    with tf.name_scope(name):
-        w = tf.Variable(tf.truncated_normal([channels_in, channels_out], stddev=0.1), name="weights")
-        b = tf.Variable(tf.constant(0.1, shape=[channels_out]), name="bias")    
-        activation = tf.matmul(x, w) + b
-        # Add summaries for helping debug
-        tf.summary.histogram("weights", w)
-        tf.summary.histogram("bias", b)
-        tf.summary.histogram("activation", activation)
-        return activation    
-
-def bound_layer(val_in, bound_val, name="bound_scale"):
-    with tf.name_scope(name):        
-        # Bound val_in between -1..1 and scale by multipling by bound_val
-        activation = tf.multiply(tf.atan(val_in), bound_val)
-        # Add summaries for helping debug        
-        tf.summary.histogram("val_in", val_in)
-        tf.summary.histogram("activation", activation)
-        return activation        
-
+from model_util import *
 
 # Create placeholders (I/O for our model/graph)
 x = tf.placeholder(tf.float32, shape=[None, 66, 200, 3])
@@ -59,8 +7,12 @@ y_ = tf.placeholder(tf.float32, shape=[None, 1])
 
 x_image = x
 
-# CONV 1
-conv1 = conv2d(x_image, 5, 5, 3, 24, 2,"conv1")
+# Add input image/steering angle on summary
+tf.summary.image("input_image", x_image, 3)
+tf.summary.histogram("steer_angle", y_)
+
+# CONV 1 (Mark that want visualization)
+conv1 = conv2d(x_image, 5, 5, 3, 24, 2,"conv1",True)
 
 # CONV 2
 conv2 = conv2d(conv1, 5, 5, 24, 36, 2,"conv2")
