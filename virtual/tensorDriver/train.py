@@ -9,10 +9,21 @@ sess = tf.InteractiveSession()
 
 L2NormConst = 0.001
 
+# Get all model "parameters" that are trainable
 train_vars = tf.trainable_variables()
 
-loss = tf.reduce_mean(tf.square(tf.subtract(model.y_, model.y))) + tf.add_n([tf.nn.l2_loss(v) for v in train_vars]) * L2NormConst
-train_step = tf.train.AdamOptimizer(1e-4).minimize(loss)
+# Loss is mean squared error plus l2 regularization
+# model.y (Model output), model.y_(Labels)
+# tf.nn.l2_loss: Computes half the L2 norm of a tensor without the sqrt
+# output = sum(t ** 2) / 2
+with tf.name_scope("MeanSquared_Loss_L2_Reg"):
+    loss = tf.reduce_mean(tf.square(tf.subtract(model.y_, model.y))) + tf.add_n([tf.nn.l2_loss(v) for v in train_vars]) * L2NormConst
+
+# Solver configuration
+with tf.name_scope("Solver"):
+    train_step = tf.train.AdamOptimizer(1e-4).minimize(loss)
+
+# Initialize all random variables (Weights/Bias)
 sess.run(tf.global_variables_initializer())
 
 # create a summary to monitor cost tensor
