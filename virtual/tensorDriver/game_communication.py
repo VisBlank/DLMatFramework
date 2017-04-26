@@ -21,8 +21,11 @@ class GameTelemetry:
         self.__m_IP = ip
     
     def connect(self):
-        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.__socket.connect((self.__m_IP, self.__m_Port))
+        try:
+            self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.__socket.connect((self.__m_IP, self.__m_Port))
+        except ConnectionRefusedError:
+            print("Connection refused, check if game is ready")
 
     def disconnect(self):
         self.__socket.send("termina".encode())
@@ -60,11 +63,32 @@ class GameTelemetry:
         sizeInfo = int.from_bytes(sizeInfoBA, byteorder='big', signed=False)
         # Get message text
         telemetry_msg = str(self.__socket.recv(sizeInfo))
-        return telemetry_msg
+        
+        # Take out some unused characters
+        telemetry_msg = telemetry_msg.strip("\\r\\n'")
+        telemetry_msg = telemetry_msg.strip("b'")
+        telemetry_msg_list = telemetry_msg.split("|")
+        
+        # Convert to list of floats
+        telemetry_msg_list = list(map(float, telemetry_msg_list))
+        
+        return telemetry_msg_list
     
-    def send_command(self, command):
-        #self.__socket.send("motor|0.0|1.0\r\n".encode())
-        self.__socket.send(command.encode())
+    def send_command(self, command):        
+        # Create string on the format "motor|0.0|1.0\r\n"
+        command_str = ""
+        command_str += "motor|"        
+        idx = 0
+        for i in command:
+            if idx != len(command)-1:
+                command_str += str(i)+"|"        
+            else:
+                command_str += str(i)
+            idx+=1
+        
+        command_str += "\r\n"
+
+        self.__socket.send(command_str.encode())
         resp = self.__socket.recv(4)
         return resp.decode()
         
