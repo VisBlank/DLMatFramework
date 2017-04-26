@@ -31,7 +31,7 @@ class GameTelemetry:
         self.__socket.send("termina".encode())
         self.__socket.close()
 
-    def get_image(self, pkgSize=32):
+    def get_image(self, pkgSize=4096):
         # Send server command to ask for a image
         self.__socket.send("imagem".encode())
         # Get 4 bytes from socket
@@ -60,7 +60,9 @@ class GameTelemetry:
         try:
             img = Image.open(io.BytesIO(dataImage))
         except OSError:
-            print("Invalid image")                        
+            print("Invalid image")
+            return None
+        
         return img
     
     def get_game_data(self):
