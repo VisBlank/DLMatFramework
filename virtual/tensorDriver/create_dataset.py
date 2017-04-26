@@ -4,6 +4,9 @@
 Created on Wed Apr 26 15:06:12 2017
 
 @author: leoara01
+Examples:
+create_dataset.py -o /home/leoara01/work/DLMatFramework/virtual/tensorDriver/testDataset
+create_dataset.py --ip=10.45.65.58 -o /home/leoara01/work/DLMatFramework/virtual/tensorDriver/testDataset
 """
 import argparse
 import game_communication
@@ -50,13 +53,14 @@ list_game_state = queue.Queue(20)
 # http://www.bogotobogo.com/python/Multithread/python_multithreading_Synchronization_Producer_Consumer_using_Queue.php
 class ConsumerThread(threading.Thread)    :
     __m_outdir = "./"
+    __m_dataFile = 0
     
     # Constructor
     def __init__(self, outDir="./", group=None, target=None, name=None,args=(), kwargs=None, verbose=None):
         super(ConsumerThread,self).__init__()
         self.target = target
         self.name = name
-        self.__m_outdir = outDir        
+        self.__m_outdir = outDir          
         return
 
     def run(self):
@@ -65,9 +69,24 @@ class ConsumerThread(threading.Thread)    :
             if not list_game_state.empty():
                 # Get list of items
                 list_items = list_game_state.get()
+                
+                # Open data.txt file
+                self.__m_dataFile = open(self.__m_outdir + "/data.txt",'a+')
+                
                 # Iterate on list saving elements to disk
                 for i in list_items:
-                    imsave(self.__m_outdir + "/" + str(i.get_id()) + ".png", i.get_image())
+                    filename = str(i.get_id()) + ".png"
+                    imsave(self.__m_outdir + "/" + filename, i.get_image())
+                    
+                    # Convert telemetry list to string
+                    telemetry_list_str = list(map(str,i.get_telemetry()))
+                    str_telemetry = " ".join(telemetry_list_str)
+                    
+                    # Write line to data.txt file
+                    self.__m_dataFile.write(filename + " " + str_telemetry + '\n')
+                
+                # Close file when queue is processed
+                self.__m_dataFile.close()
         return    
 
 
@@ -99,13 +118,12 @@ def connect_and_create_dataset(ip, port):
             else:
                 # From the main thread add item on the queue
                 if not list_game_state.full():
-                    print("Add elements to assync queue")
+                    #print("Add elements to assync queue")
                     list_game_state.put(list_records)
                     
                 list_records = []
                 list_records.append(GameRecord(img_index, cam_img, telemetry))                                
-            
-            print(telemetry)
+                        
     except KeyboardInterrupt:
         pass    
     
