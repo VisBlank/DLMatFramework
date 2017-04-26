@@ -31,27 +31,36 @@ class GameTelemetry:
         self.__socket.send("termina".encode())
         self.__socket.close()
 
-    def get_image(self):
+    def get_image(self, pkgSize=32):
         # Send server command to ask for a image
         self.__socket.send("imagem".encode())
         # Get 4 bytes from socket
         sizeInfoBA = self.__socket.recv(4)
         # Convert bytearray(4 bytes) into int32
         sizeInfo = int.from_bytes(sizeInfoBA, byteorder='big', signed=False)   
+        #print(sizeInfo)
         recBytes = 0
         dataImage = bytearray()
         while True:
             # Get some chunk of data
-            data = self.__socket.recv(self.__m_BUFFER_SIZE)
+            data = self.__socket.recv(pkgSize)
+            if not data:
+                print("Nothing")
+                break                        
             # Append bytearray with received data
             dataImage += data
             # Stop when received at least sizeInfo bytes
-            recBytes += self.__m_BUFFER_SIZE
-            if recBytes > sizeInfo:
-                break
+            recBytes += len(data)
+            #print("Something received size %d sum_received %d" % (len(data),  recBytes))
+            if recBytes >= sizeInfo:
+                #print("Received enough")
+                break            
         
         # Convert received byte array to PIL image
-        img = Image.open(io.BytesIO(dataImage))
+        try:
+            img = Image.open(io.BytesIO(dataImage))
+        except OSError:
+            print("Invalid image")                        
         return img
     
     def get_game_data(self):
