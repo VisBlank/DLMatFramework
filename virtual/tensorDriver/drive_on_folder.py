@@ -53,8 +53,7 @@ try:
         plt.subplot(211)        
         plt.imshow(full_image)
                 
-        # Rotate the wheel accordingly        
-        #dst = scipy.misc.imrotate(img,-degrees)
+        # Rotate the wheel accordingly
         dst = scipy.misc.imrotate(img,-degrees)
         
         # Plot the steering wheel

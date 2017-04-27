@@ -27,14 +27,19 @@ c = list(zip(xs, ys))
 random.shuffle(c)
 xs, ys = zip(*c)
 
+# Training set 80%
 train_xs = xs[:int(len(xs) * 0.8)]
 train_ys = ys[:int(len(xs) * 0.8)]
 
+# Validation set 20%
 val_xs = xs[-int(len(xs) * 0.2):]
 val_ys = ys[-int(len(xs) * 0.2):]
 
 num_train_images = len(train_xs)
 num_val_images = len(val_xs)
+
+print("Number training images: %d" % num_train_images)
+print("Number validation images: %d" % num_val_images)
 
 def LoadTrainBatch(batch_size):
     global train_batch_pointer
