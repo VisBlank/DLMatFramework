@@ -53,4 +53,4 @@ out_layer = util.output_layer(fc4_drop, 10, 1, "output_layer")
 
 # Bounding output and scale between -2..2
 # https://www.wolframalpha.com/input/?i=atan(x)
-y = util.bound_layer(out_layer,2)
+y = util.bound_layer(out_layer,1)

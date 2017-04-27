@@ -21,7 +21,7 @@ degrees = 0
 # Variable used to filter prediction
 smoothed_angle = 0
 # Index for test image on "driving_dataset" directory
-i = 0
+i = 1
 
     
 
@@ -31,13 +31,14 @@ try:
     
     while True:
         # Read an image (index i) from directory "driving_dataset"
-        full_image = scipy.misc.imread("driving_dataset/" + str(i) + ".jpg", mode="RGB")
+        full_image = scipy.misc.imread("driving_dataset/" + str(i) + ".png", mode="RGB")
                 
-        image = scipy.misc.imresize(full_image[-150:], [66, 200]) / 255.0
+        image = scipy.misc.imresize(full_image, [66, 200]) / 255.0
         
         # Get steering angle from tensorflow model (Also convert from rad to degree)
         # degrees = model.y.eval(feed_dict={model.x: [image], model.keep_prob: 1.0})[0][0] * 180.0 / scipy.pi
-        degrees = model.y.eval(feed_dict={model.x: [image]})[0][0] * 180.0 / scipy.pi
+        #degrees = model.y.eval(feed_dict={model.x: [image]})[0][0] * 180.0 / scipy.pi
+        degrees = model.y.eval(feed_dict={model.x: [image]})[0][0] * 180
         
         # Filter results (Smooth results between current angle and prediction)
         # Maybe this filter could be learn if we add a RNN at the end of the model
@@ -54,7 +55,7 @@ try:
                 
         # Rotate the wheel accordingly        
         #dst = scipy.misc.imrotate(img,-degrees)
-        dst = scipy.misc.imrotate(img,-smoothed_angle)
+        dst = scipy.misc.imrotate(img,-degrees)
         
         # Plot the steering wheel
         plt.subplot(212)
