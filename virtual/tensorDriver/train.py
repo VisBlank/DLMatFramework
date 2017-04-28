@@ -1,6 +1,6 @@
 import os
 import tensorflow as tf
-import driving_data
+from driving_data import HandleData
 import model
 
 LOGDIR = './save'
@@ -18,7 +18,12 @@ train_vars = tf.trainable_variables()
 # tf.nn.l2_loss: Computes half the L2 norm of a tensor without the sqrt
 # output = sum(t ** 2) / 2
 with tf.name_scope("MeanSquared_Loss_L2_Reg"):
-    loss = tf.reduce_mean(tf.square(tf.subtract(model.y_, model.y))) + tf.add_n([tf.nn.l2_loss(v) for v in train_vars]) * L2NormConst
+    loss = tf.reduce_mean(tf.square(tf.subtract(model.y_, model.y))) + tf.add_n(
+        [tf.nn.l2_loss(v) for v in train_vars]) * L2NormConst
+
+# Add model accuracy
+with tf.name_scope("Loss_Validation"):
+    loss_val = tf.reduce_mean(tf.square(tf.subtract(model.y_, model.y)))
 
 # Solver configuration
 with tf.name_scope("Solver"):
@@ -28,7 +33,8 @@ with tf.name_scope("Solver"):
 sess.run(tf.global_variables_initializer())
 
 # Monitor loss
-tf.summary.scalar("loss", loss)
+tf.summary.scalar("loss_train", loss)
+tf.summary.scalar("loss_val", loss_val)
 # merge all summaries into a single op
 merged_summary_op = tf.summary.merge_all()
 
@@ -40,39 +46,44 @@ logs_path = './logs'
 summary_writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
 
 # Define number of epochs and batch size
-epochs = 300
+epochs = 600
 batch_size = 100
 iter_disp = 10
 
+data = HandleData()
+
 # For each epoch
 for epoch in range(epochs):
-  for i in range(int(driving_data.num_images/batch_size)):
-    # Get training batch
-    xs, ys = driving_data.LoadTrainBatch(batch_size)    
-    
-    # Send batch to tensorflow graph
-    train_step.run(feed_dict={model.x: xs, model.y_: ys})
-    
-    # Display some information each x iterations
-    if i % iter_disp == 0:
-      # Get validation batch
-      xs, ys = driving_data.LoadValBatch(batch_size)      
-      loss_value = loss.eval(feed_dict={model.x:xs, model.y_: ys})
-      print("Epoch: %d, Step: %d, Loss: %g" % (epoch, epoch * batch_size + i, loss_value))
+    for i in range(int(data.get_num_images() / batch_size)):
+        # Get training batch
+        xs, ys = data.LoadTrainBatch(batch_size)
 
-    # write logs at every iteration    
-    summary = merged_summary_op.eval(feed_dict={model.x:xs, model.y_: ys})
-    summary_writer.add_summary(summary, epoch * batch_size + i)
+        # Send batch to tensorflow graph
+        train_step.run(feed_dict={model.x: xs, model.y_: ys})
 
-    # Save checkpoint after each epoch
-    if i % batch_size == 0:
-      if not os.path.exists(LOGDIR):
-        os.makedirs(LOGDIR)
-      checkpoint_path = os.path.join(LOGDIR, "model.ckpt")
-      filename = saver.save(sess, checkpoint_path)
-  print("Model saved in file: %s" % filename)
+        # Display some information each x iterations
+        if i % iter_disp == 0:
+            # Get validation batch
+            xs, ys = data.LoadValBatch(batch_size)
+            # loss_value = loss.eval(feed_dict={model.x:xs, model.y_: ys})
+            loss_value = loss_val.eval(feed_dict={model.x: xs, model.y_: ys})
+            print("Epoch: %d, Step: %d, Loss: %g" % (epoch, epoch * batch_size + i, loss_value))
 
+        # write logs at every iteration
+        summary = merged_summary_op.eval(feed_dict={model.x: xs, model.y_: ys})
+        summary_writer.add_summary(summary, epoch * batch_size + i)
+
+        # Save checkpoint after each epoch
+        if i % batch_size == 0:
+            if not os.path.exists(LOGDIR):
+                os.makedirs(LOGDIR)
+            checkpoint_path = os.path.join(LOGDIR, "model.ckpt")
+            filename = saver.save(sess, checkpoint_path)
+    print("Model saved in file: %s" % filename)
+    # Shuffle data at each epoch end
+    print("Shuffle data")
+    data.shuffleData()
 
 print("Run the command line:\n" \
-          "--> tensorboard --logdir=./logs " \
-          "\nThen open http://0.0.0.0:6006/ into your web browser")
+      "--> tensorboard --logdir=./logs " \
+      "\nThen open http://0.0.0.0:6006/ into your web browser")

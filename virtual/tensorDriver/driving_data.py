@@ -2,87 +2,108 @@ import scipy.misc
 import random
 import h5py
 
-xs = []
-ys = []
 
-#points to the end of the last batch
-train_batch_pointer = 0
-val_batch_pointer = 0
+class HandleData:
+    __xs = []
+    __ys = []
+    __file = []
+    __dataset_imgs = []
+    __dataset_label = []
+    __num_images = 0
+    __train_xs = []
+    __train_ys = []
+    __val_xs = []
+    __val_ys = []
+    __num_train_images = 0
+    __num_val_images = 0
+    __train_batch_pointer = 0
+    __val_batch_pointer = 0
+    __train_perc = 0
+    __val_perc = 0
 
-# Read hdf5
-file = h5py.File ('DrivingData.h5', 'a')
-# Check if the dataset exist
-existTrain = "/Train/Labels" in file
+    # points to the end of the last batch
+    __train_batch_pointer = 0
+    __val_batch_pointer = 0
 
-if existTrain:
-    # Initialize pre-existing datasets
-    dataset_imgs = file["/Train/Images"]
-    dataset_label = file["/Train/Labels"]
+    def __init__(self, path='DrivingData.h5', train_perc=0.8, val_perc=0.2):
+        self.__train_perc = train_perc
+        self.__val_perc = val_perc
+        print("Loading data")
+        # Read hdf5
+        self.__file = h5py.File(path, 'a')
+        # Check if the dataset exist
+        existTrain = "/Train/Labels" in self.__file
+        if existTrain:
+            # Initialize pre-existing datasets
+            self.__dataset_imgs = self.__file["/Train/Images"]
+            self.__dataset_label = self.__file["/Train/Labels"]
 
-    # Get old sizes
-    old_size_imgs = dataset_imgs.shape[0]
-    old_size_labels = dataset_label.shape[0]
+            self.__xs = list(self.__dataset_imgs)
+            self.__ys = list(self.__dataset_label)
 
-    xs = list(dataset_imgs)
-    ys = list(dataset_label)
+            self.__num_images = len(self.__xs)
 
+            # Shuffle data
+            c = list(zip(self.__xs, self.__ys))
+            random.shuffle(c)
+            self.__xs, self.__ys = zip(*c)
 
-#read data.txt
-#with open("driving_dataset/data.txt") as f:
-#    for line in f:
-#        xs.append("driving_dataset/" + line.split()[0])
-#        # Input wheel ranges [-1..1]
-#        ys.append(float(line.split()[1]))
+            # Training set 80%
+            self.__train_xs = self.__xs[:int(len(self.__xs) * train_perc)]
+            self.__train_ys = self.__ys[:int(len(self.__xs) * train_perc)]
 
-#get number of images
-num_images = len(xs)
+            # Validation set 20%
+            self.__val_xs = self.__xs[-int(len(self.__xs) * val_perc):]
+            self.__val_ys = self.__ys[-int(len(self.__xs) * val_perc):]
 
-#shuffle list of images
-c = list(zip(xs, ys))
-random.shuffle(c)
-xs, ys = zip(*c)
+            # Get number of images
+            self.__num_train_images = len(self.__train_xs)
+            self.__num_val_images = len(self.__val_xs)
 
-# Training set 80%
-train_xs = xs[:int(len(xs) * 0.8)]
-train_ys = ys[:int(len(xs) * 0.8)]
+            print("Number training images: %d" % self.__num_train_images)
+            print("Number validation images: %d" % self.__num_val_images)
 
-# Validation set 20%
-val_xs = xs[-int(len(xs) * 0.2):]
-val_ys = ys[-int(len(xs) * 0.2):]
+    def shuffleData(self):
+        # Shuffle data
+        c = list(zip(self.__xs, self.__ys))
+        random.shuffle(c)
+        self.__xs, self.__ys = zip(*c)
 
-# Get number of images
-num_train_images = len(train_xs)
-num_val_images = len(val_xs)
+        # Training set 80%
+        self.__train_xs = self.__xs[:int(len(self.__xs) * self.__train_perc)]
+        self.__train_ys = self.__ys[:int(len(self.__xs) * self.__train_perc)]
 
-print("Number training images: %d" % num_train_images)
-print("Number validation images: %d" % num_val_images)
+        # Validation set 20%
+        self.__val_xs = self.__xs[-int(len(self.__xs) * self.__val_perc):]
+        self.__val_ys = self.__ys[-int(len(self.__xs) * self.__val_perc):]
 
-def LoadTrainBatch(batch_size):
-    global train_batch_pointer
-    x_out = []
-    y_out = []
-    for i in range(0, batch_size):
-        # Load image
-        #image = scipy.misc.imread(train_xs[(train_batch_pointer + i) % num_train_images], mode="RGB")
-        image = train_xs[(train_batch_pointer + i) % num_train_images]
-        # Resize to 66x200 and divide by 255.0
-        image = scipy.misc.imresize(image, [66, 200]) / 255.0
-        x_out.append(image)
-        y_out.append([train_ys[(train_batch_pointer + i) % num_train_images]])
-    train_batch_pointer += batch_size
-    return x_out, y_out
+    def LoadTrainBatch(self, batch_size):
+        x_out = []
+        y_out = []
+        for i in range(0, batch_size):
+            # Load image
+            # image = scipy.misc.imread(train_xs[(train_batch_pointer + i) % num_train_images], mode="RGB")
+            image = self.__train_xs[(self.__train_batch_pointer + i) % self.__num_train_images]
+            # Resize to 66x200 and divide by 255.0
+            image = scipy.misc.imresize(image, [66, 200]) / 255.0
+            x_out.append(image)
+            y_out.append([self.__train_ys[(self.__train_batch_pointer + i) % self.__num_train_images]])
+            self.__train_batch_pointer += batch_size
+        return x_out, y_out
 
-def LoadValBatch(batch_size):
-    global val_batch_pointer
-    x_out = []
-    y_out = []
-    for i in range(0, batch_size):
-        # Load image
-        #image = scipy.misc.imread(val_xs[(val_batch_pointer + i) % num_val_images], mode="RGB")
-        image = val_xs[(val_batch_pointer + i) % num_val_images]
-        # Resize to 66x200 and divide by 255.0
-        image = scipy.misc.imresize(image, [66, 200]) / 255.0
-        x_out.append(image)
-        y_out.append([val_ys[(val_batch_pointer + i) % num_val_images]])
-    val_batch_pointer += batch_size
-    return x_out, y_out
+    def LoadValBatch(self, batch_size):
+        x_out = []
+        y_out = []
+        for i in range(0, batch_size):
+            # Load image
+            # image = scipy.misc.imread(val_xs[(val_batch_pointer + i) % num_val_images], mode="RGB")
+            image = self.__val_xs[(self.__val_batch_pointer + i) % self.__num_val_images]
+            # Resize to 66x200 and divide by 255.0
+            image = scipy.misc.imresize(image, [66, 200]) / 255.0
+            x_out.append(image)
+            y_out.append([self.__val_ys[(self.__val_batch_pointer + i) % self.__num_val_images]])
+            self.__val_batch_pointer += batch_size
+        return x_out, y_out
+
+    def get_num_images(self):
+        return self.__num_images
