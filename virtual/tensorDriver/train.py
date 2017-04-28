@@ -5,6 +5,11 @@ import model
 
 LOGDIR = './save'
 
+# Define number of epochs and batch size
+epochs = 600
+batch_size = 100
+iter_disp = 10
+
 sess = tf.InteractiveSession()
 
 # Regularization value
@@ -27,14 +32,22 @@ with tf.name_scope("Loss_Validation"):
 
 # Solver configuration
 with tf.name_scope("Solver"):
-    train_step = tf.train.AdamOptimizer(1e-4).minimize(loss)
+    global_step = tf.Variable(0, trainable=False)
+    starter_learning_rate = 0.0001
+    # decay every 10000 steps with a base of 0.96
+    learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step,
+                                               10000, 0.96, staircase=True)
+
+    train_step = tf.train.AdamOptimizer(learning_rate).minimize(loss, global_step=global_step)
 
 # Initialize all random variables (Weights/Bias)
 sess.run(tf.global_variables_initializer())
 
-# Monitor loss
+# Monitor loss, learning_rate, global_step, etc...
 tf.summary.scalar("loss_train", loss)
 tf.summary.scalar("loss_val", loss_val)
+tf.summary.scalar("learning_rate", learning_rate)
+tf.summary.scalar("global_step", global_step)
 # merge all summaries into a single op
 merged_summary_op = tf.summary.merge_all()
 
@@ -44,11 +57,6 @@ saver = tf.train.Saver()
 # Configure where to save the logs for tensorboard
 logs_path = './logs'
 summary_writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
-
-# Define number of epochs and batch size
-epochs = 600
-batch_size = 100
-iter_disp = 10
 
 data = HandleData()
 
@@ -67,7 +75,7 @@ for epoch in range(epochs):
             xs, ys = data.LoadValBatch(batch_size)
             # loss_value = loss.eval(feed_dict={model.x:xs, model.y_: ys})
             loss_value = loss_val.eval(feed_dict={model.x: xs, model.y_: ys})
-            print("Epoch: %d, Step: %d, Loss: %g" % (epoch, epoch * batch_size + i, loss_value))
+            print("Epoch: %d, Step: %d, Loss(Val): %g" % (epoch, epoch * batch_size + i, loss_value))
 
         # write logs at every iteration
         summary = merged_summary_op.eval(feed_dict={model.x: xs, model.y_: ys})
