@@ -12,12 +12,11 @@ import game_communication
 import tensorflow as tf
 import scipy.misc
 import model
+import time
 
-# Load tensorflow section
-sess = tf.InteractiveSession()
-saver = tf.train.Saver()
-saver.restore(sess, "save/model.ckpt")
-
+# Force to see just the first GPU
+# https://devblogs.nvidia.com/parallelforall/cuda-pro-tip-control-gpu-visibility-cuda_visible_devices/
+import os
 
 class GameRecord:
     __m_id = 0
@@ -45,10 +44,26 @@ class GameRecord:
 parser = argparse.ArgumentParser(description='Drive inside game')
 parser.add_argument('--ip', type=str, required=False, default='127.0.0.1', help='Server IP address')
 parser.add_argument('--port', type=int, required=False, default=50007, help='Server TCP/IP port')
+parser.add_argument('--model', type=str, required=False, default='save/model.ckpt', help='Trained driver model')
+parser.add_argument('--gpu', type=int, required=False, default=0, help='GPU number (-1) for CPU')
 args = parser.parse_args()
 
 
-def game_pilot(ip, port):
+def game_pilot(ip, port, model_path, gpu):
+
+    # Set enviroment variable to set the GPU to use
+    if gpu != -1:
+        os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu)
+    else:
+        print('Set tensorflow on CPU')
+        os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
+    # Load tensorflow model
+    print("Loading model: %s" % model_path)
+    sess = tf.InteractiveSession()
+    saver = tf.train.Saver()
+    saver.restore(sess, model_path)
+
     print(ip)
     print(port)
 
@@ -64,8 +79,11 @@ def game_pilot(ip, port):
             cam_img = comm.get_image()
 
             # Skip entire record if image is invalid
-            if cam_img is None:
+            if (cam_img is None) or (telemetry is None):
                 continue
+
+            # Sleep for 50ms
+            time.sleep(0.05)
 
             # Resize image to the format expected by the model
             cam_img_res = scipy.misc.imresize(cam_img, [66, 200]) / 255.0
@@ -86,4 +104,4 @@ def game_pilot(ip, port):
 
 if __name__ == "__main__":
     # Create consumer thread (only execute when there is something to do)
-    game_pilot(args.ip, args.port)
+    game_pilot(args.ip, args.port, args.model, args.gpu)

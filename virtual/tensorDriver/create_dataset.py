@@ -12,6 +12,7 @@ import argparse
 import game_communication
 import threading
 import queue
+import time
 
 from matplotlib.pyplot import imshow
 from matplotlib.pyplot import imsave
@@ -107,8 +108,11 @@ def connect_and_create_dataset(ip, port):
             cam_img = comm.get_image()
             
             # Skip entire record if image is invalid
-            if cam_img is None:
-                continue;
+            if (cam_img is None) or (telemetry is None):
+                continue
+
+            # Sleep for 30ms
+            time.sleep(0.03)
                 
             img_index += 1
             

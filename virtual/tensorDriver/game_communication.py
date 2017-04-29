@@ -14,16 +14,26 @@ class GameTelemetry:
     __m_IP = '127.0.0.1'
     __m_Port = 50007
     __m_BUFFER_SIZE = 4096
+    __m_disconnect_error = 0
     
     # Constructor
     def __init__(self, ip = '127.0.0.1', port = 50007):
         self.__m_Port = port        
         self.__m_IP = ip
-    
+
+    # After too much Timeouts reconnect
+    def handle_timeout(self):
+        self.__m_disconnect_error += 1
+        if self.__m_disconnect_error > 2:
+            self.disconnect()
+            self.connect()
+
     def connect(self):
         try:
             self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.__socket.settimeout(1.5)
             self.__socket.connect((self.__m_IP, self.__m_Port))
+            self.__m_disconnect_error = 0
         except ConnectionRefusedError:
             print("Connection refused, check if game is ready")
 
@@ -34,27 +44,42 @@ class GameTelemetry:
     def get_image(self, pkgSize=4096):
         # Send server command to ask for a image
         self.__socket.send("imagem".encode())
-        # Get 4 bytes from socket
-        sizeInfoBA = self.__socket.recv(4)
+
+        # Try to get something
+        try:
+            # Get 4 bytes from socket
+            sizeInfoBA = self.__socket.recv(4)
+        except socket.timeout:
+            print("Network timeout")
+            self.handle_timeout()
+            return None
+
         # Convert bytearray(4 bytes) into int32
         sizeInfo = int.from_bytes(sizeInfoBA, byteorder='big', signed=False)   
         #print(sizeInfo)
         recBytes = 0
         dataImage = bytearray()
+
+        # Wait to receive all packages
         while True:
-            # Get some chunk of data
-            data = self.__socket.recv(pkgSize)
-            if not data:
-                print("Nothing")
-                break                        
-            # Append bytearray with received data
-            dataImage += data
-            # Stop when received at least sizeInfo bytes
-            recBytes += len(data)
-            #print("Something received size %d sum_received %d" % (len(data),  recBytes))
-            if recBytes >= sizeInfo:
-                #print("Received enough")
-                break            
+            try:
+                # Get some chunk of data
+                data = self.__socket.recv(pkgSize)
+                if not data:
+                    print("Nothing")
+                    break
+                # Append bytearray with received data
+                dataImage += data
+                # Stop when received at least sizeInfo bytes
+                recBytes += len(data)
+                #print("Something received size %d sum_received %d" % (len(data),  recBytes))
+                if recBytes >= sizeInfo:
+                    #print("Received enough")
+                    break
+            except socket.timeout:
+                print("Network timeout")
+                self.handle_timeout()
+                return None
         
         # Convert received byte array to PIL image
         try:
@@ -68,8 +93,15 @@ class GameTelemetry:
     def get_game_data(self):
         # Send server command to ask for other information        
         self.__socket.send("telemetria".encode())
-        # Get 4 bytes from socket
-        sizeInfoBA = self.__socket.recv(4)
+
+        # Try to get something
+        try:
+            # Get 4 bytes from socket
+            sizeInfoBA = self.__socket.recv(4)
+        except socket.timeout:
+            self.handle_timeout()
+            return None
+
         # Convert bytearray(4 bytes) into int32
         sizeInfo = int.from_bytes(sizeInfoBA, byteorder='big', signed=False)
         # Get message text
@@ -100,6 +132,15 @@ class GameTelemetry:
         command_str += "\r\n"
 
         self.__socket.send(command_str.encode())
-        resp = self.__socket.recv(4)
+
+        # Try to get something
+        try:
+            # Get 4 bytes from socket
+            resp = self.__socket.recv(4)
+        except socket.timeout:
+            print("Network timeout")
+            self.handle_timeout()
+            return None
+
         return resp.decode()
         
