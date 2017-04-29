@@ -25,7 +25,7 @@ class GameTelemetry:
     def handle_timeout(self):
         self.__m_disconnect_error += 1
         if self.__m_disconnect_error > 1:
-            printf("Try to reconnect.")
+            print("Try to reconnect.")
             self.disconnect()
             self.connect()
 
