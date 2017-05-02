@@ -32,7 +32,7 @@ class GameTelemetry:
     def connect(self):
         try:
             self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.__socket.settimeout(1.5)
+            self.__socket.settimeout(0.5)
             self.__socket.connect((self.__m_IP, self.__m_Port))
             self.__m_disconnect_error = 0
         except ConnectionRefusedError:
