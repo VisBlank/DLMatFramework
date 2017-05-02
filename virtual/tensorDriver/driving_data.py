@@ -80,6 +80,11 @@ class HandleData:
     def LoadTrainBatch(self, batch_size):
         x_out = []
         y_out = []
+
+        # If batch_size is -1 load the whole thing
+        if batch_size == -1:
+            batch_size = self.__num_train_images
+
         for i in range(0, batch_size):
             # Load image
             # image = scipy.misc.imread(train_xs[(train_batch_pointer + i) % num_train_images], mode="RGB")
@@ -94,6 +99,11 @@ class HandleData:
     def LoadValBatch(self, batch_size):
         x_out = []
         y_out = []
+
+        # If batch_size is -1 load the whole thing
+        if batch_size == -1:
+            batch_size = self.__num_val_images
+
         for i in range(0, batch_size):
             # Load image
             # image = scipy.misc.imread(val_xs[(val_batch_pointer + i) % num_val_images], mode="RGB")
