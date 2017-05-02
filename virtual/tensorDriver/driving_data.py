@@ -25,7 +25,7 @@ class HandleData:
     __train_batch_pointer = 0
     __val_batch_pointer = 0
 
-    def __init__(self, path='DrivingData.h5', train_perc=0.8, val_perc=0.2):
+    def __init__(self, path='DrivingData.h5', train_perc=0.8, val_perc=0.2, shuffle=True):
         self.__train_perc = train_perc
         self.__val_perc = val_perc
         print("Loading data")
@@ -43,9 +43,14 @@ class HandleData:
 
             self.__num_images = len(self.__xs)
 
-            # Shuffle data
+
+            # Create a zip list with images and angles
             c = list(zip(self.__xs, self.__ys))
-            random.shuffle(c)
+
+            # Shuffle data
+            if shuffle == True:
+                random.shuffle(c)
+
             self.__xs, self.__ys = zip(*c)
 
             # Training set 80%
@@ -77,7 +82,7 @@ class HandleData:
         self.__val_xs = self.__xs[-int(len(self.__xs) * self.__val_perc):]
         self.__val_ys = self.__ys[-int(len(self.__xs) * self.__val_perc):]
 
-    def LoadTrainBatch(self, batch_size):
+    def LoadTrainBatch(self, batch_size, crop_up=0):
         x_out = []
         y_out = []
 
@@ -89,14 +94,14 @@ class HandleData:
             # Load image
             # image = scipy.misc.imread(train_xs[(train_batch_pointer + i) % num_train_images], mode="RGB")
             image = self.__train_xs[(self.__train_batch_pointer + i) % self.__num_train_images]
-            # Resize to 66x200 and divide by 255.0
-            image = scipy.misc.imresize(image, [66, 200]) / 255.0
+            # Crop top, resize to 66x200 and divide by 255.0
+            image = scipy.misc.imresize(image[-crop_up:], [66, 200]) / 255.0
             x_out.append(image)
             y_out.append([self.__train_ys[(self.__train_batch_pointer + i) % self.__num_train_images]])
             self.__train_batch_pointer += batch_size
         return x_out, y_out
 
-    def LoadValBatch(self, batch_size):
+    def LoadValBatch(self, batch_size, crop_up=0):
         x_out = []
         y_out = []
 
@@ -108,8 +113,8 @@ class HandleData:
             # Load image
             # image = scipy.misc.imread(val_xs[(val_batch_pointer + i) % num_val_images], mode="RGB")
             image = self.__val_xs[(self.__val_batch_pointer + i) % self.__num_val_images]
-            # Resize to 66x200 and divide by 255.0
-            image = scipy.misc.imresize(image, [66, 200]) / 255.0
+            # Crop top, resize to 66x200 and divide by 255.0
+            image = scipy.misc.imresize(image[-crop_up:], [66, 200]) / 255.0
             x_out.append(image)
             y_out.append([self.__val_ys[(self.__val_batch_pointer + i) % self.__num_val_images]])
             self.__val_batch_pointer += batch_size
