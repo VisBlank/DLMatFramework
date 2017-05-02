@@ -2,8 +2,12 @@ TEMPLATE = app
 CONFIG += console c++11
 CONFIG -= app_bundle
 CONFIG -= qt
-LIBS += -fopenmp -lhdf5 -lhdf5_cpp -lhdf5_hl_cpp
+LIBS += -fopenmp -lhdf5_serial -lhdf5_cpp -lhdf5_hl_cpp
 QMAKE_CXXFLAGS += -fopenmp
+
+# Add H5F5 include/libpath (Dependent of your Ubuntu version)
+INCLUDEPATH += /usr/include/hdf5/serial
+LIBS += -L/usr/lib/x86_64-linux-gnu/
 
 SOURCES += main.cpp \    
     solver/adam.cpp \
