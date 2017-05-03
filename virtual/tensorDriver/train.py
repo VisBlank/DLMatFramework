@@ -5,7 +5,8 @@ from driving_data import HandleData
 import model
 
 parser = argparse.ArgumentParser(description='Train network')
-parser.add_argument('--input', type=str, required=False, default='DrivingData.h5', help='Server IP address')
+parser.add_argument('--input', type=str, required=False, default='DrivingData.h5', help='Training hdf5 file')
+parser.add_argument('--input_val', type=str, required=False, default='', help='Validation hdf5 file')
 parser.add_argument('--gpu', type=int, required=False, default=0, help='GPU number (-1) for CPU')
 args = parser.parse_args()
 
@@ -20,10 +21,12 @@ LOGDIR = './save'
 
 # Define number of epochs and batch size
 epochs = 600
-batch_size = 1000
+batch_size = 4000
 iter_disp = 10
 
-sess = tf.InteractiveSession()
+# Avoid allocating the whole memory
+gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.6)
+sess = tf.InteractiveSession(config=tf.ConfigProto(gpu_options=gpu_options))
 
 # Regularization value
 L2NormConst = 0.001
@@ -35,7 +38,7 @@ train_vars = tf.trainable_variables()
 # model.y (Model output), model.y_(Labels)
 # tf.nn.l2_loss: Computes half the L2 norm of a tensor without the sqrt
 # output = sum(t ** 2) / 2
-with tf.name_scope("MeanSquared_Loss_L2_Reg"):
+with tf.name_scope("MSE_Loss_L2Reg"):
     loss = tf.reduce_mean(tf.square(tf.subtract(model.y_, model.y))) + tf.add_n(
         [tf.nn.l2_loss(v) for v in train_vars]) * L2NormConst
 
@@ -71,7 +74,7 @@ saver = tf.train.Saver()
 logs_path = './logs'
 summary_writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
 
-data = HandleData(path=args.input)
+data = HandleData(path=args.input, path_val=args.input_val)
 
 # For each epoch
 for epoch in range(epochs):
