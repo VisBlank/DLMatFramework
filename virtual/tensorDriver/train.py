@@ -1,13 +1,26 @@
+import argparse
 import os
 import tensorflow as tf
 from driving_data import HandleData
 import model
 
+parser = argparse.ArgumentParser(description='Train network')
+parser.add_argument('--input', type=str, required=False, default='DrivingData.h5', help='Server IP address')
+parser.add_argument('--gpu', type=int, required=False, default=0, help='GPU number (-1) for CPU')
+args = parser.parse_args()
+
+# Set enviroment variable to set the GPU to use
+if args.gpu != -1:
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu)
+else:
+    print('Set tensorflow on CPU')
+    os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
 LOGDIR = './save'
 
 # Define number of epochs and batch size
 epochs = 600
-batch_size = 100
+batch_size = 1000
 iter_disp = 10
 
 sess = tf.InteractiveSession()
@@ -33,7 +46,7 @@ with tf.name_scope("Loss_Validation"):
 # Solver configuration
 with tf.name_scope("Solver"):
     global_step = tf.Variable(0, trainable=False)
-    starter_learning_rate = 0.0001
+    starter_learning_rate = 0.001
     # decay every 10000 steps with a base of 0.96
     learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step,
                                                10000, 0.96, staircase=True)
@@ -58,7 +71,7 @@ saver = tf.train.Saver()
 logs_path = './logs'
 summary_writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
 
-data = HandleData()
+data = HandleData(path=args.input)
 
 # For each epoch
 for epoch in range(epochs):
