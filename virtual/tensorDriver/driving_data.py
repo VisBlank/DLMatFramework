@@ -8,8 +8,11 @@ class HandleData:
     __xs = []
     __ys = []
     __file = []
+    __file_val = []
     __dataset_imgs = []
     __dataset_label = []
+    __dataset_imgs_val = []
+    __dataset_label_val = []
     __num_images = 0
     __train_xs = []
     __train_ys = []
@@ -29,7 +32,7 @@ class HandleData:
     def __init__(self, path='DrivingData.h5', path_val='', train_perc=0.8, val_perc=0.2, shuffle=True):
         self.__train_perc = train_perc
         self.__val_perc = val_perc
-        print("Loading data")
+        print("Loading training data")
         # Read hdf5
         self.__file = h5py.File(path, 'a')
         # Check if the dataset exist
@@ -52,20 +55,38 @@ class HandleData:
             if shuffle == True:
                 random.shuffle(c)
 
-            self.__xs, self.__ys = zip(*c)
+            # Check if validation set is not given
+            if not path_val:
+                self.__xs, self.__ys = zip(*c)
 
-            # Training set 80%
-            self.__train_xs = self.__xs[:int(len(self.__xs) * train_perc)]
-            self.__train_ys = self.__ys[:int(len(self.__xs) * train_perc)]
+                # Training set 80%
+                self.__train_xs = self.__xs[:int(len(self.__xs) * train_perc)]
+                self.__train_ys = self.__ys[:int(len(self.__xs) * train_perc)]
 
-            # Validation set 20%
-            self.__val_xs = self.__xs[-int(len(self.__xs) * val_perc):]
-            self.__val_ys = self.__ys[-int(len(self.__xs) * val_perc):]
+                # Validation set 20%
+                self.__val_xs = self.__xs[-int(len(self.__xs) * val_perc):]
+                self.__val_ys = self.__ys[-int(len(self.__xs) * val_perc):]
+            else:
+                print('Load validation dataset')
+                # Read hdf5
+                self.__file_val = h5py.File(path_val, 'a')
+                # Check if the dataset exist
+                existTrain = "/Train/Labels" in self.__file_val
+                if existTrain:
+                    # Training set 100%
+                    self.__train_xs = self.__xs
+                    self.__train_ys = self.__ys
+
+                    # Initialize pre-existing datasets
+                    self.__dataset_imgs_val = self.__file_val["/Train/Images"]
+                    self.__dataset_label_val = self.__file_val["/Train/Labels"]
+
+                    self.__val_xs = list(self.__dataset_imgs_val)
+                    self.__val_ys = list(self.__dataset_label_val)
 
             # Get number of images
             self.__num_train_images = len(self.__train_xs)
             self.__num_val_images = len(self.__val_xs)
-
             print("Number training images: %d" % self.__num_train_images)
             print("Number validation images: %d" % self.__num_val_images)
 

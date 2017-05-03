@@ -11,115 +11,126 @@ parser.add_argument('--input', type=str, required=False, default='DrivingData.h5
 parser.add_argument('--input_val', type=str, required=False, default='', help='Validation hdf5 file')
 parser.add_argument('--gpu', type=int, required=False, default=0, help='GPU number (-1) for CPU')
 parser.add_argument('--checkpoint_dir', type=str, required=False, default='', help='Load checkpoint')
+parser.add_argument('--logdir', type=str, required=False, default='./logs', help='Tensorboard log directory')
+parser.add_argument('--savedir', type=str, required=False, default='./save', help='Tensorboard checkpoint directory')
+parser.add_argument('--epochs', type=int, required=False, default=600, help='Number of epochs')
+parser.add_argument('--batch', type=int, required=False, default=400, help='Batch size')
 args = parser.parse_args()
 
-# Set enviroment variable to set the GPU to use
-if args.gpu != -1:
-    os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu)
-else:
-    print('Set tensorflow on CPU')
-    os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
-# Define number of epochs and batch size, where to save logs, etc...
-epochs = 600
-batch_size = 500
-iter_disp = 10
-LOGDIR = './save'
-start_lr = 0.0001
-logs_path = './logs'
+def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint, epochs, batch_size, logs_path, save_dir):
 
-# Avoid allocating the whole memory
-gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.6)
-sess = tf.InteractiveSession(config=tf.ConfigProto(gpu_options=gpu_options))
+    # Create log directory if it does not exist
+    if not os.path.exists(logs_path):
+        os.makedirs(logs_path)
 
-# Regularization value
-L2NormConst = 0.001
+    # Set enviroment variable to set the GPU to use
+    if gpu != -1:
+        os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu)
+    else:
+        print('Set tensorflow on CPU')
+        os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
-# Get all model "parameters" that are trainable
-train_vars = tf.trainable_variables()
+    # Define number of epochs and batch size, where to save logs, etc...
+    iter_disp = 10
+    start_lr = 0.0001
 
-# Loss is mean squared error plus l2 regularization
-# model.y (Model output), model.y_(Labels)
-# tf.nn.l2_loss: Computes half the L2 norm of a tensor without the sqrt
-# output = sum(t ** 2) / 2
-with tf.name_scope("MSE_Loss_L2Reg"):
-    loss = tf.reduce_mean(tf.square(tf.subtract(model.y_, model.y))) + tf.add_n(
-        [tf.nn.l2_loss(v) for v in train_vars]) * L2NormConst
+    # Avoid allocating the whole memory
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.6)
+    sess = tf.InteractiveSession(config=tf.ConfigProto(gpu_options=gpu_options))
 
-# Add model accuracy
-with tf.name_scope("Loss_Validation"):
-    loss_val = tf.reduce_mean(tf.square(tf.subtract(model.y_, model.y)))
+    # Regularization value
+    L2NormConst = 0.001
 
-# Solver configuration
-with tf.name_scope("Solver"):
-    global_step = tf.Variable(0, trainable=False)
-    starter_learning_rate = start_lr
-    # decay every 10000 steps with a base of 0.96
-    learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step,
-                                               10000, 0.96, staircase=True)
+    # Get all model "parameters" that are trainable
+    train_vars = tf.trainable_variables()
 
-    train_step = tf.train.AdamOptimizer(learning_rate).minimize(loss, global_step=global_step)
+    # Loss is mean squared error plus l2 regularization
+    # model.y (Model output), model.y_(Labels)
+    # tf.nn.l2_loss: Computes half the L2 norm of a tensor without the sqrt
+    # output = sum(t ** 2) / 2
+    with tf.name_scope("MSE_Loss_L2Reg"):
+        loss = tf.reduce_mean(tf.square(tf.subtract(model.y_, model.y))) + tf.add_n(
+            [tf.nn.l2_loss(v) for v in train_vars]) * L2NormConst
 
-# Initialize all random variables (Weights/Bias)
-sess.run(tf.global_variables_initializer())
+    # Add model accuracy
+    with tf.name_scope("Loss_Validation"):
+        loss_val = tf.reduce_mean(tf.square(tf.subtract(model.y_, model.y)))
 
-# Load checkpoint if needed
-if args.checkpoint_dir:
-    # Load tensorflow model
-    print("Loading pre-trained model: %s" % args.checkpoint_dir)
-    # Create saver object to save/load training checkpoint
-    saver = tf.train.Saver()
-    saver.restore(sess, args.checkpoint_dir)
-else:
-    # Just create saver for saving checkpoints
-    saver = tf.train.Saver()
+    # Solver configuration
+    with tf.name_scope("Solver"):
+        global_step = tf.Variable(0, trainable=False)
+        starter_learning_rate = start_lr
+        # decay every 10000 steps with a base of 0.96
+        learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step,
+                                                   10000, 0.96, staircase=True)
 
+        train_step = tf.train.AdamOptimizer(learning_rate).minimize(loss, global_step=global_step)
 
-# Monitor loss, learning_rate, global_step, etc...
-tf.summary.scalar("loss_train", loss)
-tf.summary.scalar("loss_val", loss_val)
-tf.summary.scalar("learning_rate", learning_rate)
-tf.summary.scalar("global_step", global_step)
-# merge all summaries into a single op
-merged_summary_op = tf.summary.merge_all()
+    # Initialize all random variables (Weights/Bias)
+    sess.run(tf.global_variables_initializer())
 
-# Configure where to save the logs for tensorboard
-summary_writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
+    # Load checkpoint if needed
+    if pre_trained_checkpoint:
+        # Load tensorflow model
+        print("Loading pre-trained model: %s" % args.checkpoint_dir)
+        # Create saver object to save/load training checkpoint
+        saver = tf.train.Saver()
+        saver.restore(sess, args.checkpoint_dir)
+    else:
+        # Just create saver for saving checkpoints
+        saver = tf.train.Saver()
 
-data = HandleData(path=args.input, path_val=args.input_val)
+    # Monitor loss, learning_rate, global_step, etc...
+    tf.summary.scalar("loss_train", loss)
+    tf.summary.scalar("loss_val", loss_val)
+    tf.summary.scalar("learning_rate", learning_rate)
+    tf.summary.scalar("global_step", global_step)
+    # merge all summaries into a single op
+    merged_summary_op = tf.summary.merge_all()
 
-# For each epoch
-for epoch in range(epochs):
-    for i in range(int(data.get_num_images() / batch_size)):
-        # Get training batch
-        xs, ys = data.LoadTrainBatch(batch_size)
+    # Configure where to save the logs for tensorboard
+    summary_writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
 
-        # Send batch to tensorflow graph
-        train_step.run(feed_dict={model.x: xs, model.y_: ys})
+    data = HandleData(path=input_train_hdf5, path_val=input_val_hdf5)
 
-        # Display some information each x iterations
-        if i % iter_disp == 0:
-            # Get validation batch
-            xs, ys = data.LoadValBatch(batch_size)
-            # loss_value = loss.eval(feed_dict={model.x:xs, model.y_: ys})
-            loss_value = loss_val.eval(feed_dict={model.x: xs, model.y_: ys})
-            print("Epoch: %d, Step: %d, Loss(Val): %g" % (epoch, epoch * batch_size + i, loss_value))
+    # For each epoch
+    for epoch in range(epochs):
+        for i in range(int(data.get_num_images() / batch_size)):
+            # Get training batch
+            xs, ys = data.LoadTrainBatch(batch_size)
 
-        # write logs at every iteration
-        summary = merged_summary_op.eval(feed_dict={model.x: xs, model.y_: ys})
-        summary_writer.add_summary(summary, epoch * batch_size + i)
+            # Send batch to tensorflow graph
+            train_step.run(feed_dict={model.x: xs, model.y_: ys})
 
-        # Save checkpoint after each epoch
-        if i % batch_size == 0:
-            if not os.path.exists(LOGDIR):
-                os.makedirs(LOGDIR)
-            checkpoint_path = os.path.join(LOGDIR, "model.ckpt")
-            filename = saver.save(sess, checkpoint_path)
-    print("Model saved in file: %s" % filename)
-    # Shuffle data at each epoch end
-    print("Shuffle data")
-    data.shuffleData()
+            # Display some information each x iterations
+            if i % iter_disp == 0:
+                # Get validation batch
+                xs, ys = data.LoadValBatch(batch_size)
+                # loss_value = loss.eval(feed_dict={model.x:xs, model.y_: ys})
+                loss_value = loss_val.eval(feed_dict={model.x: xs, model.y_: ys})
+                print("Epoch: %d, Step: %d, Loss(Val): %g" % (epoch, epoch * batch_size + i, loss_value))
 
-print("Run the command line:\n" \
-      "--> tensorboard --logdir=./logs " \
-      "\nThen open http://0.0.0.0:6006/ into your web browser")
+            # write logs at every iteration
+            summary = merged_summary_op.eval(feed_dict={model.x: xs, model.y_: ys})
+            summary_writer.add_summary(summary, epoch * batch_size + i)
+
+            # Save checkpoint after each epoch
+            if i % batch_size == 0:
+                if not os.path.exists(save_dir):
+                    os.makedirs(save_dir)
+                checkpoint_path = os.path.join(save_dir, "model.ckpt")
+                filename = saver.save(sess, checkpoint_path)
+        print("Model saved in file: %s" % filename)
+        # Shuffle data at each epoch end
+        print("Shuffle data")
+        data.shuffleData()
+
+    print("Run the command line:\n" \
+          "--> tensorboard --logdir=./logs " \
+          "\nThen open http://0.0.0.0:6006/ into your web browser")
+
+if __name__ == "__main__":
+    # Call function that implement the auto-pilot
+    train_network(args.input, args.input_val, args.gpu,
+                  args.checkpoint_dir, args.epochs, args.batch, args.logdir, args.savedir)

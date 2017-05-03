@@ -103,5 +103,5 @@ def game_pilot(ip, port, model_path, gpu):
 
 
 if __name__ == "__main__":
-    # Create consumer thread (only execute when there is something to do)
+    # Call function that implement the auto-pilot
     game_pilot(args.ip, args.port, args.model, args.gpu)
