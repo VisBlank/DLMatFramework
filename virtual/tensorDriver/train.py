@@ -1,13 +1,16 @@
+# https://www.tensorflow.org/programmers_guide/variables
 import argparse
 import os
 import tensorflow as tf
 from driving_data import HandleData
 import model
 
+# Example: python train.py --input=DrivingData.h5 --gpu=0 --checkpoint_dir=save/model.ckpt
 parser = argparse.ArgumentParser(description='Train network')
 parser.add_argument('--input', type=str, required=False, default='DrivingData.h5', help='Training hdf5 file')
 parser.add_argument('--input_val', type=str, required=False, default='', help='Validation hdf5 file')
 parser.add_argument('--gpu', type=int, required=False, default=0, help='GPU number (-1) for CPU')
+parser.add_argument('--checkpoint_dir', type=str, required=False, default='', help='Load checkpoint')
 args = parser.parse_args()
 
 # Set enviroment variable to set the GPU to use
@@ -17,12 +20,13 @@ else:
     print('Set tensorflow on CPU')
     os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
-LOGDIR = './save'
-
-# Define number of epochs and batch size
+# Define number of epochs and batch size, where to save logs, etc...
 epochs = 600
-batch_size = 4000
+batch_size = 500
 iter_disp = 10
+LOGDIR = './save'
+start_lr = 0.0001
+logs_path = './logs'
 
 # Avoid allocating the whole memory
 gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.6)
@@ -49,7 +53,7 @@ with tf.name_scope("Loss_Validation"):
 # Solver configuration
 with tf.name_scope("Solver"):
     global_step = tf.Variable(0, trainable=False)
-    starter_learning_rate = 0.001
+    starter_learning_rate = start_lr
     # decay every 10000 steps with a base of 0.96
     learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step,
                                                10000, 0.96, staircase=True)
@@ -59,6 +63,18 @@ with tf.name_scope("Solver"):
 # Initialize all random variables (Weights/Bias)
 sess.run(tf.global_variables_initializer())
 
+# Load checkpoint if needed
+if args.checkpoint_dir:
+    # Load tensorflow model
+    print("Loading pre-trained model: %s" % args.checkpoint_dir)
+    # Create saver object to save/load training checkpoint
+    saver = tf.train.Saver()
+    saver.restore(sess, args.checkpoint_dir)
+else:
+    # Just create saver for saving checkpoints
+    saver = tf.train.Saver()
+
+
 # Monitor loss, learning_rate, global_step, etc...
 tf.summary.scalar("loss_train", loss)
 tf.summary.scalar("loss_val", loss_val)
@@ -67,11 +83,7 @@ tf.summary.scalar("global_step", global_step)
 # merge all summaries into a single op
 merged_summary_op = tf.summary.merge_all()
 
-# Create saver object to save training checkpoint
-saver = tf.train.Saver()
-
 # Configure where to save the logs for tensorboard
-logs_path = './logs'
 summary_writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
 
 data = HandleData(path=args.input, path_val=args.input_val)
