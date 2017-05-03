@@ -1,6 +1,7 @@
 import scipy.misc
 import random
 import h5py
+import numpy as np
 
 
 class HandleData:
@@ -25,7 +26,7 @@ class HandleData:
     __train_batch_pointer = 0
     __val_batch_pointer = 0
 
-    def __init__(self, path='DrivingData.h5', train_perc=0.8, val_perc=0.2, shuffle=True):
+    def __init__(self, path='DrivingData.h5', path_val='', train_perc=0.8, val_perc=0.2, shuffle=True):
         self.__train_perc = train_perc
         self.__val_perc = val_perc
         print("Loading data")
@@ -122,3 +123,33 @@ class HandleData:
 
     def get_num_images(self):
         return self.__num_images
+
+    def save_hdf5(self, list_tups_train, filename='newHdf5.h5'):
+        ys = []
+        imgs = []
+        for (tup_element) in list_tups_train:
+            img, steer = tup_element
+            ys.append(steer)
+            imgs.append(img)
+
+        # Convert to numpy arrays
+        list_labels_ndarray = np.asarray(ys)
+        list_imgs_ndarray = np.asarray(imgs)
+        # Should have shape 1111,
+        list_labels_ndarray = list_labels_ndarray.reshape(list_labels_ndarray.size)
+
+        file = h5py.File(filename, 'w')  # 'a' is append
+        # Create Training group
+        group = file.create_group("Train")
+        # Dataset must be resizable and chunked
+        dataset_label = group.create_dataset("Labels", list_labels_ndarray.shape, maxshape=(None,), chunks=True)
+        dataset_imgs = group.create_dataset("Images", list_imgs_ndarray.shape, maxshape=(None, 256, 256, 3),
+                                            chunks=True)
+
+        # Copy data
+        dataset_label[...] = list_labels_ndarray
+        dataset_imgs[...] = list_imgs_ndarray
+
+        # Close and save data
+        file.flush()
+        file.close()

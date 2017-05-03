@@ -8,7 +8,7 @@ y_ = tf.placeholder(tf.float32, shape=[None, 1])
 x_image = x
 
 # Add input image/steering angle on summary
-tf.summary.image("input_image", x_image, 3)
+tf.summary.image("input_image", x_image, 10)
 tf.summary.histogram("steer_angle", y_)
 
 # CONV 1 (Mark that want visualization)
