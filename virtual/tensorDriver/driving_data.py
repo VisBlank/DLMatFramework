@@ -26,6 +26,7 @@ class HandleData:
     __train_perc = 0
     __val_perc = 0
     __augment = None
+    __split_training = False
 
     # points to the end of the last batch
     __train_batch_pointer = 0
@@ -58,10 +59,13 @@ class HandleData:
             if shuffle == True:
                 random.shuffle(c)
 
+            # Split the items on c
+            self.__xs, self.__ys = zip(*c)
+
             # Check if validation set is not given
             if not path_val:
-                self.__xs, self.__ys = zip(*c)
-
+                print('Spliting training and validation')
+                self.__split_training = True
                 # Training set 80%
                 self.__train_xs = self.__xs[:int(len(self.__xs) * train_perc)]
                 self.__train_ys = self.__ys[:int(len(self.__xs) * train_perc)]
@@ -71,6 +75,7 @@ class HandleData:
                 self.__val_ys = self.__ys[-int(len(self.__xs) * val_perc):]
             else:
                 print('Load validation dataset')
+                self.__split_training = False
                 # Read hdf5
                 self.__file_val = h5py.File(path_val, 'a')
                 # Check if the dataset exist
@@ -99,15 +104,20 @@ class HandleData:
         random.shuffle(c)
         self.__xs, self.__ys = zip(*c)
 
-        # Training set 80%
-        self.__train_xs = self.__xs[:int(len(self.__xs) * self.__train_perc)]
-        self.__train_ys = self.__ys[:int(len(self.__xs) * self.__train_perc)]
+        if self.__split_training == True:
+            # Training set 80%
+            self.__train_xs = self.__xs[:int(len(self.__xs) * self.__train_perc)]
+            self.__train_ys = self.__ys[:int(len(self.__xs) * self.__train_perc)]
 
-        # Validation set 20%
-        self.__val_xs = self.__xs[-int(len(self.__xs) * self.__val_perc):]
-        self.__val_ys = self.__ys[-int(len(self.__xs) * self.__val_perc):]
+            # Validation set 20%
+            self.__val_xs = self.__xs[-int(len(self.__xs) * self.__val_perc):]
+            self.__val_ys = self.__ys[-int(len(self.__xs) * self.__val_perc):]
+        else:
+            # Training set 100%
+            self.__train_xs = self.__xs
+            self.__train_ys = self.__ys
 
-    def LoadTrainBatch(self, batch_size, crop_up=0, should_augment=False):
+    def LoadTrainBatch(self, batch_size, crop_up=130, should_augment=False):
         x_out = []
         y_out = []
 
@@ -135,7 +145,7 @@ class HandleData:
 
         return x_out, y_out
 
-    def LoadValBatch(self, batch_size, crop_up=0):
+    def LoadValBatch(self, batch_size, crop_up=130):
         x_out = []
         y_out = []
 

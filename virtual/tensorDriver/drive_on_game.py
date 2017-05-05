@@ -46,10 +46,11 @@ parser.add_argument('--ip', type=str, required=False, default='127.0.0.1', help=
 parser.add_argument('--port', type=int, required=False, default=50007, help='Server TCP/IP port')
 parser.add_argument('--model', type=str, required=False, default='save/model.ckpt', help='Trained driver model')
 parser.add_argument('--gpu', type=int, required=False, default=0, help='GPU number (-1) for CPU')
+parser.add_argument('--top_crop', type=int, required=False, default=130, help='Top crop to avoid horizon')
 args = parser.parse_args()
 
 
-def game_pilot(ip, port, model_path, gpu):
+def game_pilot(ip, port, model_path, gpu, crop=130):
 
     # Set enviroment variable to set the GPU to use
     if gpu != -1:
@@ -86,7 +87,7 @@ def game_pilot(ip, port, model_path, gpu):
             time.sleep(0.05)
 
             # Resize image to the format expected by the model
-            cam_img_res = scipy.misc.imresize(cam_img, [66, 200]) / 255.0
+            cam_img_res = scipy.misc.imresize(cam_img[-crop:], [66, 200]) / 255.0
 
             # Get steering angle from tensorflow model (Also convert from rad to degree)
             degrees = model.y.eval(feed_dict={model.x: [cam_img_res]})[0][0]
@@ -104,4 +105,4 @@ def game_pilot(ip, port, model_path, gpu):
 
 if __name__ == "__main__":
     # Call function that implement the auto-pilot
-    game_pilot(args.ip, args.port, args.model, args.gpu)
+    game_pilot(args.ip, args.port, args.model, args.gpu, args.top_crop)
