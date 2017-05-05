@@ -98,7 +98,7 @@ def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint,
     for epoch in range(epochs):
         for i in range(int(data.get_num_images() / batch_size)):
             # Get training batch
-            xs, ys = data.LoadTrainBatch(batch_size)
+            xs, ys = data.LoadTrainBatch(batch_size, should_augment=True)
 
             # Send batch to tensorflow graph
             train_step.run(feed_dict={model.x: xs, model.y_: ys})

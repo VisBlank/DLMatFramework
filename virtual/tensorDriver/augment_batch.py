@@ -12,9 +12,10 @@ class AugmentDrivingBatch:
     def __init__(self):
         # Initialize seed
         #random.seed(42)
-        # Create a list of functions that could be applied
+        # Create a list of functions that could be applied on the batch
         self.__list_func = [lambda img: self.convert_to_gray(img), lambda img: self.add_noise(img),
-                            lambda img: self.add_gaussian(img), lambda img: self.convert_to_sepia(img),lambda img: self.color_swap(img)]
+                            lambda img: self.add_gaussian(img), lambda img: self.convert_to_sepia(img),
+                            lambda img: self.color_swap(img), lambda img: self.invert_color(img)]
 
     def augment(self, batch):
         # Roll the dice
@@ -27,11 +28,8 @@ class AugmentDrivingBatch:
             # Do a copy of the batch
             new_batch = batch
 
-            # Flip steering independent of other augmentations
-            print(type(batch))
-            print(type(batch[0]))
+            # Flip steering independent of other augmentations (Idea is to have more steering actions on training)
             batch_fliped = self.create_flip_steering(new_batch)
-            #batch_fliped = new_batch
 
             # Choose one operation to be applied on the whole batch
             #operation = randint(0, len(self.__list_func) - 1)
@@ -71,6 +69,10 @@ class AugmentDrivingBatch:
         new_img = skimage.util.random_noise(img,var=0.001)
         return new_img
 
+    def invert_color(self, img):
+        new_img = skimage.util.invert(img)
+        return new_img
+
     def add_gaussian(self, img):
         new_img = skimage.filters.gaussian(img,sigma=0.9, multichannel=True)
         return new_img
@@ -93,8 +95,7 @@ class AugmentDrivingBatch:
             if steering != 0.0:
                 img = np.fliplr(img)
                 # TODO: Why this is a list?
-                print(type(steering))
-                steering = -steering
+                steering[0] = -steering[0]
             new_batch[idx] = (img, steering)
             idx += 1
         return new_batch
