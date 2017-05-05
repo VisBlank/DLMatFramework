@@ -10,6 +10,7 @@ drive_on_game.py --ip=10.45.65.58
 import argparse
 import game_communication
 import tensorflow as tf
+import numpy as np
 import scipy.misc
 import model
 import time
@@ -87,7 +88,7 @@ def game_pilot(ip, port, model_path, gpu, crop=130):
             time.sleep(0.05)
 
             # Resize image to the format expected by the model
-            cam_img_res = scipy.misc.imresize(cam_img[-crop:], [66, 200]) / 255.0
+            cam_img_res = scipy.misc.imresize(np.array(cam_img)[-crop:], [66, 200]) / 255.0
 
             # Get steering angle from tensorflow model (Also convert from rad to degree)
             degrees = model.y.eval(feed_dict={model.x: [cam_img_res]})[0][0]
