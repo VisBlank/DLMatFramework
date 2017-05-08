@@ -7,7 +7,7 @@ import model
 
 # Example: python train.py --input=DrivingData.h5 --gpu=0 --checkpoint_dir=save/model.ckpt
 parser = argparse.ArgumentParser(description='Train network')
-parser.add_argument('--input', type=str, required=False, default='DrivingData.h5', help='Training hdf5 file')
+parser.add_argument('--input', type=str, required=False, default='DrivingData.h5', help='Training hdf5/lmdb file')
 parser.add_argument('--input_val', type=str, required=False, default='', help='Validation hdf5 file')
 parser.add_argument('--gpu', type=int, required=False, default=0, help='GPU number (-1) for CPU')
 parser.add_argument('--checkpoint_dir', type=str, required=False, default='', help='Load checkpoint')

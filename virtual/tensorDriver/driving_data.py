@@ -1,6 +1,7 @@
 import scipy.misc
 import random
 import h5py
+import lmdb
 import numpy as np
 from augment_batch import AugmentDrivingBatch
 
@@ -167,6 +168,7 @@ class HandleData:
     def get_num_images(self):
         return self.__num_images
 
+
     def save_hdf5(self, list_tups_train, filename='newHdf5.h5'):
         ys = []
         imgs = []
@@ -196,3 +198,11 @@ class HandleData:
         # Close and save data
         file.flush()
         file.close()
+
+    def handle_file_dataset(self, path_train, path_val):
+        '''Handle loading HDF5 and LMDB files'''
+        has_validation = not path_val == ''
+        if "h5" in path_train:
+            print('HDF5 file')
+        else:
+            print('LMDB file')
