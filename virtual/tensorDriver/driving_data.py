@@ -276,7 +276,7 @@ class HandleData:
                     for key, value in cursor:
                         key_str = key.decode('ascii')
                         if 'label' in key_str:
-                            self.__val_ys.append(np.frombuffer(value, dtype=np.float32, count=1))
+                            self.__val_ys.append(np.float32(np.asscalar(np.frombuffer(value, dtype=np.float32, count=1))))
                         else:
                             # Get shape information from key name
                             info_key = key_str.split('_')
