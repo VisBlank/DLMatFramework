@@ -36,9 +36,7 @@ try:
         image = scipy.misc.imresize(full_image, [66, 200]) / 255.0
         
         # Get steering angle from tensorflow model (Also convert from rad to degree)
-        # degrees = model.y.eval(feed_dict={model.x: [image], model.keep_prob: 1.0})[0][0] * 180.0 / scipy.pi
-        #degrees = model.y.eval(feed_dict={model.x: [image]})[0][0] * 180.0 / scipy.pi
-        degrees = model.y.eval(feed_dict={model.x: [image]})[0][0] * 180
+        degrees = model.y.eval(feed_dict={model.x: [image], model.dropout_prob: 1.0})[0][0] * 180
         
         # Filter results (Smooth results between current angle and prediction)
         # Maybe this filter could be learn if we add a RNN at the end of the model
