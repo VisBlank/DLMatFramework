@@ -4,6 +4,7 @@ import model_util as util
 # Create placeholders (I/O for our model/graph)
 x = tf.placeholder(tf.float32, shape=[None, 66, 200, 3])
 y_ = tf.placeholder(tf.float32, shape=[None, 1])
+dropout_prob = tf.placeholder(tf.float32)
 
 x_image = x
 
@@ -31,22 +32,22 @@ conv5 = util.conv2d(conv4, 3, 3, 64, 64, 1, "conv5")
 conv5_flat = tf.reshape(conv5, [-1, 1152])
 fc1 = util.fc_layer(conv5_flat, 1152, 1164, "fc1")
 # Add dropout to the fully connected layer
-fc1_drop = tf.nn.dropout(fc1, 0.8)
+fc1_drop = tf.nn.dropout(fc1, dropout_prob)
 
 # Fully Connect 2
 fc2 = util.fc_layer(fc1_drop, 1164, 100, "fc2")
 # Add dropout to the fully connected layer
-fc2_drop = tf.nn.dropout(fc2, 0.8)
+fc2_drop = tf.nn.dropout(fc2, dropout_prob)
 
 # Fully Connect 3
 fc3 = util.fc_layer(fc2_drop, 100, 50, "fc3")
 # Add dropout to the fully connected layer
-fc3_drop = tf.nn.dropout(fc3, 0.8)
+fc3_drop = tf.nn.dropout(fc3, dropout_prob)
 
 # Fully Connect 4
 fc4 = util.fc_layer(fc3_drop, 50, 10, "fc4")
 # Add dropout to the fully connected layer
-fc4_drop = tf.nn.dropout(fc4, 0.8)
+fc4_drop = tf.nn.dropout(fc4, dropout_prob)
 
 #Output
 out_layer = util.output_layer(fc4_drop, 10, 1, "output_layer")

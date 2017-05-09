@@ -75,11 +75,11 @@ def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint,
         # Load tensorflow model
         print("Loading pre-trained model: %s" % args.checkpoint_dir)
         # Create saver object to save/load training checkpoint
-        saver = tf.train.Saver()
+        saver = tf.train.Saver(max_to_keep=None)
         saver.restore(sess, args.checkpoint_dir)
     else:
         # Just create saver for saving checkpoints
-        saver = tf.train.Saver()
+        saver = tf.train.Saver(max_to_keep=None)
 
     # Monitor loss, learning_rate, global_step, etc...
     tf.summary.scalar("loss_train", loss)
@@ -100,19 +100,19 @@ def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint,
             # Get training batch
             xs, ys = data.LoadTrainBatch(batch_size, should_augment=True)
 
-            # Send batch to tensorflow graph
-            train_step.run(feed_dict={model.x: xs, model.y_: ys})
+            # Send training batch to tensorflow graph (Dropout enabled)
+            train_step.run(feed_dict={model.x: xs, model.y_: ys, model.dropout_prob: 0.8})
 
             # Display some information each x iterations
             if i % iter_disp == 0:
                 # Get validation batch
                 xs, ys = data.LoadValBatch(batch_size)
-                # loss_value = loss.eval(feed_dict={model.x:xs, model.y_: ys})
-                loss_value = loss_val.eval(feed_dict={model.x: xs, model.y_: ys})
+                # Send validation batch to tensorflow graph (Dropout disabled)
+                loss_value = loss_val.eval(feed_dict={model.x: xs, model.y_: ys, model.dropout_prob: 1.0})
                 print("Epoch: %d, Step: %d, Loss(Val): %g" % (epoch, epoch * batch_size + i, loss_value))
 
             # write logs at every iteration
-            summary = merged_summary_op.eval(feed_dict={model.x: xs, model.y_: ys})
+            summary = merged_summary_op.eval(feed_dict={model.x: xs, model.y_: ys, model.dropout_prob: 1.0})
             summary_writer.add_summary(summary, epoch * batch_size + i)
 
             # Save checkpoint after each epoch
