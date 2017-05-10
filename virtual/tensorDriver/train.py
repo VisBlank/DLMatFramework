@@ -115,7 +115,7 @@ def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint,
                 print("Epoch: %d, Step: %d, Loss(Val): %g" % (epoch, epoch * batch_size + i, loss_value))
 
             # write logs at every iteration
-            summary = merged_summary_op.eval(feed_dict={model.x: xs, model.y_: ys, model.dropout_prob: 1.0})
+            summary = merged_summary_op.eval(feed_dict={model.x: xs_train, model.y_: ys_train, model.dropout_prob: 1.0})
             summary_writer.add_summary(summary, epoch * batch_size + i)
 
         # Save checkpoint after each epoch
