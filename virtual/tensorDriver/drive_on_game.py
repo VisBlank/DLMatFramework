@@ -45,7 +45,7 @@ class GameRecord:
 parser = argparse.ArgumentParser(description='Drive inside game')
 parser.add_argument('--ip', type=str, required=False, default='127.0.0.1', help='Server IP address')
 parser.add_argument('--port', type=int, required=False, default=50007, help='Server TCP/IP port')
-parser.add_argument('--model', type=str, required=False, default='save/model.ckpt', help='Trained driver model')
+parser.add_argument('--model', type=str, required=False, default='save/model-0', help='Trained driver model')
 parser.add_argument('--gpu', type=int, required=False, default=0, help='GPU number (-1) for CPU')
 parser.add_argument('--top_crop', type=int, required=False, default=130, help='Top crop to avoid horizon')
 args = parser.parse_args()

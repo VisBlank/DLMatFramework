@@ -15,6 +15,7 @@ parser.add_argument('--logdir', type=str, required=False, default='./logs', help
 parser.add_argument('--savedir', type=str, required=False, default='./save', help='Tensorboard checkpoint directory')
 parser.add_argument('--epochs', type=int, required=False, default=600, help='Number of epochs')
 parser.add_argument('--batch', type=int, required=False, default=400, help='Batch size')
+parser.add_argument('--learning_rate', type=float, required=False, default=0.0001, help='Initial learning rate')
 args = parser.parse_args()
 
 
@@ -33,7 +34,7 @@ def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint,
 
     # Define number of epochs and batch size, where to save logs, etc...
     iter_disp = 10
-    start_lr = 0.0001
+    start_lr = args.learning_rate
 
     # Avoid allocating the whole memory
     gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.6)
@@ -63,7 +64,7 @@ def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint,
         starter_learning_rate = start_lr
         # decay every 10000 steps with a base of 0.96
         learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step,
-                                                   10000, 0.96, staircase=True)
+                                                   1000, 0.9, staircase=True)
 
         train_step = tf.train.AdamOptimizer(learning_rate).minimize(loss, global_step=global_step)
 
@@ -93,20 +94,22 @@ def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint,
     summary_writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
 
     data = HandleData(path=input_train_hdf5, path_val=input_val_hdf5)
+    num_images_epoch = int(data.get_num_images() / batch_size)
+    print('Num samples',data.get_num_images(), 'Iterations per epoch:', num_images_epoch, 'batch size:', batch_size)
 
     # For each epoch
     for epoch in range(epochs):
         for i in range(int(data.get_num_images() / batch_size)):
             # Get training batch
-            xs, ys = data.LoadTrainBatch(batch_size, should_augment=True)
+            xs_train, ys_train = data.LoadTrainBatch(batch_size, should_augment=True)
 
             # Send training batch to tensorflow graph (Dropout enabled)
-            train_step.run(feed_dict={model.x: xs, model.y_: ys, model.dropout_prob: 0.8})
+            train_step.run(feed_dict={model.x: xs_train, model.y_: ys_train, model.dropout_prob: 0.5})
 
             # Display some information each x iterations
             if i % iter_disp == 0:
                 # Get validation batch
-                xs, ys = data.LoadValBatch(batch_size)
+                xs, ys = data.LoadValBatch(-1)
                 # Send validation batch to tensorflow graph (Dropout disabled)
                 loss_value = loss_val.eval(feed_dict={model.x: xs, model.y_: ys, model.dropout_prob: 1.0})
                 print("Epoch: %d, Step: %d, Loss(Val): %g" % (epoch, epoch * batch_size + i, loss_value))
@@ -115,13 +118,13 @@ def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint,
             summary = merged_summary_op.eval(feed_dict={model.x: xs, model.y_: ys, model.dropout_prob: 1.0})
             summary_writer.add_summary(summary, epoch * batch_size + i)
 
-            # Save checkpoint after each epoch
-            if i % batch_size == 0:
-                if not os.path.exists(save_dir):
-                    os.makedirs(save_dir)
-                checkpoint_path = os.path.join(save_dir, "model.ckpt")
-                filename = saver.save(sess, checkpoint_path)
+        # Save checkpoint after each epoch
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+        checkpoint_path = os.path.join(save_dir, "model")
+        filename = saver.save(sess, checkpoint_path, global_step=epoch)
         print("Model saved in file: %s" % filename)
+
         # Shuffle data at each epoch end
         print("Shuffle data")
         data.shuffleData()
