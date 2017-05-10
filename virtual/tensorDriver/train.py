@@ -104,12 +104,12 @@ def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint,
             xs_train, ys_train = data.LoadTrainBatch(batch_size, should_augment=True)
 
             # Send training batch to tensorflow graph (Dropout enabled)
-            train_step.run(feed_dict={model.x: xs_train, model.y_: ys_train, model.dropout_prob: 0.5})
+            train_step.run(feed_dict={model.x: xs_train, model.y_: ys_train, model.dropout_prob: 0.8})
 
             # Display some information each x iterations
             if i % iter_disp == 0:
                 # Get validation batch
-                xs, ys = data.LoadValBatch(-1)
+                xs, ys = data.LoadValBatch(batch_size)
                 # Send validation batch to tensorflow graph (Dropout disabled)
                 loss_value = loss_val.eval(feed_dict={model.x: xs, model.y_: ys, model.dropout_prob: 1.0})
                 print("Epoch: %d, Step: %d, Loss(Val): %g" % (epoch, epoch * batch_size + i, loss_value))

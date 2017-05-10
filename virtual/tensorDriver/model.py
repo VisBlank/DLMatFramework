@@ -2,9 +2,9 @@ import tensorflow as tf
 import model_util as util
 
 # Create placeholders (I/O for our model/graph)
-x = tf.placeholder(tf.float32, shape=[None, 66, 200, 3])
-y_ = tf.placeholder(tf.float32, shape=[None, 1])
-dropout_prob = tf.placeholder(tf.float32)
+x = tf.placeholder(tf.float32, shape=[None, 66, 200, 3], name='IMAGE_IN')
+y_ = tf.placeholder(tf.float32, shape=[None, 1], name='LABEL_IN')
+dropout_prob = tf.placeholder(tf.float32, name='drop_prob')
 
 x_image = x
 
@@ -50,8 +50,8 @@ fc4 = util.fc_layer(fc3_drop, 50, 10, "fc4")
 fc4_drop = tf.nn.dropout(fc4, dropout_prob)
 
 #Output
-out_layer = util.output_layer(fc4_drop, 10, 1, "output_layer")
+y = util.output_layer(fc4_drop, 10, 1, "output_layer")
 
-# Bounding output and scale between -2..2
+# Bounding output and scale between -1..1
 # https://www.wolframalpha.com/input/?i=atan(x)
-y = util.bound_layer(out_layer,1)
+#y = util.bound_layer(out_layer,1)
