@@ -109,5 +109,26 @@ def bound_layer(val_in, bound_val, name="bound_scale"):
         # Add summaries for helping debug        
         tf.summary.histogram("val_in", val_in)
         tf.summary.histogram("activation", activation)
-        return activation        
+        return activation
+
+
+def read_decode_tfrecord_list(file_list):
+    ''''Read TFRecord content'''
+    reader = tf.TFRecordReader()
+    _, serialized_example = reader.read(file_list)
+    features = tf.parse_single_example(
+        serialized_example,
+        # Defaults are not specified since both keys are required.
+        features={
+            'image': tf.FixedLenFeature([], tf.string),
+            'shape': tf.FixedLenFeature([], tf.string),
+            'label': tf.FixedLenFeature([], tf.float32),
+        })
+
+    image = tf.decode_raw(features['image'], tf.uint8)
+    print('Shape is:', image.shape)
+    image.set_shape([256, 256, 3])
+    label = tf.cast(features['label'], tf.float32)
+
+    return image, label
 

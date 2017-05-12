@@ -283,3 +283,13 @@ class HandleData:
                             # Get image shape [2:None] means from index 2 to the end
                             shape_img = tuple(map(lambda x: int(x), info_key[2:None]))
                             self.__val_xs.append(np.frombuffer(value, dtype=np.uint8).reshape(shape_img).astype(np.float32))
+
+
+    @staticmethod
+    def get_list_from_file(file_list):
+        ''''Get all lines from a text file'''
+        list_files = []
+        with open(file_list) as f:
+            for line in f:
+                list_files.append(line)
+        return list_files
