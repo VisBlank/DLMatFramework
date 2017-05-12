@@ -1,6 +1,7 @@
 import argparse
 import os
 import tensorflow as tf
+import time
 from driving_data import HandleData
 import model
 import model_util as util
@@ -47,6 +48,15 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
         print('Set tensorflow on CPU')
         os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
+    # Get file list
+    list_tfrecord_files = HandleData.get_list_from_file(input_list)
+
+    # Create the graph input part (Responsible to load files, do augmentations, etc...)
+    images, labels = create_input_graph(list_tfrecord_files, epochs, batch_size)
+
+    # Build Graph
+    model_out = model.build_graph_no_placeholder(images)
+
     # Define number of epochs and batch size, where to save logs, etc...
     iter_disp = 10
     start_lr = args.learning_rate
@@ -66,12 +76,12 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
     # tf.nn.l2_loss: Computes half the L2 norm of a tensor without the sqrt
     # output = sum(t ** 2) / 2
     with tf.name_scope("MSE_Loss_L2Reg"):
-        loss = tf.reduce_mean(tf.square(tf.subtract(model.y_, model.y))) + tf.add_n(
+        loss = tf.reduce_mean(tf.square(tf.subtract(labels, model_out))) + tf.add_n(
             [tf.nn.l2_loss(v) for v in train_vars]) * L2NormConst
 
     # Add model accuracy
     with tf.name_scope("Loss_Validation"):
-        loss_val = tf.reduce_mean(tf.square(tf.subtract(model.y_, model.y)))
+        loss_val = tf.reduce_mean(tf.square(tf.subtract(labels, model_out)))
 
     # Solver configuration
     with tf.name_scope("Solver"):
@@ -85,6 +95,10 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
 
     # Initialize all random variables (Weights/Bias)
     sess.run(tf.global_variables_initializer())
+
+    # Start input enqueue threads.
+    coord = tf.train.Coordinator()
+    threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
     # Load checkpoint if needed
     if pre_trained_checkpoint:
@@ -108,11 +122,36 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
     # Configure where to save the logs for tensorboard
     summary_writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
 
-    # Get file list
-    list_tfrecord_files = HandleData.get_list_from_file(input_list)
+    try:
+        step = 0
+        while not coord.should_stop():
+            start_time = time.time()
 
-    # Create the graph input part (Responsible to load files, do augmentations, etc...)
-    create_input_graph(list_tfrecord_files, epochs, batch_size)
+            # Run one step of the model.  The return values are
+            # the activations from the `train_op` (which is
+            # discarded) and the `loss` op.  To inspect the values
+            # of your ops or variables, you may include them in
+            # the list passed to sess.run() and the value tensors
+            # will be returned in the tuple from the call.
+            _, loss_value = sess.run([train_step, loss])
+
+            duration = time.time() - start_time
+
+            # Print an overview fairly often.
+            if step % 100 == 0:
+                print('Step %d: loss = %.2f (%.3f sec)' % (step, loss_value,
+                                                           duration))
+            step += 1
+    except tf.errors.OutOfRangeError:
+        #print('Done training for %d epochs, %d steps.' % (FLAGS.num_epochs, step))
+        print('error')
+    finally:
+        # When done, ask the threads to stop.
+        coord.request_stop()
+
+        # Wait for threads to finish.
+    coord.join(threads)
+    sess.close()
 
 
 

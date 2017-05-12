@@ -125,9 +125,17 @@ def read_decode_tfrecord_list(file_list):
             'label': tf.FixedLenFeature([], tf.float32),
         })
 
+    shape = tf.decode_raw(features['shape'], tf.uint8)
+    #print('Shape (shape) is:', shape.shape)
     image = tf.decode_raw(features['image'], tf.uint8)
-    print('Shape is:', image.shape)
-    image.set_shape([256, 256, 3])
+    #print('Shape (image) is:', image.shape)
+
+    image.set_shape([256* 256* 3])
+    image = tf.reshape(image, [256, 256, 3])
+    image = tf.image.resize_images(image, [66, 200])
+    # Convert from [0, 255] -> [-0.5, 0.5] floats.
+    image = tf.cast(image, tf.float32) * (1. / 255) - 0.5
+
     label = tf.cast(features['label'], tf.float32)
 
     return image, label
