@@ -94,7 +94,8 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
         train_step = tf.train.AdamOptimizer(learning_rate).minimize(loss, global_step=global_step)
 
     # Initialize all random variables (Weights/Bias)
-    sess.run(tf.global_variables_initializer())
+    init_op = tf.group(tf.global_variables_initializer(),tf.local_variables_initializer())
+    sess.run(init_op)
 
     # Start input enqueue threads.
     coord = tf.train.Coordinator()
