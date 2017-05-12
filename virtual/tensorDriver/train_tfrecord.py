@@ -28,7 +28,7 @@ def create_input_graph(list_files, num_epochs, batch_size):
 
         # Shuffle examples
         images, labels = tf.train.shuffle_batch(
-            [image, label], batch_size=batch_size, num_threads=2,
+            [image, label], batch_size=batch_size, num_threads=1,
             capacity=1000 + 3 * batch_size,
             # Ensures a minimum amount of shuffling of examples.
             min_after_dequeue=1000)
@@ -55,7 +55,7 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
     images, labels = create_input_graph(list_tfrecord_files, epochs, batch_size)
 
     # Build Graph
-    model_out = model.build_graph_no_placeholder(images)
+    model_out, dropout_prob = model.build_graph_no_placeholder(images)
 
     # Define number of epochs and batch size, where to save logs, etc...
     iter_disp = 10
@@ -134,7 +134,7 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
             # of your ops or variables, you may include them in
             # the list passed to sess.run() and the value tensors
             # will be returned in the tuple from the call.
-            _, loss_value = sess.run([train_step, loss])
+            _, loss_value = sess.run([train_step, loss], feed_dict={dropout_prob: 0.8})
 
             duration = time.time() - start_time
 

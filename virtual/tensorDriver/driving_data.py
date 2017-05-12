@@ -291,5 +291,5 @@ class HandleData:
         list_files = []
         with open(file_list) as f:
             for line in f:
-                list_files.append(line)
+                list_files.append(line.strip())
         return list_files

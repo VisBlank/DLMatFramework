@@ -105,5 +105,5 @@ def build_graph_no_placeholder(input):
     # Output
     y = util.output_layer(fc4_drop, 10, 1, "output_layer")
 
-    return y
+    return y, dropout_prob
 
