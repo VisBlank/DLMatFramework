@@ -1,1 +1,1 @@
-/home/leoara01/work/DLMatFramework/virtual/tensorDriver/Dataset.tfrec
+Dataset.tfrec

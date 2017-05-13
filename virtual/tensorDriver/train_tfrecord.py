@@ -28,7 +28,7 @@ def create_input_graph(list_files, num_epochs, batch_size):
 
         # Shuffle examples
         images, labels = tf.train.shuffle_batch(
-            [image, label], batch_size=batch_size, num_threads=1,
+            [image, label], batch_size=batch_size, num_threads=3,
             capacity=1000 + 3 * batch_size,
             # Ensures a minimum amount of shuffling of examples.
             min_after_dequeue=1000)
