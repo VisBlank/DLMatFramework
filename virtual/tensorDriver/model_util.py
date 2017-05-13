@@ -112,6 +112,22 @@ def bound_layer(val_in, bound_val, name="bound_scale"):
         return activation
 
 
+def create_input_graph(list_files, num_epochs, batch_size):
+    with tf.name_scope('input_handler'):
+        filename_queue = tf.train.string_input_producer(list_files, num_epochs=num_epochs)
+
+        # Read files from TFRecord list
+        image, label = read_decode_tfrecord_list(filename_queue)
+
+        # Shuffle examples
+        images, labels = tf.train.shuffle_batch(
+            [image, label], batch_size=batch_size, num_threads=3,
+            capacity=1000 + 3 * batch_size,
+            # Ensures a minimum amount of shuffling of examples.
+            min_after_dequeue=1000)
+
+    return images, labels
+
 def read_decode_tfrecord_list(file_list):
     ''''Read TFRecord content'''
     reader = tf.TFRecordReader()
@@ -129,14 +145,70 @@ def read_decode_tfrecord_list(file_list):
     #print('Shape (shape) is:', shape.shape)
     image = tf.decode_raw(features['image'], tf.uint8)
     #print('Shape (image) is:', image.shape)
+    label = tf.cast(features['label'], tf.float32)
 
     image.set_shape([256* 256* 3])
     image = tf.reshape(image, [256, 256, 3])
-    image = tf.image.resize_images(image, [66, 200])
-    # Convert from [0, 255] -> [-0.5, 0.5] floats.
-    image = tf.cast(image, tf.float32) * (1. / 255) - 0.5
 
-    label = tf.cast(features['label'], tf.float32)
+    image, label = process_features(image, label)
+
+
+    return image, label
+
+# Reference:
+# http://stackoverflow.com/questions/37299345/using-if-conditions-inside-a-tensorflow-graph
+# https://github.com/tensorflow/models/blob/master/inception/inception/image_processing.py
+# http://stackoverflow.com/questions/42147427/tensorflow-how-to-randomly-crop-input-images-and-labels-in-the-same-way
+# https://indico.io/blog/tensorflow-data-input-part2-extensions/
+# http://stackoverflow.com/questions/36088277/how-to-select-rows-from-a-3-d-tensor-in-tensorflow
+def process_features(image, label):
+    # Do any image preprocessing/augmentation here...
+    with tf.name_scope('process_features'):
+        # Crop upper part of tensor (-130 on numpy)
+        image = tf.slice(image, [100,0,0], [156, 256, 3])
+
+        # Crop bottom part (Front of car)
+        image = tf.slice(image, [0, 0, 0], [120, 256, 3])
+
+        # Resize image
+        image = tf.image.resize_images(image, [66, 200])
+
+        # Change or not change colors
+        def do_color_changes():
+            distorted_image = tf.image.random_brightness(image, max_delta=63)
+            distorted_image = tf.image.random_saturation(distorted_image, lower=0.5, upper=1.5)
+            distorted_image = tf.image.random_hue(distorted_image, max_delta=0.2)
+            distorted_image = tf.image.random_contrast(distorted_image, lower=0.2, upper=1.8)
+            return distorted_image
+
+        def no_color_change():
+            distorted_image = image
+            return distorted_image
+        # Uniform variable in [0,1)
+        flip_coin_color = tf.random_uniform(shape=[], minval=0., maxval=1., dtype=tf.float32)
+        pred_color = tf.less(flip_coin_color, 0.5)
+        # Randomically select doing color augmentation
+        image = tf.cond(pred_color, do_color_changes, no_color_change, name='if_color')
+
+        # Change or not change colors
+        def flip_image_steering():
+            distorted_image = tf.image.flip_left_right(image)
+            distorted_label = -label
+            return distorted_image, distorted_label
+
+        def no_flip_image_steering():
+            distorted_image = image
+            distorted_label = label
+            return distorted_image, distorted_label
+        # Uniform variable in [0,1)
+        flip_coin_flip = tf.random_uniform(shape=[], minval=0., maxval=1., dtype=tf.float32)
+        pred_flip = tf.less(flip_coin_flip, 0.5)
+        # Randomically select doing color augmentation
+        image, label = tf.cond(pred_flip, flip_image_steering, no_flip_image_steering, name='if_steering')
+
+
+        # Convert from [0, 255] -> [-0.5, 0.5] floats.
+        image = tf.cast(image, tf.float32) * (1. / 255) - 0.5
 
     return image, label
 

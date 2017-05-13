@@ -57,13 +57,10 @@ def build_graph_placeholder():
 
 
 def build_graph_no_placeholder(input):
-    y_ = tf.placeholder(tf.float32, shape=[None, 1], name='LABEL_IN')
     dropout_prob = tf.placeholder(tf.float32, name='drop_prob')
-
 
     # Add input image/steering angle on summary
     tf.summary.image("input_image", input, 10)
-    tf.summary.histogram("steer_angle", y_)
 
     # CONV 1 (Mark that want visualization)
     conv1 = util.conv2d(input, 5, 5, 3, 24, 2, "conv1", True)

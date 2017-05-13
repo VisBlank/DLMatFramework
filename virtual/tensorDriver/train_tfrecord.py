@@ -19,22 +19,6 @@ parser.add_argument('--batch', type=int, required=False, default=400, help='Batc
 parser.add_argument('--learning_rate', type=float, required=False, default=0.0001, help='Initial learning rate')
 args = parser.parse_args()
 
-def create_input_graph(list_files, num_epochs, batch_size):
-    with tf.name_scope('input_handler'):
-        filename_queue = tf.train.string_input_producer(list_files, num_epochs=num_epochs)
-
-        # Read files from TFRecord list
-        image, label = util.read_decode_tfrecord_list(filename_queue)
-
-        # Shuffle examples
-        images, labels = tf.train.shuffle_batch(
-            [image, label], batch_size=batch_size, num_threads=3,
-            capacity=1000 + 3 * batch_size,
-            # Ensures a minimum amount of shuffling of examples.
-            min_after_dequeue=1000)
-
-    return images, labels
-
 def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epochs, batch_size, logs_path, save_dir):
 
     # Create log directory if it does not exist
@@ -52,10 +36,13 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
     list_tfrecord_files = HandleData.get_list_from_file(input_list)
 
     # Create the graph input part (Responsible to load files, do augmentations, etc...)
-    images, labels = create_input_graph(list_tfrecord_files, epochs, batch_size)
+    images, labels = util.create_input_graph(list_tfrecord_files, epochs, batch_size)
 
     # Build Graph
     model_out, dropout_prob = model.build_graph_no_placeholder(images)
+
+    # Create histogram for labels
+    tf.summary.histogram("steer_angle", labels)
 
     # Define number of epochs and batch size, where to save logs, etc...
     iter_disp = 10
@@ -143,6 +130,11 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
                 print('Step %d: loss = %.2f (%.3f sec)' % (step, loss_value,
                                                            duration))
             step += 1
+
+            # write logs at every iteration
+            summary = merged_summary_op.eval(feed_dict={dropout_prob: 1.0})
+            summary_writer.add_summary(summary, batch_size + step)
+
     except tf.errors.OutOfRangeError:
         #print('Done training for %d epochs, %d steps.' % (FLAGS.num_epochs, step))
         print('error')
