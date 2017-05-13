@@ -60,6 +60,9 @@ def game_pilot(ip, port, model_path, gpu, crop=130):
         print('Set tensorflow on CPU')
         os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
+    # Build model and get references to placeholders
+    model_in, model_out, labels_in, model_drop = model.build_graph_placeholder()
+
     # Load tensorflow model
     print("Loading model: %s" % model_path)
     sess = tf.InteractiveSession()
@@ -91,7 +94,7 @@ def game_pilot(ip, port, model_path, gpu, crop=130):
             cam_img_res = scipy.misc.imresize(np.array(cam_img)[-crop:], [66, 200]) / 255.0
 
             # Get steering angle from tensorflow model (Also convert from rad to degree)
-            degrees = model.y.eval(feed_dict={model.x: [cam_img_res], model.dropout_prob: 1.0})[0][0]
+            degrees = model_out.eval(feed_dict={model_in: [cam_img_res], model_drop: 1.0})[0][0]
             print(degrees)
 
             # Send command to game here...

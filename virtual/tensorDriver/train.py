@@ -43,6 +43,9 @@ def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint,
     # Regularization value
     L2NormConst = 0.001
 
+    # Build model and get references to placeholders
+    model_in, model_out, labels_in, model_drop = model.build_graph_placeholder()
+
     # Get all model "parameters" that are trainable
     train_vars = tf.trainable_variables()
 
@@ -51,12 +54,12 @@ def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint,
     # tf.nn.l2_loss: Computes half the L2 norm of a tensor without the sqrt
     # output = sum(t ** 2) / 2
     with tf.name_scope("MSE_Loss_L2Reg"):
-        loss = tf.reduce_mean(tf.square(tf.subtract(model.y_, model.y))) + tf.add_n(
+        loss = tf.reduce_mean(tf.square(tf.subtract(labels_in, model_out))) + tf.add_n(
             [tf.nn.l2_loss(v) for v in train_vars]) * L2NormConst
 
     # Add model accuracy
     with tf.name_scope("Loss_Validation"):
-        loss_val = tf.reduce_mean(tf.square(tf.subtract(model.y_, model.y)))
+        loss_val = tf.reduce_mean(tf.square(tf.subtract(labels_in, model_out)))
 
     # Solver configuration
     with tf.name_scope("Solver"):
@@ -104,18 +107,18 @@ def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint,
             xs_train, ys_train = data.LoadTrainBatch(batch_size, should_augment=True)
 
             # Send training batch to tensorflow graph (Dropout enabled)
-            train_step.run(feed_dict={model.x: xs_train, model.y_: ys_train, model.dropout_prob: 0.8})
+            train_step.run(feed_dict={model_in: xs_train, labels_in: ys_train, model_drop: 0.8})
 
             # Display some information each x iterations
             if i % iter_disp == 0:
                 # Get validation batch
                 xs, ys = data.LoadValBatch(batch_size)
                 # Send validation batch to tensorflow graph (Dropout disabled)
-                loss_value = loss_val.eval(feed_dict={model.x: xs, model.y_: ys, model.dropout_prob: 1.0})
+                loss_value = loss_val.eval(feed_dict={model_in: xs, labels_in: ys, model_drop: 1.0})
                 print("Epoch: %d, Step: %d, Loss(Val): %g" % (epoch, epoch * batch_size + i, loss_value))
 
             # write logs at every iteration
-            summary = merged_summary_op.eval(feed_dict={model.x: xs_train, model.y_: ys_train, model.dropout_prob: 1.0})
+            summary = merged_summary_op.eval(feed_dict={model_in: xs_train, labels_in: ys_train, model_drop: 1.0})
             summary_writer.add_summary(summary, epoch * batch_size + i)
 
         # Save checkpoint after each epoch
