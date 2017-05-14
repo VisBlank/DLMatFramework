@@ -112,6 +112,7 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
 
     try:
         step = 0
+        count_model = 0
         while not coord.should_stop():
             start_time = time.time()
 
@@ -127,8 +128,16 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
 
             # Print an overview fairly often.
             if step % 100 == 0:
-                print('Step %d: loss = %.2f (%.3f sec)' % (step, loss_value,
-                                                           duration))
+                print('Step %d: loss = %.2f (%.3f sec)' % (step, loss_value,duration))
+
+                # Save checkpoint after each epoch
+                if not os.path.exists(save_dir):
+                    os.makedirs(save_dir)
+                checkpoint_path = os.path.join(save_dir, "model")
+                filename = saver.save(sess, checkpoint_path, global_step=count_model)
+                print("Model saved in file: %s" % filename)
+                count_model += 1
+
             step += 1
 
             # write logs at every iteration
