@@ -165,11 +165,9 @@ def read_decode_tfrecord_list(file_list):
 def process_features(image, label):
     # Do any image preprocessing/augmentation here...
     with tf.name_scope('process_features'):
-        # Crop upper part of tensor (-130 on numpy)
-        image = tf.slice(image, [100,0,0], [156, 256, 3])
 
-        # Crop bottom part (Front of car)
-        image = tf.slice(image, [0, 0, 0], [120, 256, 3])
+        # Crop driving view (Start from row 126, and slice 100 rows)
+        image = tf.slice(image, [126, 0, 0], [100, 256, 3])
 
         # Resize image
         image = tf.image.resize_images(image, [66, 200])

@@ -51,7 +51,7 @@ parser.add_argument('--top_crop', type=int, required=False, default=130, help='T
 args = parser.parse_args()
 
 
-def game_pilot(ip, port, model_path, gpu, crop=130):
+def game_pilot(ip, port, model_path, gpu, crop_start=126, crop_end=226):
 
     # Set enviroment variable to set the GPU to use
     if gpu != -1:
@@ -91,7 +91,7 @@ def game_pilot(ip, port, model_path, gpu, crop=130):
             time.sleep(0.05)
 
             # Resize image to the format expected by the model
-            cam_img_res = scipy.misc.imresize(np.array(cam_img)[-crop:], [66, 200]) / 255.0
+            cam_img_res = scipy.misc.imresize(np.array(cam_img)[crop_start:crop_end], [66, 200]) / 255.0
 
             # Get steering angle from tensorflow model (Also convert from rad to degree)
             degrees = model_out.eval(feed_dict={model_in: [cam_img_res], model_drop: 1.0})[0][0]
