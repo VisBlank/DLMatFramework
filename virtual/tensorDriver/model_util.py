@@ -147,6 +147,7 @@ def read_decode_tfrecord_list(file_list):
     #print('Shape (image) is:', image.shape)
     label = tf.cast(features['label'], tf.float32)
 
+    # TODO: Infer from shape field from TFRecord
     image.set_shape([256* 256* 3])
     image = tf.reshape(image, [256, 256, 3])
 

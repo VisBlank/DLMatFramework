@@ -3,6 +3,7 @@ import random
 import h5py
 import lmdb
 import numpy as np
+import tensorflow as tf
 from augment_batch import AugmentDrivingBatch
 
 
@@ -119,8 +120,40 @@ class HandleData:
     def get_num_images(self):
         return self.__num_images
 
+    @staticmethod
+    def save_tfrecord(list_tups_train, filename='newTFRecord.tfrec'):
+        '''Save batch to a TFRecord file'''
+        writer = tf.python_io.TFRecordWriter(filename)
+        # Iterate on batch
+        for (tup_element) in list_tups_train:
+            img, steer = tup_element
+            # Convert to numpy array to get bytes more easy
+            shape_info = np.array(img.shape)
 
-    def save_hdf5(self, list_tups_train, filename='newHdf5.h5'):
+            # Describe record entry
+            example = tf.train.Example(
+                # Record description
+                features=tf.train.Features(
+                    feature={
+                        # A Feature contains one of either a int64_list, float_list, or bytes_list
+                        'label': tf.train.Feature(
+                            float_list=tf.train.FloatList(value=[steer])),
+                        'shape': tf.train.Feature(
+                            bytes_list=tf.train.BytesList(value=[shape_info.tobytes()])),
+                        'image': tf.train.Feature(
+                            bytes_list=tf.train.BytesList(value=[img.tobytes()])),
+                    }))
+
+            # use the proto object to serialize the example to a string
+            serialized = example.SerializeToString()
+            # write the serialized object to disk
+            writer.write(serialized)
+
+        # Close file
+        writer.close()
+
+    @staticmethod
+    def save_hdf5(list_tups_train, filename='newHdf5.h5'):
         '''Save batch to a hdf5 file'''
         ys = []
         imgs = []

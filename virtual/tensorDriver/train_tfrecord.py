@@ -130,6 +130,8 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
             if step % 100 == 0:
                 print('Step %d: loss = %.2f (%.3f sec)' % (step, loss_value,duration))
 
+            # Save model
+            if step % 4000 == 0:
                 # Save checkpoint after each epoch
                 if not os.path.exists(save_dir):
                     os.makedirs(save_dir)
