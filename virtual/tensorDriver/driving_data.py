@@ -68,7 +68,7 @@ class HandleData:
             self.__train_xs = self.__xs
             self.__train_ys = self.__ys
 
-    def LoadTrainBatch(self, batch_size, crop_up=130, should_augment=False):
+    def LoadTrainBatch(self, batch_size, crop_start=126, crop_end=226, should_augment=False):
         '''Load training batch, if batch_size=-1 load all dataset'''
         x_out = []
         y_out = []
@@ -83,7 +83,7 @@ class HandleData:
             # image = scipy.misc.imread(train_xs[(train_batch_pointer + i) % num_train_images], mode="RGB")
             image = self.__train_xs[(self.__train_batch_pointer + i) % self.__num_train_images]
             # Crop top, resize to 66x200 and divide by 255.0
-            image = scipy.misc.imresize(image[-crop_up:], [66, 200]) / 255.0
+            image = scipy.misc.imresize(image[crop_start:crop_end], [66, 200]) / 255.0
             x_out.append(image)
             y_out.append([self.__train_ys[(self.__train_batch_pointer + i) % self.__num_train_images]])
             self.__train_batch_pointer += batch_size
@@ -97,7 +97,7 @@ class HandleData:
 
         return x_out, y_out
 
-    def LoadValBatch(self, batch_size, crop_up=130):
+    def LoadValBatch(self, batch_size, crop_start=126, crop_end=226):
         '''Load validation batch, if batch_size=-1 load all dataset'''
         x_out = []
         y_out = []
@@ -111,7 +111,7 @@ class HandleData:
             # image = scipy.misc.imread(val_xs[(val_batch_pointer + i) % num_val_images], mode="RGB")
             image = self.__val_xs[(self.__val_batch_pointer + i) % self.__num_val_images]
             # Crop top, resize to 66x200 and divide by 255.0
-            image = scipy.misc.imresize(image[-crop_up:], [66, 200]) / 255.0
+            image = scipy.misc.imresize(image[crop_start:crop_end], [66, 200]) / 255.0
             x_out.append(image)
             y_out.append([self.__val_ys[(self.__val_batch_pointer + i) % self.__num_val_images]])
             self.__val_batch_pointer += batch_size

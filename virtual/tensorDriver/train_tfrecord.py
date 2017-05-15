@@ -76,7 +76,7 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
         starter_learning_rate = start_lr
         # decay every 10000 steps with a base of 0.96
         learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step,
-                                                   1000, 0.9, staircase=True)
+                                                   1000, 0.5, staircase=True)
 
         train_step = tf.train.AdamOptimizer(learning_rate).minimize(loss, global_step=global_step)
 
