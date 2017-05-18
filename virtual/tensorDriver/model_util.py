@@ -211,3 +211,21 @@ def process_features(image, label):
 
     return image, label
 
+
+# Define the huber loss (More resilient against outliers)
+def huber_loss(self, delta=1.0):
+    with tf.name_scope('Huber_Loss'):
+        # Calculate a residual difference (error)
+        residual = tf.abs(self.labels - self.pred)
+
+        # Check if error is bigger than a delta
+        condition = tf.less(residual, delta)
+
+        # Absolute error
+        small_res = 0.5 * tf.square(residual)
+
+        # L2
+        large_res = (delta * residual) - 0.5 * tf.square(delta)
+
+        # Decide between L2 and absolute error
+        return tf.where(condition, small_res, large_res)
