@@ -96,18 +96,29 @@ def get_angle_from_file():
 
 # Service that will return an angle given some data
 # From matlab this would be
-# webwrite('127.0.0.1:8090/angle_from_data);
+# A = [1,2,3; 4, 5, 6]
+# options = weboptions('MediaType','application/json');
+# webwrite('http://127.0.0.1:8090/angle_from_data',jsonencode(struct('rows',2,'cols',3,'data',A)), options)
 @app.route('/angle_from_data', methods=['POST'])
 def get_angle_from_data():
     # Get data from json request
     request_rows = request.json['rows']
     request_cols = request.json['cols']
+    request_depth = request.json['depth']
     request_data = request.json['data']
 
     # Transform data to numpy array
-    input = np.array(request_data, dtype=np.uint8).reshape([int(request_rows),int(request_cols)])
+    img_array = np.array(request_data, dtype=np.uint8).reshape([int(request_depth), int(request_rows),int(request_cols)])
 
-    return jsonify({'angle': '0.3'})
+    # Do some image processing
+    #img_array = pre_proc_img(img_array)
+
+    # Get steering angle from tensorflow model (Also convert from rad to degree)
+    #degrees = sess.run(model_out, feed_dict={model_in: [img_array], model_drop: 1.0})[0][0]
+
+    #return jsonify(output=float(degrees))
+    print(img_array)
+    return jsonify(output=float(0.1))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True, port=args.port)
