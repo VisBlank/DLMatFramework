@@ -21,6 +21,7 @@ import scipy.misc
 import model
 import io
 from PIL import Image
+import matplotlib.pyplot as plt
 
 # Force to see just the first GPU
 # https://devblogs.nvidia.com/parallelforall/cuda-pro-tip-control-gpu-visibility-cuda_visible_devices/
@@ -121,6 +122,9 @@ def get_angle_from_data():
 
     # Transform data to numpy array
     img_array = np.array(request_data, dtype=np.uint8).reshape([int(request_rows),int(request_cols), int(request_depth)])
+
+    plt.imshow(img_array)
+    plt.show()
 
     # Do some image processing
     img_array = pre_proc_img(img_array)
