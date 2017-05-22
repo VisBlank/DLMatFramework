@@ -7,6 +7,9 @@ References:
     http://stackoverflow.com/questions/4628529/how-can-i-created-a-pil-image-from-an-in-memory-file
     https://uk.mathworks.com/help/matlab/ref/webread.html
     https://uk.mathworks.com/help/matlab/ref/webwrite.html
+    http://uk.mathworks.com/matlabcentral/fileexchange/59673-upload-a-file-to-dropbox-directly-from-matlab
+    https://uk.mathworks.com/help/matlab/ref/jsonencode.html
+    https://uk.mathworks.com/help/mps/restfuljson/json-representation-of-matlab-data-types.html
 '''
 
 # Import Flask stuff
@@ -64,15 +67,10 @@ sess, model_in, model_out, labels_in, model_drop = init_tensorflow_model(args.gp
 # Add app to use flask
 app = Flask(__name__)
 
-# This will fire when you access from the web browser the address 127.0.0.1:8090:/
-@app.route('/', methods=['GET'])
-def test():
-    return jsonify({'message' : 'It works!'})
-
 
 # Service that will return an angle given an image
 # From matlab this would be
-# webread('127.0.0.1:8090/angle_from_file);
+# webwrite('127.0.0.1:8090/angle_from_file);
 @app.route('/angle_from_file', methods=['POST'])
 def get_angle_from_file():
     # Get image file from json request
@@ -98,12 +96,18 @@ def get_angle_from_file():
 
 # Service that will return an angle given some data
 # From matlab this would be
-# webread('127.0.0.1:8090/angle_from_file);
+# webwrite('127.0.0.1:8090/angle_from_data);
 @app.route('/angle_from_data', methods=['POST'])
 def get_angle_from_data():
-    # Get input from json
-    input = ((255 - np.array(request.json, dtype=np.uint8)) / 255.0).reshape(1, 784)
+    # Get data from json request
+    request_rows = request.json['rows']
+    request_cols = request.json['cols']
+    request_data = request.json['data']
+
+    # Transform data to numpy array
+    input = np.array(request_data, dtype=np.uint8).reshape([int(request_rows),int(request_cols)])
+
     return jsonify({'angle': '0.3'})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=args.port)
+    app.run(host='0.0.0.0', debug=True, port=args.port)
