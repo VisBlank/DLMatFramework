@@ -120,11 +120,10 @@ def get_angle_from_data():
     request_data = request.json['data']
 
     # Transform data to numpy array
-    img_array = np.array(request_data, dtype=np.uint8).reshape([int(request_depth), int(request_rows),int(request_cols)])
+    img_array = np.array(request_data, dtype=np.uint8).reshape([int(request_rows),int(request_cols), int(request_depth)])
 
     # Do some image processing
-    #img_array = pre_proc_img(img_array)
-    img_array = scipy.misc.imresize(img_array[126:226], [66, 200]) / 255.0
+    img_array = pre_proc_img(img_array)
 
     # Get steering angle from tensorflow model (Also convert from rad to degree)
     degrees = sess.run(model_out, feed_dict={model_in: [img_array], model_drop: 1.0})[0][0]
