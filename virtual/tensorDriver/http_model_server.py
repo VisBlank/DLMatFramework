@@ -94,11 +94,23 @@ def get_angle_from_file():
     return jsonify(output=float(degrees))
 
 
-# Service that will return an angle given some data
+
+'''
+Service that will return an angle given some data
+JSON format
+{
+	"rows": "2",
+	"cols": "3",
+	"depth": "1",
+	"data": [1,2,3,4,5,6]
+}
+
 # From matlab this would be
 # A = [1,2,3; 4, 5, 6]
 # options = weboptions('MediaType','application/json');
 # webwrite('http://127.0.0.1:8090/angle_from_data',jsonencode(struct('rows',2,'cols',3,'depth',1,'data',A)), options)
+
+'''
 @app.route('/angle_from_data', methods=['POST'])
 def get_angle_from_data():
     # Get data from json request
