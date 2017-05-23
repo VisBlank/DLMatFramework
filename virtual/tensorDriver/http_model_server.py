@@ -1,6 +1,8 @@
 '''
 HTTP Rest server for allowing the model to be infered from a json type request
 References:
+    https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
+    https://s3.us-east-2.amazonaws.com/prettyprinted/flask_cheatsheet.pdf
     https://github.com/sugyan/tensorflow-mnist
     https://github.com/benman1/tensorflow_flask
     https://github.com/sofeikov/WebImageCrop/blob/master/main.py
