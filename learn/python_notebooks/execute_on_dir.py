@@ -12,6 +12,7 @@ References:
     https://github.com/google/python-fire
     https://stackoverflow.com/questions/1685157/python-specify-popen-working-directory-via-argument
     https://github.com/google/python-fire
+    https://stackoverflow.com/questions/21406887/subprocess-changing-directory
     
 '''
 import fire
