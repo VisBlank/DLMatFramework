@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 from model import CNNDriver
 
 # Hyper Parameters
-num_epochs = 5
+num_epochs = 10
 batch_size = 50
 learning_rate = 0.001
 
@@ -16,7 +16,7 @@ cnn = CNNDriver()
 cnn = cnn.cuda()
 
 transformations = transforms.Compose([
-    transforms.RandomCrop((66, 200)),transforms.RandomHorizontalFlip(),
+    transforms.RandomCrop((66, 200)),
     transforms.ToTensor()])
 
 # Instantiate a dataset
@@ -31,7 +31,7 @@ train_loader = DataLoader(dset_train,
 
 
 # Loss and Optimizer
-criterion = nn.MSELoss()
+loss_func = nn.MSELoss()
 optimizer = torch.optim.Adam(cnn.parameters(), lr=learning_rate)
 
 print('Train size:',len(dset_train), 'Batch size:', 400)
@@ -49,7 +49,7 @@ for epoch in range(num_epochs):
         # Forward + Backward + Optimize
         optimizer.zero_grad()
         outputs = cnn(images)
-        loss = criterion(outputs, labels)
+        loss = loss_func(outputs, labels)
         loss.backward()
         optimizer.step()
 
@@ -57,3 +57,6 @@ for epoch in range(num_epochs):
             print('Epoch [%d/%d] Loss: %.4f' % (epoch + 1, num_epochs, loss.data[0]))
 
         iteration_count += 1
+
+# Save the Trained Model parameters
+torch.save(cnn.state_dict(), 'cnn.pkl')

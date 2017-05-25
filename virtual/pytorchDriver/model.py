@@ -1,8 +1,8 @@
 # References
 # https://github.com/vinhkhuc/PyTorch-Mini-Tutorials
-import torch.nn as nn
-import torch.nn.functional as F
+# https://arxiv.org/pdf/1604.07316.pdf
 
+import torch.nn as nn
 
 class CNNDriver(nn.Module):
     def __init__(self):
@@ -51,6 +51,7 @@ class CNNDriver(nn.Module):
         self.out = nn.Linear(10, 1)
 
     def forward(self, x):
+        # The expected image size is 66x200
         layer1 = self.layer1.forward(x)
         layer2 = self.layer2.forward(layer1)
         layer3 = self.layer3.forward(layer2)
