@@ -83,6 +83,7 @@ def game_pilot(ip, port, model_path, gpu, crop_start=126, crop_end=226):
     # Run until Crtl-C
     try:
         list_records = []
+        degrees = 0
         while True:
             # Get telemetry and image
             telemetry = comm.get_game_data()
@@ -92,28 +93,31 @@ def game_pilot(ip, port, model_path, gpu, crop_start=126, crop_end=226):
             if (cam_img is None) or (telemetry is None):
                 continue
 
-            # Sleep for 50ms
-            time.sleep(0.05)
-
+            start = time.time()
             # Resize image to the format expected by the model
             cam_img_res = scipy.misc.imresize(np.array(cam_img)[crop_start:crop_end], [66, 200]) / 255.0
-            cam_img_res = cam_img_res.transpose([2, 0, 1])
+            cam_img_res = cam_img_res.transpose([2, 0, 1]).astype(np.float32)
             cam_img_res = np.expand_dims(cam_img_res, axis=0)
-            cam_img_res = Variable(torch.from_numpy(cam_img_res).float(), requires_grad=False)
+            cam_img_res = Variable(torch.from_numpy(cam_img_res), requires_grad=False)
             cam_img_res = cam_img_res.cuda()
 
-            # Get steering angle from model (Current problem to slow...)
+            # Get steering angle from model
             degrees = cnn(cam_img_res)
 
             # Convert to numpy
-            degrees = degrees.data.cpu().numpy()
+            degrees = float(degrees.data.cpu().numpy())
+            #time.sleep(0.55)
+            end = time.time()
+            elapsed_seconds = float("%.2f" % (end - start))
+            #print('Elapsed time:', elapsed_seconds, 'angle:', degrees)
 
-            #degrees = 0
 
             # Send command to game here...
             commands = [degrees, 0.5]
             comm.send_command(commands)
 
+            # Sleep for 50ms
+            time.sleep(0.05)
     except KeyboardInterrupt:
         pass
 
