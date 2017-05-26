@@ -85,6 +85,9 @@ def game_pilot(ip, port, model_path, gpu, crop_start=126, crop_end=226):
         list_records = []
         degrees = 0
         while True:
+            # Sleep for 50ms
+            time.sleep(0.05)
+
             # Get telemetry and image
             telemetry = comm.get_game_data()
             cam_img = comm.get_image()
@@ -109,15 +112,13 @@ def game_pilot(ip, port, model_path, gpu, crop_start=126, crop_end=226):
             #time.sleep(0.55)
             end = time.time()
             elapsed_seconds = float("%.2f" % (end - start))
-            #print('Elapsed time:', elapsed_seconds, 'angle:', degrees)
+            print('Elapsed time:', elapsed_seconds, 'angle:', degrees)
 
 
             # Send command to game here...
             commands = [degrees, 0.5]
             comm.send_command(commands)
 
-            # Sleep for 50ms
-            time.sleep(0.05)
     except KeyboardInterrupt:
         pass
 

@@ -16,7 +16,6 @@ cnn = CNNDriver()
 cnn = cnn.cuda()
 
 transformations = transforms.Compose([
-    transforms.RandomCrop((66, 200)),
     transforms.ToTensor()])
 
 # Instantiate a dataset

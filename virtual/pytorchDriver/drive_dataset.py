@@ -2,6 +2,7 @@ import numpy as np
 import torch
 from torch.utils.data.dataset import Dataset
 from PIL import Image
+import scipy.misc
 
 class DriveData(Dataset):
     __xs = []
@@ -19,8 +20,13 @@ class DriveData(Dataset):
 
     # Override to give PyTorch access to any image on the dataset
     def __getitem__(self, index):
-        img = Image.open(self.__xs[index])
-        img = img.convert('RGB')
+        #img = Image.open(self.__xs[index])
+        #img = img.convert('RGB')
+        #img_np = np.array(img)
+        #img_np = img_np[126:200] / 255.0
+        #img = img.crop(126,0,100,256)
+        img = scipy.misc.imread(self.__xs[index], mode="RGB")
+        img = scipy.misc.imresize(img[126:226], [66, 200]) / 255.0
 
         # Do Transformations on the image
         if self.transform is not None:
