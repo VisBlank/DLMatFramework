@@ -72,8 +72,8 @@ def game_pilot(ip, port, model_path, gpu, crop_start=126, crop_end=226):
     print("Loading model: %s" % model_path)
     cnn = CNNDriver()
     cnn.load_state_dict(torch.load(model_path))
-    cnn = cnn.cuda()
     cnn.eval()
+    cnn = cnn.cuda()
 
 
     print(ip)
