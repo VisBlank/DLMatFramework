@@ -48,7 +48,7 @@ class CNNDriver(nn.Module):
         self.fc4.add_module("relu_9", nn.ReLU())
         self.fc4.add_module("dropout_4", nn.Dropout())
 
-        self.out = nn.Linear(10, 1)
+        self.fc_out = nn.Linear(10, 1)
 
     def forward(self, x):
         # The expected image size is 66x200
@@ -58,7 +58,7 @@ class CNNDriver(nn.Module):
         layer4 = self.layer4.forward(layer3)
         layer5 = self.layer5.forward(layer4)
 
-        # Reshape layer5 activation
+        # Reshape layer5 activation to a vector
         layer5_reshape = layer5.view(layer5.size(0), -1)
 
         fc1 = self.fc1.forward(layer5_reshape)
@@ -66,5 +66,5 @@ class CNNDriver(nn.Module):
         fc3 = self.fc3.forward(fc2)
         fc4 = self.fc4.forward(fc3)
 
-        out = self.out(fc4)
+        out = self.fc_out(fc4)
         return out
