@@ -18,12 +18,13 @@ viz = Visdom()
 hist_labels = None
 
 # Hyper Parameters
-num_epochs = 10
+num_epochs = 1000
 batch_size = 4000
 learning_rate = 0.01
 L2NormConst = 0.001
 
 cnn = CNNDriver()
+print(cnn)
 # Put model on GPU
 cnn = cnn.cuda()
 
@@ -87,7 +88,7 @@ for epoch in range(num_epochs):
             hist_labels = viz.histogram(labels.data.cpu().numpy(), opts=dict(title='Labels histogram epoch='+str(epoch)))
             hist_output = viz.histogram(outputs.data.cpu().numpy(), opts=dict(title='Output histogram epoch='+str(epoch)))
             video_visdom = images.data.cpu().numpy() * 255.0
-            grid_batch = viz.images(video_visdom[0:15], opts=dict(title='Batch images sample'))
+            grid_batch = viz.images(video_visdom[:16], opts=dict(title='Batch images sample'))
             #viz.video(video_visdom)
 
             # Save the Trained Model parameters
