@@ -76,7 +76,8 @@ def game_pilot(ip, port, model_path, gpu, crop_start=126, crop_end=226):
     cnn.eval()
     cnn = cnn.cuda()
 
-
+    transformations = transforms.Compose([
+        transforms.ToTensor(), transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])])
 
     print(ip)
     print(port)
@@ -102,12 +103,13 @@ def game_pilot(ip, port, model_path, gpu, crop_start=126, crop_end=226):
 
             start = time.time()
             # Resize image to the format expected by the model
-            cam_img_res = (scipy.misc.imresize(np.array(cam_img)[crop_start:crop_end], [66, 200]) )
-            cam_img_res = cam_img_res.transpose([2, 0, 1]).astype(np.float32)
-            trfNorm = transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
-            torch_tensor = torch.from_numpy(cam_img_res).unsqueeze(0)
-            torch_tensor = trfNorm(torch_tensor)
-            cam_img_res = Variable(torch.from_numpy(cam_img_res).unsqueeze(0), volatile=True)
+            cam_img_res = (scipy.misc.imresize(np.array(cam_img)[crop_start:crop_end], [66, 200]))
+            #cam_img_res = cam_img_res.transpose([2, 0, 1]).astype(np.float32)
+            #cam_img_res = np.expand_dims(cam_img_res, axis=0)
+            #torch_tensor = torch.from_numpy(cam_img_res).unsqueeze(0)
+            #torch_tensor = trfNorm(torch_tensor)
+            torch_tensor = transformations(cam_img_res)
+            cam_img_res = Variable(torch_tensor.unsqueeze(0), volatile=True)
             cam_img_res = cam_img_res.cuda()
 
             # Get steering angle from model

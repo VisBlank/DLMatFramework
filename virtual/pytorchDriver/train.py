@@ -18,9 +18,9 @@ viz = Visdom()
 hist_labels = None
 
 # Hyper Parameters
-num_epochs = 10
-batch_size = 400
-learning_rate = 0.0001
+num_epochs = 100
+batch_size = 4000
+learning_rate = 0.01
 L2NormConst = 0.001
 
 cnn = CNNDriver()
@@ -69,8 +69,8 @@ for epoch in range(num_epochs):
 
         # Forward + Backward + Optimize
         outputs = cnn(images)
-        loss = loss_func(outputs, labels)
-        #loss = (outputs - labels).pow(2).sum() / batch_size
+        #loss = loss_func(outputs, labels)
+        loss = (outputs - labels).pow(2).sum() / outputs.size(0)
 
         loss.backward()
         optimizer.step()
