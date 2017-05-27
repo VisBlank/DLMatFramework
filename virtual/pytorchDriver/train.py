@@ -18,9 +18,9 @@ viz = Visdom()
 hist_labels = None
 
 # Hyper Parameters
-num_epochs = 5
+num_epochs = 10
 batch_size = 400
-learning_rate = 0.01
+learning_rate = 0.0001
 L2NormConst = 0.001
 
 cnn = CNNDriver()
@@ -30,7 +30,7 @@ print(cnn)
 cnn = cnn.cuda()
 
 transformations = transforms.Compose([
-    transforms.ToTensor()])
+    transforms.ToTensor(), transforms.Normalize(mean = [ 0.5, 0.5, 0.5 ],std = [ 0.5, 0.5, 0.5 ])])
 
 # Instantiate a dataset
 dset_train = DriveData('./Track1_Wheel/', transformations)
@@ -69,8 +69,8 @@ for epoch in range(num_epochs):
 
         # Forward + Backward + Optimize
         outputs = cnn(images)
-        #loss = loss_func(outputs, labels)
-        loss = (outputs - labels).pow(2).sum()
+        loss = loss_func(outputs, labels)
+        #loss = (outputs - labels).pow(2).sum() / batch_size
 
         loss.backward()
         optimizer.step()
@@ -88,7 +88,7 @@ for epoch in range(num_epochs):
             # Vizualize some stuff
             hist_labels = viz.histogram(labels.data.cpu().numpy(), opts=dict(title='Labels histogram epoch='+str(epoch)))
             hist_output = viz.histogram(outputs.data.cpu().numpy(), opts=dict(title='Output histogram epoch='+str(epoch)))
-            video_visdom = images.data.cpu().numpy() * 255.0
+            video_visdom = images.data.cpu().numpy()
             grid_batch = viz.images(video_visdom[:16], opts=dict(title='Batch images sample'))
             #viz.video(video_visdom)
 

@@ -1,6 +1,9 @@
 # References
 # https://github.com/vinhkhuc/PyTorch-Mini-Tutorials
 # https://arxiv.org/pdf/1604.07316.pdf
+# https://discuss.pytorch.org/t/weight-initilzation/157/41
+# https://github.com/pytorch/vision
+# https://github.com/pytorch/examples/blob/master/word_language_model/model.py
 
 import torch.nn as nn
 
