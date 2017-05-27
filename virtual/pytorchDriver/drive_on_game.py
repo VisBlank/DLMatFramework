@@ -101,7 +101,7 @@ def game_pilot(ip, port, model_path, gpu, crop_start=126, crop_end=226):
 
             start = time.time()
             # Resize image to the format expected by the model
-            cam_img_res = (scipy.misc.imresize(np.array(cam_img)[crop_start:crop_end], [66, 200]) - 128.0) / 255.0
+            cam_img_res = (scipy.misc.imresize(np.array(cam_img)[crop_start:crop_end], [66, 200])) / 255.0
             cam_img_res = cam_img_res.transpose([2, 0, 1]).astype(np.float32)
             cam_img_res = Variable(torch.from_numpy(cam_img_res).unsqueeze(0), requires_grad=False)
             cam_img_res = cam_img_res.cuda()
