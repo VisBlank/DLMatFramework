@@ -51,7 +51,7 @@ class GameRecord:
 parser = argparse.ArgumentParser(description='Drive inside game')
 parser.add_argument('--ip', type=str, required=False, default='127.0.0.1', help='Server IP address')
 parser.add_argument('--port', type=int, required=False, default=50007, help='Server TCP/IP port')
-parser.add_argument('--model', type=str, required=False, default='cnn.pkl', help='Trained driver model')
+parser.add_argument('--model', type=str, required=False, default='cnn_0.pkl', help='Trained driver model')
 parser.add_argument('--gpu', type=int, required=False, default=0, help='GPU number (-1) for CPU')
 parser.add_argument('--top_crop', type=int, required=False, default=126, help='Top crop to avoid horizon')
 parser.add_argument('--bottom_crop', type=int, required=False, default=226, help='Bottom crop to avoid front of car')
@@ -74,6 +74,7 @@ def game_pilot(ip, port, model_path, gpu, crop_start=126, crop_end=226):
     cnn.load_state_dict(torch.load(model_path))
     cnn.eval()
     cnn = cnn.cuda()
+
 
 
     print(ip)
@@ -100,7 +101,7 @@ def game_pilot(ip, port, model_path, gpu, crop_start=126, crop_end=226):
 
             start = time.time()
             # Resize image to the format expected by the model
-            cam_img_res = scipy.misc.imresize(np.array(cam_img)[crop_start:crop_end], [66, 200]) / 255.0
+            cam_img_res = (scipy.misc.imresize(np.array(cam_img)[crop_start:crop_end], [66, 200]) - 128.0) / 255.0
             cam_img_res = cam_img_res.transpose([2, 0, 1]).astype(np.float32)
             cam_img_res = Variable(torch.from_numpy(cam_img_res).unsqueeze(0), requires_grad=False)
             cam_img_res = cam_img_res.cuda()

@@ -30,7 +30,7 @@ class DriveData(Dataset):
     # Override to give PyTorch access to any image on the dataset
     def __getitem__(self, index):
         img = scipy.misc.imread(self.__xs[index], mode="RGB")
-        img = scipy.misc.imresize(img[126:226], [66, 200]) / 255.0
+        img = (scipy.misc.imresize(img[126:226], [66, 200]) - 128.0) / 255.0
 
         # Do Transformations on the image
         if self.transform is not None:

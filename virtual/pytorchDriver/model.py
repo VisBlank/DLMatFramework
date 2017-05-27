@@ -31,22 +31,22 @@ class CNNDriver(nn.Module):
         self.fc1 = nn.Sequential()
         self.fc1.add_module("fc1", nn.Linear(1152, 1164))
         self.fc1.add_module("relu_6", nn.ReLU())
-        self.fc1.add_module("dropout_1", nn.Dropout())
+        self.fc1.add_module("dropout_1", nn.Dropout(p=0.8))
 
         self.fc2 = nn.Sequential()
         self.fc2.add_module("fc2", nn.Linear(1164, 100))
         self.fc2.add_module("relu_7", nn.ReLU())
-        self.fc2.add_module("dropout_2", nn.Dropout())
+        self.fc2.add_module("dropout_2", nn.Dropout(p=0.8))
 
         self.fc3 = nn.Sequential()
         self.fc3.add_module("fc3", nn.Linear(100, 50))
         self.fc3.add_module("relu_8", nn.ReLU())
-        self.fc3.add_module("dropout_3", nn.Dropout())
+        self.fc3.add_module("dropout_3", nn.Dropout(p=0.8))
 
         self.fc4 = nn.Sequential()
         self.fc4.add_module("fc4", nn.Linear(50, 10))
         self.fc4.add_module("relu_9", nn.ReLU())
-        self.fc4.add_module("dropout_4", nn.Dropout())
+        self.fc4.add_module("dropout_4", nn.Dropout(p=0.8))
 
         self.fc_out = nn.Linear(10, 1)
 
@@ -66,5 +66,5 @@ class CNNDriver(nn.Module):
         fc3 = self.fc3.forward(fc2)
         fc4 = self.fc4.forward(fc3)
 
-        out = self.fc_out(fc4)
-        return out
+        fc_out = self.fc_out(fc4)
+        return fc_out

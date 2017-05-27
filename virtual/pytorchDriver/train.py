@@ -18,12 +18,13 @@ viz = Visdom()
 hist_labels = None
 
 # Hyper Parameters
-num_epochs = 1000
+num_epochs = 5
 batch_size = 400
 learning_rate = 0.01
 L2NormConst = 0.001
 
 cnn = CNNDriver()
+cnn.train()
 print(cnn)
 # Put model on GPU
 cnn = cnn.cuda()
