@@ -19,7 +19,7 @@ hist_labels = None
 
 # Hyper Parameters
 num_epochs = 1000
-batch_size = 4000
+batch_size = 400
 learning_rate = 0.01
 L2NormConst = 0.001
 
@@ -68,8 +68,8 @@ for epoch in range(num_epochs):
 
         # Forward + Backward + Optimize
         outputs = cnn(images)
-        loss = loss_func(outputs, labels)
-        #loss = (outputs - labels).pow(2).sum()
+        #loss = loss_func(outputs, labels)
+        loss = (outputs - labels).pow(2).sum()
 
         loss.backward()
         optimizer.step()

@@ -39,6 +39,7 @@ class DriveData(Dataset):
         # #img = torch.from_numpy(np.asarray(img)) (We have a transform to do the job)
         # Convert label to torch tensors
         label = self.__ys[index]
+        #label = np.float32(-1.0)
         label = torch.from_numpy(np.asarray(label).reshape([1, 1]))
         return img, label
 
