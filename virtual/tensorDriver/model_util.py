@@ -120,11 +120,18 @@ def create_input_graph(list_files, num_epochs, batch_size):
         image, label = read_decode_tfrecord_list(filename_queue)
 
         # Shuffle examples
-        images, labels = tf.train.shuffle_batch(
-            [image, label], batch_size=batch_size, num_threads=3,
-            capacity=1000 + 3 * batch_size,
+        #images, labels = tf.train.shuffle_batch (
+        #    [image, label], batch_size=batch_size, num_threads=3,
+        #    capacity=50000,
+        #    # Ensures a minimum amount of shuffling of examples.
+        #    min_after_dequeue=10000)
+        example_list = [read_decode_tfrecord_list(filename_queue)
+                        for _ in range(3)]
+        images, labels = tf.train.shuffle_batch_join(
+            example_list, batch_size=batch_size,
+            capacity=50000,
             # Ensures a minimum amount of shuffling of examples.
-            min_after_dequeue=1000)
+            min_after_dequeue=10000)
 
     return images, labels
 
@@ -207,7 +214,7 @@ def process_features(image, label):
 
 
         # Convert from [0, 255] -> [-0.5, 0.5] floats.
-        image = tf.cast(image, tf.float32) * (1. / 255) - 0.5
+        image = tf.cast(image, tf.float32) * (1. / 255.0)
 
     return image, label
 

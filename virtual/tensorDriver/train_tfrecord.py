@@ -130,8 +130,13 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
             if step % 100 == 0:
                 print('Step %d: loss = %.2f (%.3f sec)' % (step, loss_value,duration))
 
+            if step % iter_disp == 0:
+                # write logs
+                summary = merged_summary_op.eval(feed_dict={dropout_prob: 1.0})
+                summary_writer.add_summary(summary, batch_size + step)
+
             # Save model
-            if step % 4000 == 0:
+            if step % 400 == 0:
                 # Save checkpoint after each epoch
                 if not os.path.exists(save_dir):
                     os.makedirs(save_dir)
@@ -141,10 +146,6 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
                 count_model += 1
 
             step += 1
-
-            # write logs at every iteration
-            summary = merged_summary_op.eval(feed_dict={dropout_prob: 1.0})
-            summary_writer.add_summary(summary, batch_size + step)
 
     except tf.errors.OutOfRangeError:
         #print('Done training for %d epochs, %d steps.' % (FLAGS.num_epochs, step))
