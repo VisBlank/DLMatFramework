@@ -39,10 +39,14 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
     images, labels = util.create_input_graph(list_tfrecord_files, epochs, batch_size)
 
     # Build Graph
-    model_out, dropout_prob = model.build_graph_no_placeholder(images)
+    driving_model = model.DrivingModel(input=images, use_placeholder = False)
+    model_out = driving_model.output
+    dropout_prob = driving_model.dropout_control
 
     # Create histogram for labels
     tf.summary.histogram("steer_angle", labels)
+    # Add input image/steering angle on summary
+    tf.summary.image("input_image", images, 10)
 
     # Define number of epochs and batch size, where to save logs, etc...
     iter_disp = 10
@@ -55,20 +59,16 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
     # Regularization value
     L2NormConst = 0.001
 
-    # Get all model "parameters" that are trainable
-    train_vars = tf.trainable_variables()
-
     # Loss is mean squared error plus l2 regularization
     # model.y (Model output), model.y_(Labels)
     # tf.nn.l2_loss: Computes half the L2 norm of a tensor without the sqrt
     # output = sum(t ** 2) / 2
+    # Get all model "parameters" that are trainable
+    train_vars = tf.trainable_variables()
     with tf.name_scope("MSE_Loss_L2Reg"):
         loss = tf.reduce_mean(tf.square(tf.subtract(labels, model_out))) + tf.add_n(
             [tf.nn.l2_loss(v) for v in train_vars]) * L2NormConst
 
-    # Add model accuracy
-    with tf.name_scope("Loss_Validation"):
-        loss_val = tf.reduce_mean(tf.square(tf.subtract(labels, model_out)))
 
     # Solver configuration
     with tf.name_scope("Solver"):
@@ -101,7 +101,6 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
 
     # Monitor loss, learning_rate, global_step, etc...
     tf.summary.scalar("loss_train", loss)
-    tf.summary.scalar("loss_val", loss_val)
     tf.summary.scalar("learning_rate", learning_rate)
     tf.summary.scalar("global_step", global_step)
     # merge all summaries into a single op

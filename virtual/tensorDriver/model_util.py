@@ -131,7 +131,7 @@ def create_input_graph(list_files, num_epochs, batch_size):
             example_list, batch_size=batch_size,
             capacity=50000,
             # Ensures a minimum amount of shuffling of examples.
-            min_after_dequeue=10000)
+            min_after_dequeue=5000)
 
     return images, labels
 

@@ -44,15 +44,23 @@ def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint,
     L2NormConst = 0.001
 
     # Build model and get references to placeholders
-    model_in, model_out, labels_in, model_drop = model.build_graph_placeholder()
+    driving_model = model.DrivingModel()
+    model_in = driving_model.input
+    model_out = driving_model.output
+    labels_in = driving_model.label_in
+    model_drop = driving_model.dropout_control
 
-    # Get all model "parameters" that are trainable
-    train_vars = tf.trainable_variables()
+    # Create histogram for labels
+    tf.summary.histogram("steer_angle", labels_in)
+    # Add input image/steering angle on summary
+    tf.summary.image("input_image", model_in, 10)
 
     # Loss is mean squared error plus l2 regularization
     # model.y (Model output), model.y_(Labels)
     # tf.nn.l2_loss: Computes half the L2 norm of a tensor without the sqrt
     # output = sum(t ** 2) / 2
+    # Get all model "parameters" that are trainable
+    train_vars = tf.trainable_variables()
     with tf.name_scope("MSE_Loss_L2Reg"):
         loss = tf.reduce_mean(tf.square(tf.subtract(labels_in, model_out))) + tf.add_n(
             [tf.nn.l2_loss(v) for v in train_vars]) * L2NormConst
