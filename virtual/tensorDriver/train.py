@@ -70,6 +70,9 @@ def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint,
         loss_val = tf.reduce_mean(tf.square(tf.subtract(labels_in, model_out)))
 
     # Solver configuration
+    # Get ops to update moving_mean and moving_variance from batch_norm
+    # Reference: https://www.tensorflow.org/api_docs/python/tf/contrib/layers/batch_norm
+    update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
     with tf.name_scope("Solver"):
         global_step = tf.Variable(0, trainable=False)
         starter_learning_rate = start_lr
@@ -77,7 +80,10 @@ def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint,
         learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step,
                                                    1000, 0.9, staircase=True)
 
-        train_step = tf.train.AdamOptimizer(learning_rate).minimize(loss, global_step=global_step)
+        # Basically update the batch_norm moving averages before the training step
+        # http://ruishu.io/2016/12/27/batchnorm/
+        with tf.control_dependencies(update_ops):
+            train_step = tf.train.AdamOptimizer(learning_rate).minimize(loss, global_step=global_step)
 
     # Initialize all random variables (Weights/Bias)
     sess.run(tf.global_variables_initializer())
