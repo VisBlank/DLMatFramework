@@ -181,10 +181,10 @@ def process_features(image, label):
 
         # Change or not change colors
         def do_color_changes():
-            distorted_image = tf.image.random_brightness(image, max_delta=63)
+            distorted_image = tf.image.random_brightness(image, max_delta=32. / 255.)
             distorted_image = tf.image.random_saturation(distorted_image, lower=0.5, upper=1.5)
             distorted_image = tf.image.random_hue(distorted_image, max_delta=0.2)
-            distorted_image = tf.image.random_contrast(distorted_image, lower=0.2, upper=1.8)
+            distorted_image = tf.image.random_contrast(distorted_image, lower=0.5, upper=1.5)
             return distorted_image
 
         def no_color_change():
@@ -215,6 +215,7 @@ def process_features(image, label):
 
         # Convert from [0, 255] -> [-0.5, 0.5] floats.
         image = tf.cast(image, tf.float32) * (1. / 255.0)
+        #image = tf.image.per_image_standardization(image)
 
     return image, label
 
