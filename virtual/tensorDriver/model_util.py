@@ -60,7 +60,10 @@ def put_kernels_on_grid (kernel, grid_Y, grid_X, pad = 1):
 def conv2d(x, k_h, k_w, channels_in, channels_out, stride, name="conv", viewWeights=False):
     with tf.name_scope(name):
         # Define weights
-        w = tf.Variable(tf.truncated_normal([k_h,k_w, channels_in, channels_out], stddev=0.1), name="weights")
+        # Initialize weights with Xavier Initialization
+        shape = [k_h,k_w, channels_in, channels_out]
+        initializer = tf.contrib.layers.xavier_initializer_conv2d()
+        w = tf.Variable(initializer(shape=shape), name="weights")
         b = tf.Variable(tf.constant(0.1, shape=[channels_out]), name="bias")    
         # Convolution
         #conv = tf.nn.conv2d(x, w, strides=[1, 1, 1, 1], padding='SAME')    
@@ -113,7 +116,10 @@ def max_pool(x, k_h, k_w, S, name="maxpool"):
 
 def fc_layer(x, channels_in, channels_out, name="fc"):
     with tf.name_scope(name):
-        w = tf.Variable(tf.truncated_normal([channels_in, channels_out], stddev=0.1), name="weights")
+        # Initialize weights with Xavier Initialization
+        shape = [channels_in, channels_out]
+        initializer = tf.contrib.layers.xavier_initializer()
+        w = tf.Variable(initializer(shape=shape), name="weights")
         b = tf.Variable(tf.constant(0.1, shape=[channels_out]), name="bias")    
         activation = tf.nn.relu(tf.matmul(x, w) + b)
         # Add summaries for helping debug
@@ -125,7 +131,10 @@ def fc_layer(x, channels_in, channels_out, name="fc"):
 
 def linear_layer(x, channels_in, channels_out, name="linear"):
     with tf.name_scope(name):
-        w = tf.Variable(tf.truncated_normal([channels_in, channels_out], stddev=0.1), name="weights")
+        # Initialize weights with Xavier Initialization
+        shape = [channels_in, channels_out]
+        initializer = tf.contrib.layers.xavier_initializer()
+        w = tf.Variable(initializer(shape=shape), name="weights")
         b = tf.Variable(tf.constant(0.1, shape=[channels_out]), name="bias")    
         activation = tf.matmul(x, w) + b
         # Add summaries for helping debug
