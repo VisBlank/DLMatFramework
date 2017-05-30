@@ -68,6 +68,8 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
     with tf.name_scope("MSE_Loss_L2Reg"):
         loss = tf.reduce_mean(tf.square(tf.subtract(labels, model_out))) + tf.add_n(
             [tf.nn.l2_loss(v) for v in train_vars]) * L2NormConst
+    #with tf.name_scope("Loss_Huber"):
+    #    loss = tf.reduce_mean(util.huber_loss(labels, model_out))
 
 
     # Solver configuration

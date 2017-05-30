@@ -221,10 +221,10 @@ def process_features(image, label):
 
 
 # Define the huber loss (More resilient against outliers)
-def huber_loss(self, delta=1.0):
+def huber_loss(labels, pred, delta=1.0):
     with tf.name_scope('Huber_Loss'):
         # Calculate a residual difference (error)
-        residual = tf.abs(self.labels - self.pred)
+        residual = tf.abs(labels - pred)
 
         # Check if error is bigger than a delta
         condition = tf.less(residual, delta)
