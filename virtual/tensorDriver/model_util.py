@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+
 # References:
 # https://gist.github.com/kukuruza/03731dc494603ceab0c5
 # https://github.com/tensorflow/tensorflow/issues/908
@@ -55,6 +56,7 @@ def put_kernels_on_grid (kernel, grid_Y, grid_X, pad = 1):
     # scale to [0, 255] and convert to uint8
     return tf.image.convert_image_dtype(x7, dtype = tf.uint8)
 
+
 def conv2d(x, k_h, k_w, channels_in, channels_out, stride, name="conv", viewWeights=False):
     with tf.name_scope(name):
         # Define weights
@@ -62,9 +64,10 @@ def conv2d(x, k_h, k_w, channels_in, channels_out, stride, name="conv", viewWeig
         b = tf.Variable(tf.constant(0.1, shape=[channels_out]), name="bias")    
         # Convolution
         #conv = tf.nn.conv2d(x, w, strides=[1, 1, 1, 1], padding='SAME')    
-        conv = tf.nn.conv2d(x, w, strides=[1, stride, stride, 1], padding='VALID')    
+        conv = tf.nn.conv2d(x, w, strides=[1, stride, stride, 1], padding='VALID')
         # Relu
-        activation = tf.nn.relu(conv + b)
+        activation = conv + b
+
         # Add summaries for helping debug
         tf.summary.histogram("weights", w)
         tf.summary.histogram("bias", b)
@@ -76,9 +79,42 @@ def conv2d(x, k_h, k_w, channels_in, channels_out, stride, name="conv", viewWeig
             
         return activation
 
+
+def relu(x, name="Relu"):
+    with tf.name_scope(name):
+        activation = tf.nn.relu(x)
+        # Add summaries for helping debug
+        tf.summary.histogram("activation", activation)
+    return activation
+
+
+# Batchnorm
+# https://www.tensorflow.org/api_docs/python/tf/contrib/layers/batch_norm
+# http://ruishu.io/2016/12/27/batchnorm/
+# https://stackoverflow.com/questions/40879967/how-to-use-batch-normalization-correctly-in-tensorflow
+# https://stackoverflow.com/documentation/tensorflow/7909/using-batch-normalization#t=201611300538141458755
+# When is_training is True the moving_mean and moving_variance need to be updated,
+# by default the update_ops are placed in tf.GraphKeys.UPDATE_OPS so they need to be added as a
+# dependency to the train_op
+# update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+# with tf.control_dependencies(update_ops):
+#    train_op = optimizer.minimize(loss)
+def batch_norm(x, is_training, name="batch_norm"):
+    with tf.name_scope(name):
+        activation = tf.contrib.layers.batch_norm(inputs=x,
+                                     decay=0.9999,
+                                     center=True,
+                                     scale=True,
+                                     is_training=is_training,
+                                     fused=True,
+                                     updates_collections=None)
+    return activation
+
+
 def max_pool(x, k_h, k_w, S, name="maxpool"):
     with tf.name_scope(name):
         return tf.nn.max_pool(x, ksize=[1, k_h, k_w, 1],strides=[1, S, S, 1], padding='SAME')
+
 
 def fc_layer(x, channels_in, channels_out, name="fc"):
     with tf.name_scope(name):
@@ -91,7 +127,8 @@ def fc_layer(x, channels_in, channels_out, name="fc"):
         tf.summary.histogram("activation", activation)
         return activation
 
-def output_layer(x, channels_in, channels_out, name="output"):
+
+def linear_layer(x, channels_in, channels_out, name="linear"):
     with tf.name_scope(name):
         w = tf.Variable(tf.truncated_normal([channels_in, channels_out], stddev=0.1), name="weights")
         b = tf.Variable(tf.constant(0.1, shape=[channels_out]), name="bias")    
@@ -101,6 +138,7 @@ def output_layer(x, channels_in, channels_out, name="output"):
         tf.summary.histogram("bias", b)
         tf.summary.histogram("activation", activation)
         return activation    
+
 
 def bound_layer(val_in, bound_val, name="bound_scale"):
     with tf.name_scope(name):        
@@ -135,6 +173,7 @@ def create_input_graph(list_files, num_epochs, batch_size):
 
     return images, labels
 
+
 def read_decode_tfrecord_list(file_list):
     ''''Read TFRecord content'''
     reader = tf.TFRecordReader()
@@ -162,6 +201,7 @@ def read_decode_tfrecord_list(file_list):
 
 
     return image, label
+
 
 # Reference:
 # http://stackoverflow.com/questions/37299345/using-if-conditions-inside-a-tensorflow-graph
@@ -221,10 +261,10 @@ def process_features(image, label):
 
 
 # Define the huber loss (More resilient against outliers)
-def huber_loss(labels, pred, delta=1.0):
+def huber_loss(labels, predidction, delta=1.0):
     with tf.name_scope('Huber_Loss'):
         # Calculate a residual difference (error)
-        residual = tf.abs(labels - pred)
+        residual = tf.abs(labels - predidction)
 
         # Check if error is bigger than a delta
         condition = tf.less(residual, delta)

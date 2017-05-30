@@ -62,7 +62,7 @@ def game_pilot(ip, port, model_path, gpu, crop_start=126, crop_end=226):
         os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
     # Build model and get references to placeholders
-    driving_model = model.DrivingModel()
+    driving_model = model.DrivingModel(training_mode=False)
     model_in = driving_model.input
     model_out = driving_model.output
     model_drop = driving_model.dropout_control
