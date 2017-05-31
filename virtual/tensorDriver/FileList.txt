@@ -1,5 +1,4 @@
 /media/laraujo/BigLinuxPart/Dataset_Balanced_1.tfrec
-/media/laraujo/BigLinuxPart/Dataset_Balanced_3.tfrec
 /media/laraujo/BigLinuxPart/Dataset_Balanced_5.tfrec
 /media/laraujo/BigLinuxPart/Dataset_Balanced_7.tfrec
 /media/laraujo/BigLinuxPart/Dataset_Balanced_1_Wheel.tfrec
