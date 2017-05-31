@@ -171,9 +171,9 @@ def create_input_graph(list_files, num_epochs, batch_size):
                         for _ in range(3)]
         images, labels = tf.train.shuffle_batch_join(
             example_list, batch_size=batch_size,
-            capacity=50000,
+            capacity=batch_size*10,
             # Ensures a minimum amount of shuffling of examples.
-            min_after_dequeue=5000)
+            min_after_dequeue=batch_size*5)
 
     return images, labels
 
