@@ -15,28 +15,28 @@ class DrivingModel(object):
             # CONV 1 (Mark that want visualization)
             self.__conv1 = util.conv2d(input, 5, 5, 3, 24, 2, "conv1", True)
 
-        self.__conv1_bn = util.batch_norm(self.__conv1, training_mode)
-        self.__conv1_act = util.relu(self.__conv1_bn)
+        #self.__conv1_bn = util.batch_norm(self.__conv1, training_mode)
+        self.__conv1_act = util.relu(self.__conv1)
 
         # CONV 2
         self.__conv2 = util.conv2d(self.__conv1_act, 5, 5, 24, 36, 2, "conv2")
-        self.__conv2_bn = util.batch_norm(self.__conv2, training_mode)
-        self.__conv2_act = util.relu(self.__conv2_bn)
+        #self.__conv2_bn = util.batch_norm(self.__conv2, training_mode)
+        self.__conv2_act = util.relu(self.__conv2)
 
         # CONV 3
         self.__conv3 = util.conv2d(self.__conv2_act, 5, 5, 36, 48, 2, "conv3")
-        self.__conv3_bn = util.batch_norm(self.__conv3, training_mode)
-        self.__conv3_act = util.relu(self.__conv3_bn)
+        #self.__conv3_bn = util.batch_norm(self.__conv3, training_mode)
+        self.__conv3_act = util.relu(self.__conv3)
 
         # CONV 4
         self.__conv4 = util.conv2d(self.__conv3_act, 3, 3, 48, 64, 1, "conv4")
-        self.__conv4_bn = util.batch_norm(self.__conv4, training_mode)
-        self.__conv4_act = util.relu(self.__conv4_bn)
+        #self.__conv4_bn = util.batch_norm(self.__conv4, training_mode)
+        self.__conv4_act = util.relu(self.__conv4)
 
         # CONV 5
         self.__conv5 = util.conv2d(self.__conv4_act, 3, 3, 64, 64, 1, "conv5")
-        self.__conv5_bn = util.batch_norm(self.__conv5, training_mode)
-        self.__conv5_act = util.relu(self.__conv5_bn)
+        #self.__conv5_bn = util.batch_norm(self.__conv5, training_mode)
+        self.__conv5_act = util.relu(self.__conv5)
 
         # Fully Connect 1
         # Needs calculation... (-1 means any batch size)
