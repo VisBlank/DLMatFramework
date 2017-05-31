@@ -104,8 +104,9 @@ def relu(x, name="Relu"):
 #    train_op = optimizer.minimize(loss)
 def batch_norm(x, is_training, name="batch_norm"):
     with tf.name_scope(name):
-        activation = tf.contrib.layers.batch_norm(inputs=x, decay=0.9999, center=True, scale=True,
-                                                  is_training=is_training, trainable=True, updates_collections=None)
+        activation = tf.contrib.layers.batch_norm(inputs=x, decay=0.9, center=True, scale=True,
+                                                  is_training=is_training, trainable=True,
+                                                  updates_collections=None, fused=True, scope=name)
     return activation
 
 
