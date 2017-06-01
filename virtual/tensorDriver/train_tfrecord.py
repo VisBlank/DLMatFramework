@@ -73,15 +73,23 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
     #    loss = tf.reduce_mean(util.huber_loss(labels, model_out))
 
 
+    # Get ops to update moving_mean and moving_variance from batch_norm
+    # Reference: https://www.tensorflow.org/api_docs/python/tf/contrib/layers/batch_norm
+    update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+
     # Solver configuration
     with tf.name_scope("Solver"):
+        #global_step = tf.Variable(0, name='global_step', trainable=False)
         global_step = tf.Variable(0, trainable=False)
         starter_learning_rate = start_lr
         # decay every 10000 steps with a base of 0.96
         learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step,
                                                    1000, 0.5, staircase=True)
 
-        train_step = tf.train.AdamOptimizer(learning_rate).minimize(loss, global_step=global_step)
+        # Basically update the batch_norm moving averages before the training step
+        # http://ruishu.io/2016/12/27/batchnorm/
+        with tf.control_dependencies(update_ops):
+            train_step = tf.train.AdamOptimizer(learning_rate).minimize(loss, global_step=global_step)
 
     # Initialize all random variables (Weights/Bias)
     init_op = tf.group(tf.global_variables_initializer(),tf.local_variables_initializer())
@@ -98,6 +106,11 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
         # Create saver object to save/load training checkpoint
         saver = tf.train.Saver(max_to_keep=None)
         saver.restore(sess, args.checkpoint_dir)
+
+        # If learning_rate is set reset the global variable
+        assign_globabl_step_op = tf.assign(global_step, 0)
+        sess.run(assign_globabl_step_op)
+
     else:
         # Just create saver for saving checkpoints
         saver = tf.train.Saver(max_to_keep=None)
