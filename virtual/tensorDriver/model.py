@@ -154,7 +154,7 @@ class DrivingModelAutoEncoder(object):
         self.__conv_t1_out = util.conv2d_transpose(self.__conv_t2_out_act, (5, 5), (66, 200), 24, 64, 2, name="dconv5", do_summary = False)
         self.__conv_t1_out_act = util.relu(self.__conv_t1_out, do_summary = False)
 
-        # Just adapt volume to from 28x28x16 to 28x28x1 (Output)
+        # Just adapt volume to from 66x200x64 to 66x200x3 (Output)
         self.__y_out = util.conv2d(self.__conv_t1_out_act, 1, 1, 64, 3, 1, name="conv_out", pad='SAME', do_summary = False)
         self.__y = util.sigmoid(self.__y_out, do_summary = False)
 

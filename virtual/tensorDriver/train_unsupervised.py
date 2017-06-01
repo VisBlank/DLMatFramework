@@ -56,10 +56,11 @@ def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint,
     # Loss is binary cross-entropy
     # Get all model "parameters" that are trainable
     train_vars = tf.trainable_variables()
-    # Binary cross-entropy
-    with tf.name_scope("cross_entropy"):
-        cross_entropy = -1. * model_in * tf.log(model_out) - (1. - model_in) * tf.log(1. - model_out)
-        loss = tf.reduce_mean(cross_entropy)
+    # Trying now L2 loss (maybe not good idea)
+    with tf.name_scope("L2_LOSS"):
+        #cross_entropy = -1. * model_in * tf.log(model_out) - (1. - model_in) * tf.log(1. - model_out)
+        #loss = tf.reduce_mean(cross_entropy)
+        loss = tf.nn.l2_loss(model_in-model_out)
 
 
     # Solver configuration
