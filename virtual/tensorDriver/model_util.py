@@ -57,7 +57,7 @@ def put_kernels_on_grid (kernel, grid_Y, grid_X, pad = 1):
     return tf.image.convert_image_dtype(x7, dtype = tf.uint8)
 
 
-def conv2d(x, k_h, k_w, channels_in, channels_out, stride, name="conv", viewWeights=False):
+def conv2d(x, k_h, k_w, channels_in, channels_out, stride, name="conv", viewWeights=False, pad='VALID', do_summary = True):
     with tf.name_scope(name):
         # Define weights
         # Initialize weights with Xavier Initialization
@@ -67,14 +67,16 @@ def conv2d(x, k_h, k_w, channels_in, channels_out, stride, name="conv", viewWeig
         b = tf.Variable(tf.constant(0.1, shape=[channels_out]), name="bias")    
         # Convolution
         #conv = tf.nn.conv2d(x, w, strides=[1, 1, 1, 1], padding='SAME')    
-        conv = tf.nn.conv2d(x, w, strides=[1, stride, stride, 1], padding='VALID')
-        # Relu
+        conv = tf.nn.conv2d(x, w, strides=[1, stride, stride, 1], padding=pad)
+
+        # Conv activation
         activation = conv + b
 
-        # Add summaries for helping debug
-        tf.summary.histogram("weights", w)
-        tf.summary.histogram("bias", b)
-        tf.summary.histogram("activation", activation)
+        if do_summary:
+            # Add summaries for helping debug
+            tf.summary.histogram("weights", w)
+            tf.summary.histogram("bias", b)
+            tf.summary.histogram("activation", activation)
         
         # Visualize weights if needed
         if viewWeights == True:                        
@@ -83,11 +85,46 @@ def conv2d(x, k_h, k_w, channels_in, channels_out, stride, name="conv", viewWeig
         return activation
 
 
-def relu(x, name="Relu"):
+# 2d Transposed convolution (Deconvolution)
+def conv2d_transpose(x, kernel, out_size, channels_in, channels_out, stride, name="deconv", pad='VALID', do_summary = True):
+    with tf.name_scope(name):
+        # Define weights (Notice that out/in channels are swapped on transposed conv)
+        w = tf.Variable(tf.truncated_normal([kernel[0], kernel[1], channels_out, channels_in], stddev=0.1), name="weights")
+        b = tf.Variable(tf.constant(0.1, shape=[channels_out]), name="bias")
+
+        # Image output shape
+        shape4D = [tf.shape(x)[0], out_size[0], out_size[1], channels_out]
+        # Deconvolution (Transposed convolution)
+        conv = tf.nn.conv2d_transpose(x, w, output_shape=shape4D, strides=[1, stride, stride, 1], padding=pad)
+
+        # Conv activation
+        activation = conv + b
+
+        if do_summary:
+            # Add summaries for helping debug
+            tf.summary.histogram("weights", w)
+            tf.summary.histogram("bias", b)
+            tf.summary.histogram("activation", activation)
+
+        return activation
+
+
+def sigmoid(x, name="Sigmoid", do_summary = True):
+    with tf.name_scope(name):
+        activation = tf.sigmoid(x)
+
+        if do_summary:
+            # Add summaries for helping debug
+            tf.summary.histogram("activation", activation)
+    return activation
+
+def relu(x, name="Relu", do_summary = True):
     with tf.name_scope(name):
         activation = tf.nn.relu(x)
-        # Add summaries for helping debug
-        tf.summary.histogram("activation", activation)
+
+        if do_summary:
+            # Add summaries for helping debug
+            tf.summary.histogram("activation", activation)
     return activation
 
 
@@ -120,7 +157,7 @@ def max_pool(x, k_h, k_w, S, name="maxpool"):
         return tf.nn.max_pool(x, ksize=[1, k_h, k_w, 1],strides=[1, S, S, 1], padding='SAME')
 
 
-def fc_layer(x, channels_in, channels_out, name="fc"):
+def fc_layer(x, channels_in, channels_out, name="fc", do_summary = True):
     with tf.name_scope(name):
         # Initialize weights with Xavier Initialization
         shape = [channels_in, channels_out]
@@ -128,14 +165,16 @@ def fc_layer(x, channels_in, channels_out, name="fc"):
         w = tf.Variable(initializer(shape=shape), name="weights")
         b = tf.Variable(tf.constant(0.1, shape=[channels_out]), name="bias")    
         activation = tf.nn.relu(tf.matmul(x, w) + b)
-        # Add summaries for helping debug
-        tf.summary.histogram("weights", w)
-        tf.summary.histogram("bias", b)
-        tf.summary.histogram("activation", activation)
+
+        if do_summary:
+            # Add summaries for helping debug
+            tf.summary.histogram("weights", w)
+            tf.summary.histogram("bias", b)
+            tf.summary.histogram("activation", activation)
         return activation
 
 
-def linear_layer(x, channels_in, channels_out, name="linear"):
+def linear_layer(x, channels_in, channels_out, name="linear", do_summary = True):
     with tf.name_scope(name):
         # Initialize weights with Xavier Initialization
         shape = [channels_in, channels_out]
@@ -143,10 +182,12 @@ def linear_layer(x, channels_in, channels_out, name="linear"):
         w = tf.Variable(initializer(shape=shape), name="weights")
         b = tf.Variable(tf.constant(0.1, shape=[channels_out]), name="bias")    
         activation = tf.matmul(x, w) + b
-        # Add summaries for helping debug
-        tf.summary.histogram("weights", w)
-        tf.summary.histogram("bias", b)
-        tf.summary.histogram("activation", activation)
+
+        if do_summary:
+            # Add summaries for helping debug
+            tf.summary.histogram("weights", w)
+            tf.summary.histogram("bias", b)
+            tf.summary.histogram("activation", activation)
         return activation    
 
 
