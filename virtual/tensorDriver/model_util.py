@@ -93,6 +93,8 @@ def relu(x, name="Relu"):
 
 # Batchnorm
 # https://www.tensorflow.org/api_docs/python/tf/contrib/layers/batch_norm
+# https://www.tensorflow.org/api_docs/python/tf/nn/fused_batch_norm
+# https://www.tensorflow.org/api_docs/python/tf/nn/batch_normalization
 # http://ruishu.io/2016/12/27/batchnorm/
 # https://stackoverflow.com/questions/40879967/how-to-use-batch-normalization-correctly-in-tensorflow
 # https://stackoverflow.com/documentation/tensorflow/7909/using-batch-normalization#t=201611300538141458755
@@ -104,9 +106,12 @@ def relu(x, name="Relu"):
 #    train_op = optimizer.minimize(loss)
 def batch_norm(x, is_training, name="batch_norm"):
     with tf.name_scope(name):
+        # There is a flag called fused that switch implementation between
+        # (tf.nn.fused_batch_norm and nn.batch_normalization), but on the documentation there is no difference between
+        # them.
         activation = tf.contrib.layers.batch_norm(inputs=x, decay=0.9, center=True, scale=True,
                                                   is_training=is_training, trainable=True,
-                                                  updates_collections=None, fused=True, scope=name)
+                                                  updates_collections=None) # fused=True, scope=name
     return activation
 
 
