@@ -312,6 +312,10 @@ def process_features(image, label):
 
 
 # Define the huber loss (More resilient against outliers)
+# https://en.wikipedia.org/wiki/Huber_loss
+# http://web.stanford.edu/class/cs20si/lectures/slides_03.pdf
+# https://github.com/devsisters/DQN-tensorflow/issues/16
+# https://stackoverflow.com/questions/36462962/loss-clipping-in-tensor-flow-on-deepminds-dqn/38363141
 def huber_loss(labels, predidction, delta=1.0):
     with tf.name_scope('Huber_Loss'):
         # Calculate a residual difference (error)
@@ -324,7 +328,7 @@ def huber_loss(labels, predidction, delta=1.0):
         small_res = 0.5 * tf.square(residual)
 
         # L2
-        large_res = (delta * residual) - 0.5 * tf.square(delta)
+        large_res = (delta * residual) - (0.5 * tf.square(delta))
 
         # Decide between L2 and absolute error
         return tf.where(condition, small_res, large_res)
