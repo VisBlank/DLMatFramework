@@ -95,6 +95,26 @@ class DrivingModel(object):
     def dropout_control(self):
         return self.__dropout_prob
 
+    @property
+    def conv5(self):
+        return self.__conv5_act
+
+    @property
+    def conv4(self):
+        return self.__conv4_act
+
+    @property
+    def conv3(self):
+        return self.__conv3_act
+
+    @property
+    def conv2(self):
+        return self.__conv2_act
+
+    @property
+    def conv1(self):
+        return self.__conv1_act
+
 
 # http://deeplearning.net/software/theano/tutorial/conv_arithmetic.html
 # http://www.matthewzeiler.com/pubs/cvpr2010/cvpr2010.pdf
@@ -109,6 +129,7 @@ class DrivingModelAutoEncoder(object):
 
         ##### ENCODER
         # Calculating the convolution output:
+        # https://leonardoaraujosantos.gitbooks.io/artificial-inteligence/content/convolutional_neural_networks.html
         # H_out = 1 + (H_in+(2*pad)-K)/S
         # W_out = 1 + (W_in+(2*pad)-K)/S
         # CONV1: Input 66x200x3 after CONV 5x5 P:0 S:2 H_out: 1 + (66-5)/2 = 31, W_out= 1 + (200-5)/2=98
@@ -155,8 +176,10 @@ class DrivingModelAutoEncoder(object):
         self.__conv_t1_out_act = util.relu(self.__conv_t1_out, do_summary = False)
 
         # Just adapt volume to from 66x200x64 to 66x200x3 (Output)
+        # This adaptation is actually not needed you could change the filter dimensions on conv1_transp to 64,3
         self.__y_out = util.conv2d(self.__conv_t1_out_act, 1, 1, 64, 3, 1, name="conv_out", pad='SAME', do_summary = False)
         self.__y = util.sigmoid(self.__y_out, do_summary = False)
+
 
     @property
     def output(self):
@@ -179,3 +202,24 @@ class DrivingModelAutoEncoder(object):
     @property
     def dropout_control(self):
         return self.__dropout_prob
+
+    @property
+    def conv5(self):
+        return self.__conv5_act
+
+    @property
+    def conv4(self):
+        return self.__conv4_act
+
+    @property
+    def conv3(self):
+        return self.__conv3_act
+
+    @property
+    def conv2(self):
+        return self.__conv2_act
+
+    @property
+    def conv1(self):
+        return self.__conv1_act
+
