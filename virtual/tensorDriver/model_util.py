@@ -8,6 +8,7 @@ import tensorflow as tf
 # http://stackoverflow.com/questions/35759220/how-to-visualize-learned-filters-on-tensorflow
 # http://stackoverflow.com/questions/33783672/how-can-i-visualize-the-weightsvariables-in-cnn-in-tensorflow
 # https://www.youtube.com/watch?v=5tW3y7lm7V0
+# https://github.com/oduerr/dl_tutorial/blob/master/tensorflow/debugging/embedding.ipynb
 def put_kernels_on_grid (kernel, grid_Y, grid_X, pad = 1):
 
     '''Visualize conv. features as an image (mostly for the 1st layer).
