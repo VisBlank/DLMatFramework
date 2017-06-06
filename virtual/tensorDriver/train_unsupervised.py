@@ -112,7 +112,7 @@ def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint,
     for epoch in range(epochs):
         for i in range(int(data.get_num_images() / batch_size)):
             # Get training batch
-            xs_train, ys_train = data.LoadTrainBatch(batch_size, should_augment=True)
+            xs_train, ys_train = data.LoadTrainBatch(batch_size, should_augment=False)
 
             # Send training batch to tensorflow graph (Dropout enabled)
             train_step.run(feed_dict={model_in: xs_train, model_drop: 0.8})
