@@ -4,6 +4,7 @@ import os
 import tensorflow as tf
 from driving_data import HandleData
 import model
+import model_util as util
 
 # Example: python train.py --input=DrivingData.h5 --gpu=0 --checkpoint_dir=save/model.ckpt
 parser = argparse.ArgumentParser(description='Train network')
@@ -37,7 +38,7 @@ def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint,
     start_lr = args.learning_rate
 
     # Avoid allocating the whole memory
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.6)
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.8)
     sess = tf.InteractiveSession(config=tf.ConfigProto(gpu_options=gpu_options))
 
     # Regularization value
@@ -60,8 +61,8 @@ def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint,
     with tf.name_scope("L2_LOSS"):
         #cross_entropy = -1. * model_in * tf.log(model_out) - (1. - model_in) * tf.log(1. - model_out)
         #loss = tf.reduce_mean(cross_entropy)
-        loss = tf.nn.l2_loss(model_in-model_out)
-
+        #loss = tf.nn.l2_loss(model_in-model_out)
+        loss = tf.reduce_mean(util.huber_loss(model_out, model_in))
 
     # Solver configuration
     # Get ops to update moving_mean and moving_variance from batch_norm
@@ -72,7 +73,7 @@ def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint,
         starter_learning_rate = start_lr
         # decay every 10000 steps with a base of 0.96
         learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step,
-                                                   1000, 0.9, staircase=True)
+                                                   5000, 0.9, staircase=True)
 
         # Basically update the batch_norm moving averages before the training step
         # http://ruishu.io/2016/12/27/batchnorm/
@@ -111,7 +112,7 @@ def train_network(input_train_hdf5, input_val_hdf5, gpu, pre_trained_checkpoint,
     for epoch in range(epochs):
         for i in range(int(data.get_num_images() / batch_size)):
             # Get training batch
-            xs_train, ys_train = data.LoadTrainBatch(batch_size, should_augment=True)
+            xs_train, ys_train = data.LoadTrainBatch(batch_size, should_augment=False)
 
             # Send training batch to tensorflow graph (Dropout enabled)
             train_step.run(feed_dict={model_in: xs_train, model_drop: 0.8})
