@@ -92,6 +92,12 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
             train_step = tf.train.AdamOptimizer(learning_rate).minimize(loss, global_step=global_step)
 
     # Initialize all random variables (Weights/Bias)
+    # Notice that now we also mention the local_variables, which are used on the queue coordinators
+    # And our counters, tensorflow automatically keep a different container of all global variables and local
+    # variables
+    # https://stackoverflow.com/questions/38910198/what-is-a-local-variable-in-tensorflow
+    # tf.GraphKeys.LOCAL_VARIABLES
+    # tf.GraphKeys.VARIABLES
     init_op = tf.group(tf.global_variables_initializer(),tf.local_variables_initializer())
     sess.run(init_op)
 
