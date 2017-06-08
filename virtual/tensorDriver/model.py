@@ -21,54 +21,54 @@ class DrivingModel(object):
         self.__conv1_act = util.relu(self.__conv1_bn)
 
         # CONV 2
-        self.__conv2 = util.conv2d(self.__conv1_act, 5, 5, 24, 36, 2, "conv2")
+        self.__conv2 = util.conv2d(self.__conv1_act, 5, 5, 24, 36, 2, "conv2", do_summary = False)
         self.__conv2_bn = util.batch_norm(self.__conv2, training_mode, name='bn_c2')
-        self.__conv2_act = util.relu(self.__conv2_bn)
+        self.__conv2_act = util.relu(self.__conv2_bn, do_summary = False)
 
         # CONV 3
-        self.__conv3 = util.conv2d(self.__conv2_act, 5, 5, 36, 48, 2, "conv3")
+        self.__conv3 = util.conv2d(self.__conv2_act, 5, 5, 36, 48, 2, "conv3", do_summary = False)
         self.__conv3_bn = util.batch_norm(self.__conv3, training_mode, name='bn_c3')
-        self.__conv3_act = util.relu(self.__conv3_bn)
+        self.__conv3_act = util.relu(self.__conv3_bn, do_summary = False)
 
         # CONV 4
-        self.__conv4 = util.conv2d(self.__conv3_act, 3, 3, 48, 64, 1, "conv4")
+        self.__conv4 = util.conv2d(self.__conv3_act, 3, 3, 48, 64, 1, "conv4", do_summary = False)
         self.__conv4_bn = util.batch_norm(self.__conv4, training_mode, name='bn_c4')
-        self.__conv4_act = util.relu(self.__conv4_bn)
+        self.__conv4_act = util.relu(self.__conv4_bn, do_summary = False)
 
         # CONV 5
-        self.__conv5 = util.conv2d(self.__conv4_act, 3, 3, 64, 64, 1, "conv5")
+        self.__conv5 = util.conv2d(self.__conv4_act, 3, 3, 64, 64, 1, "conv5", do_summary = False)
         self.__conv5_bn = util.batch_norm(self.__conv5, training_mode, name='bn_c5')
-        self.__conv5_act = util.relu(self.__conv5_bn)
+        self.__conv5_act = util.relu(self.__conv5_bn, do_summary = False)
 
         # Fully Connect 1
         # Needs calculation... (-1 means any batch size)
         with tf.name_scope('reshape_conv5'):
             self.__conv5_flat = tf.reshape(self.__conv5_act, [-1, 1152])
 
-        self.__fc1 = util.linear_layer(self.__conv5_flat, 1152, 1164, "fc1")
+        self.__fc1 = util.linear_layer(self.__conv5_flat, 1152, 1164, "fc1", do_summary = False)
         #self.__fc1_bn = util.batch_norm(self.__fc1, training_mode)
-        self.__fc1_act = util.relu(self.__fc1)
+        self.__fc1_act = util.relu(self.__fc1, do_summary = False)
         # Add dropout to the fully connected layer
         self.__fc1_drop = tf.nn.dropout(self.__fc1_act, self.__dropout_prob)
 
         # Fully Connect 2
-        self.__fc2 = util.linear_layer(self.__fc1_drop, 1164, 100, "fc2")
+        self.__fc2 = util.linear_layer(self.__fc1_drop, 1164, 100, "fc2", do_summary = False)
         #self.__fc2_bn = util.batch_norm(self.__fc2, training_mode)
-        self.__fc2_act = util.relu(self.__fc2)
+        self.__fc2_act = util.relu(self.__fc2, do_summary = False)
         # Add dropout to the fully connected layer
         self.__fc2_drop = tf.nn.dropout(self.__fc2_act, self.__dropout_prob)
 
         # Fully Connect 3
-        self.__fc3 = util.linear_layer(self.__fc2_drop, 100, 50, "fc3")
+        self.__fc3 = util.linear_layer(self.__fc2_drop, 100, 50, "fc3", do_summary = False)
         #self.__fc3_bn = util.batch_norm(self.__fc3, training_mode)
-        self.__fc3_act = util.relu(self.__fc3)
+        self.__fc3_act = util.relu(self.__fc3, do_summary = False)
         # Add dropout to the fully connected layer
         self.__fc3_drop = tf.nn.dropout(self.__fc3_act, self.__dropout_prob)
 
         # Fully Connect 4
-        self.__fc4 = util.linear_layer(self.__fc3_drop, 50, 10, "fc4")
+        self.__fc4 = util.linear_layer(self.__fc3_drop, 50, 10, "fc4", do_summary = False)
         #self.__fc4_bn = util.batch_norm(self.__fc4, training_mode)
-        self.__fc4_act = util.relu(self.__fc4)
+        self.__fc4_act = util.relu(self.__fc4, do_summary = False)
         # Add dropout to the fully connected layer
         self.__fc4_drop = tf.nn.dropout(self.__fc4_act, self.__dropout_prob)
 
