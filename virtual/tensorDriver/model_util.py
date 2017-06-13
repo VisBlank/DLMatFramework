@@ -66,8 +66,8 @@ def conv2d(x, k_h, k_w, channels_in, channels_out, stride, name="conv", viewWeig
         initializer = tf.contrib.layers.xavier_initializer_conv2d()
         w = tf.Variable(initializer(shape=shape), name="weights")
         b = tf.Variable(tf.constant(0.1, shape=[channels_out]), name="bias")    
+
         # Convolution
-        #conv = tf.nn.conv2d(x, w, strides=[1, 1, 1, 1], padding='SAME')    
         conv = tf.nn.conv2d(x, w, strides=[1, stride, stride, 1], padding=pad)
 
         # Conv activation
@@ -202,7 +202,7 @@ def bound_layer(val_in, bound_val, name="bound_scale"):
         return activation
 
 
-def create_input_graph(list_files, num_epochs, batch_size):
+def create_input_graph(list_files, num_epochs, batch_size, do_augment = False):
     with tf.name_scope('input_handler'):
         filename_queue = tf.train.string_input_producer(list_files, num_epochs=num_epochs)
 
@@ -215,7 +215,7 @@ def create_input_graph(list_files, num_epochs, batch_size):
         #    capacity=50000,
         #    # Ensures a minimum amount of shuffling of examples.
         #    min_after_dequeue=10000)
-        example_list = [read_decode_tfrecord_list(filename_queue)
+        example_list = [read_decode_tfrecord_list(filename_queue, do_augment)
                         for _ in range(3)]
         images, labels = tf.train.shuffle_batch_join(
             example_list, batch_size=batch_size,
@@ -226,7 +226,7 @@ def create_input_graph(list_files, num_epochs, batch_size):
     return images, labels
 
 
-def read_decode_tfrecord_list(file_list):
+def read_decode_tfrecord_list(file_list, do_augment = False):
     ''''Read TFRecord content'''
     reader = tf.TFRecordReader()
     _, serialized_example = reader.read(file_list)
@@ -249,7 +249,7 @@ def read_decode_tfrecord_list(file_list):
     image.set_shape([256* 256* 3])
     image = tf.reshape(image, [256, 256, 3])
 
-    image, label = process_features(image, label)
+    image, label = process_features(image, label, do_augment)
 
 
     return image, label
@@ -261,7 +261,7 @@ def read_decode_tfrecord_list(file_list):
 # http://stackoverflow.com/questions/42147427/tensorflow-how-to-randomly-crop-input-images-and-labels-in-the-same-way
 # https://indico.io/blog/tensorflow-data-input-part2-extensions/
 # http://stackoverflow.com/questions/36088277/how-to-select-rows-from-a-3-d-tensor-in-tensorflow
-def process_features(image, label):
+def process_features(image, label, do_augment = False):
     # Do any image preprocessing/augmentation here...
     with tf.name_scope('process_features'):
 
@@ -271,39 +271,39 @@ def process_features(image, label):
         # Resize image
         image = tf.image.resize_images(image, [66, 200])
 
-        # Change or not change colors
-        def do_color_changes():
-            distorted_image = tf.image.random_brightness(image, max_delta=32. / 255.)
-            distorted_image = tf.image.random_saturation(distorted_image, lower=0.5, upper=1.5)
-            distorted_image = tf.image.random_hue(distorted_image, max_delta=0.2)
-            distorted_image = tf.image.random_contrast(distorted_image, lower=0.5, upper=1.5)
-            return distorted_image
+        if do_augment == True:
+            # Change or not change colors
+            def do_color_changes():
+                distorted_image = tf.image.random_brightness(image, max_delta=32. / 255.)
+                distorted_image = tf.image.random_saturation(distorted_image, lower=0.5, upper=1.5)
+                distorted_image = tf.image.random_hue(distorted_image, max_delta=0.2)
+                distorted_image = tf.image.random_contrast(distorted_image, lower=0.5, upper=1.5)
+                return distorted_image
 
-        def no_color_change():
-            distorted_image = image
-            return distorted_image
-        # Uniform variable in [0,1)
-        flip_coin_color = tf.random_uniform(shape=[], minval=0., maxval=1., dtype=tf.float32)
-        pred_color = tf.less(flip_coin_color, 0.5)
-        # Randomically select doing color augmentation
-        image = tf.cond(pred_color, do_color_changes, no_color_change, name='if_color')
+            def no_color_change():
+                distorted_image = image
+                return distorted_image
+            # Uniform variable in [0,1)
+            flip_coin_color = tf.random_uniform(shape=[], minval=0., maxval=1., dtype=tf.float32)
+            pred_color = tf.less(flip_coin_color, 0.5)
+            # Randomically select doing color augmentation
+            image = tf.cond(pred_color, do_color_changes, no_color_change, name='if_color')
 
-        # Change or not change colors
-        def flip_image_steering():
-            distorted_image = tf.image.flip_left_right(image)
-            distorted_label = -label
-            return distorted_image, distorted_label
+            # Change or not change colors
+            def flip_image_steering():
+                distorted_image = tf.image.flip_left_right(image)
+                distorted_label = -label
+                return distorted_image, distorted_label
 
-        def no_flip_image_steering():
-            distorted_image = image
-            distorted_label = label
-            return distorted_image, distorted_label
-        # Uniform variable in [0,1)
-        flip_coin_flip = tf.random_uniform(shape=[], minval=0., maxval=1., dtype=tf.float32)
-        pred_flip = tf.less(flip_coin_flip, 0.5)
-        # Randomically select doing color augmentation
-        image, label = tf.cond(pred_flip, flip_image_steering, no_flip_image_steering, name='if_steering')
-
+            def no_flip_image_steering():
+                distorted_image = image
+                distorted_label = label
+                return distorted_image, distorted_label
+            # Uniform variable in [0,1)
+            flip_coin_flip = tf.random_uniform(shape=[], minval=0., maxval=1., dtype=tf.float32)
+            pred_flip = tf.less(flip_coin_flip, 0.5)
+            # Randomically select doing color augmentation
+            image, label = tf.cond(pred_flip, flip_image_steering, no_flip_image_steering, name='if_steering')
 
         # Convert from [0, 255] -> [-0.5, 0.5] floats.
         image = tf.cast(image, tf.float32) * (1. / 255.0)

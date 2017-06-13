@@ -46,28 +46,24 @@ class DrivingModel(object):
             self.__conv5_flat = tf.reshape(self.__conv5_act, [-1, 1152])
 
         self.__fc1 = util.linear_layer(self.__conv5_flat, 1152, 1164, "fc1", do_summary = False)
-        #self.__fc1_bn = util.batch_norm(self.__fc1, training_mode)
         self.__fc1_act = util.relu(self.__fc1, do_summary = False)
         # Add dropout to the fully connected layer
         self.__fc1_drop = tf.nn.dropout(self.__fc1_act, self.__dropout_prob)
 
         # Fully Connect 2
         self.__fc2 = util.linear_layer(self.__fc1_drop, 1164, 100, "fc2", do_summary = False)
-        #self.__fc2_bn = util.batch_norm(self.__fc2, training_mode)
         self.__fc2_act = util.relu(self.__fc2, do_summary = False)
         # Add dropout to the fully connected layer
         self.__fc2_drop = tf.nn.dropout(self.__fc2_act, self.__dropout_prob)
 
         # Fully Connect 3
         self.__fc3 = util.linear_layer(self.__fc2_drop, 100, 50, "fc3", do_summary = False)
-        #self.__fc3_bn = util.batch_norm(self.__fc3, training_mode)
         self.__fc3_act = util.relu(self.__fc3, do_summary = False)
         # Add dropout to the fully connected layer
         self.__fc3_drop = tf.nn.dropout(self.__fc3_act, self.__dropout_prob)
 
         # Fully Connect 4
         self.__fc4 = util.linear_layer(self.__fc3_drop, 50, 10, "fc4", do_summary = False)
-        #self.__fc4_bn = util.batch_norm(self.__fc4, training_mode)
         self.__fc4_act = util.relu(self.__fc4, do_summary = False)
         # Add dropout to the fully connected layer
         self.__fc4_drop = tf.nn.dropout(self.__fc4_act, self.__dropout_prob)

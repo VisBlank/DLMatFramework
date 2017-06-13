@@ -16,10 +16,11 @@ parser.add_argument('--logdir', type=str, required=False, default='./logs', help
 parser.add_argument('--savedir', type=str, required=False, default='./save', help='Tensorboard checkpoint directory')
 parser.add_argument('--epochs', type=int, required=False, default=600, help='Number of epochs')
 parser.add_argument('--batch', type=int, required=False, default=400, help='Batch size')
+parser.add_argument('--gpu_frac', type=float, required=False, default=0.8, help='Gpu memory fraction')
 parser.add_argument('--learning_rate', type=float, required=False, default=0.0001, help='Initial learning rate')
 args = parser.parse_args()
 
-def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epochs, batch_size, logs_path, save_dir):
+def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epochs, batch_size, logs_path, save_dir, gpu_frac):
 
     # Create log directory if it does not exist
     if not os.path.exists(logs_path):
@@ -36,7 +37,7 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
     list_tfrecord_files = HandleData.get_list_from_file(input_list)
 
     # Create the graph input part (Responsible to load files, do augmentations, etc...)
-    images, labels = util.create_input_graph(list_tfrecord_files, epochs, batch_size)
+    images, labels = util.create_input_graph(list_tfrecord_files, epochs, batch_size, do_augment = False)
 
     # Build Graph
     driving_model = model.DrivingModelAutoEncoder(input=images, use_placeholder = False)
@@ -51,13 +52,14 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
     start_lr = args.learning_rate
 
     # Avoid allocating the whole memory
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.8)
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=gpu_frac)
     sess = tf.InteractiveSession(config=tf.ConfigProto(gpu_options=gpu_options))
 
     # Get all model "parameters" that are trainable
     train_vars = tf.trainable_variables()
-    with tf.name_scope("Loss_Huber"):
-        loss = tf.reduce_mean(util.huber_loss(images, model_out))
+    with tf.name_scope("Loss"):
+        #loss = tf.reduce_mean(util.huber_loss(images, model_out))
+        loss = tf.nn.l2_loss(images - model_out)
     # Trying now L2 loss (maybe not good idea)
     #with tf.name_scope("L2_LOSS"):
         # cross_entropy = -1. * model_in * tf.log(model_out) - (1. - model_in) * tf.log(1. - model_out)
@@ -170,4 +172,4 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
 if __name__ == "__main__":
     # Call function that implement the auto-pilot
     train_network(args.input_list, args.input_val, args.gpu,
-                  args.checkpoint_dir, args.epochs, args.batch, args.logdir, args.savedir)
+                  args.checkpoint_dir, args.epochs, args.batch, args.logdir, args.savedir, args.gpu_frac)
