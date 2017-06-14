@@ -58,13 +58,9 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
     # Get all model "parameters" that are trainable
     train_vars = tf.trainable_variables()
     with tf.name_scope("Loss"):
-        #loss = tf.reduce_mean(util.huber_loss(images, model_out))
-        loss = tf.nn.l2_loss(images - model_out)
-    # Trying now L2 loss (maybe not good idea)
-    #with tf.name_scope("L2_LOSS"):
-        # cross_entropy = -1. * model_in * tf.log(model_out) - (1. - model_in) * tf.log(1. - model_out)
-        # loss = tf.reduce_mean(cross_entropy)
-    #    loss = tf.nn.l2_loss(images - model_out)
+        #cross_entropy = -1. * model_in * tf.log(model_out) - (1. - model_in) * tf.log(1. - model_out)
+        loss = tf.reduce_mean(util.huber_loss(images, model_out))
+        #loss = tf.nn.l2_loss(images - model_out)
 
 
     # Get ops to update moving_mean and moving_variance from batch_norm
@@ -145,7 +141,7 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
                 summary_writer.add_summary(summary, batch_size + step)
 
             # Save model
-            if step % 400 == 0:
+            if step % 4000 == 0:
                 # Save checkpoint after each epoch
                 if not os.path.exists(save_dir):
                     os.makedirs(save_dir)

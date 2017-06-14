@@ -12,10 +12,10 @@ class DrivingModel(object):
 
         if use_placeholder:
             # CONV 1 (Mark that want visualization)
-            self.__conv1 = util.conv2d(self.__x, 5, 5, 3, 24, 2, "conv1", True)
+            self.__conv1 = util.conv2d(self.__x, 5, 5, 3, 24, 2, "conv1", viewWeights=True)
         else:
             # CONV 1 (Mark that want visualization)
-            self.__conv1 = util.conv2d(input, 5, 5, 3, 24, 2, "conv1", True)
+            self.__conv1 = util.conv2d(input, 5, 5, 3, 24, 2, "conv1", viewWeights=True)
 
         self.__conv1_bn = util.batch_norm(self.__conv1, training_mode, name='bn_c1')
         self.__conv1_act = util.relu(self.__conv1_bn)
@@ -133,10 +133,10 @@ class DrivingModelAutoEncoder(object):
         # CONV1: Input 66x200x3 after CONV 5x5 P:0 S:2 H_out: 1 + (66-5)/2 = 31, W_out= 1 + (200-5)/2=98
         if use_placeholder:
             # CONV 1 (Mark that want visualization)
-            self.__conv1 = util.conv2d(self.__x, 5, 5, 3, 24, 2, "conv1", True, do_summary = False)
+            self.__conv1 = util.conv2d(self.__x, 5, 5, 3, 24, 2, "conv1", viewWeights=True, do_summary = False)
         else:
             # CONV 1 (Mark that want visualization)
-            self.__conv1 = util.conv2d(input, 5, 5, 3, 24, 2, "conv1", True, do_summary = False)
+            self.__conv1 = util.conv2d(input, 5, 5, 3, 24, 2, "conv1", viewWeights=True, do_summary = False)
 
         self.__conv1_bn = util.batch_norm(self.__conv1, training_mode, name='bn_c1')
         self.__conv1_act = util.relu(self.__conv1_bn, do_summary = False)

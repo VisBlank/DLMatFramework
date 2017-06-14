@@ -1,8 +1,12 @@
+/media/laraujo/BigLinuxPart/Dataset_Joy_Cam_Balanced_7.tfrec
 /media/laraujo/BigLinuxPart/Dataset_Wheel_Cam_Balanced_1.tfrec
 /media/laraujo/BigLinuxPart/Dataset_Wheel_Cam_Balanced_2.tfrec
 /media/laraujo/BigLinuxPart/Dataset_Wheel_Cam_Balanced_3.tfrec
+/media/laraujo/BigLinuxPart/Dataset_Joy_Cam_Balanced_6.tfrec
 /media/laraujo/BigLinuxPart/Dataset_Wheel_Cam_Balanced_4.tfrec
 /media/laraujo/BigLinuxPart/Dataset_Wheel_Cam_Balanced_5.tfrec
 /media/laraujo/BigLinuxPart/Dataset_Wheel_Cam_Balanced_6.tfrec
+/media/laraujo/BigLinuxPart/Dataset_Joy_Cam_Balanced_5.tfrec
 /media/laraujo/BigLinuxPart/Dataset_Wheel_Cam_Balanced_7.tfrec
 /media/laraujo/BigLinuxPart/Dataset_Wheel_Cam_Balanced_8.tfrec
+/media/laraujo/BigLinuxPart/Dataset_Joy_Cam_Balanced_1.tfrec
