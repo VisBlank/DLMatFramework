@@ -37,7 +37,7 @@ def train_network(input_list, input_val_hdf5, gpu, pre_trained_checkpoint, epoch
     list_tfrecord_files = HandleData.get_list_from_file(input_list)
 
     # Create the graph input part (Responsible to load files, do augmentations, etc...)
-    images, labels = util.create_input_graph(list_tfrecord_files, epochs, batch_size)
+    images, labels = util.create_input_graph(list_tfrecord_files, epochs, batch_size, do_augment=True)
 
     # Build Graph
     driving_model = model.DrivingModel(input=images, use_placeholder = False)
