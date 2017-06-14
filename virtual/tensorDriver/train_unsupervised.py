@@ -6,7 +6,7 @@ from driving_data import HandleData
 import model
 import model_util as util
 
-# Example: python train.py --input=DrivingData.h5 --gpu=0 --checkpoint_dir=save/model.ckpt
+# Example: python train_unsupervised_tfrecord.py --batch=100 --learning_rate=0.001
 parser = argparse.ArgumentParser(description='Train network')
 parser.add_argument('--input', type=str, required=False, default='DrivingData.h5', help='Training hdf5/lmdb file')
 parser.add_argument('--input_val', type=str, required=False, default='', help='Validation hdf5 file')
